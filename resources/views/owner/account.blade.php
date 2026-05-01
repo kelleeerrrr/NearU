@@ -1,0 +1,244 @@
+@extends('layouts.owner')
+
+@section('title', 'Owner Account — NearU')
+
+@push('styles')
+<style>
+
+/* DARK MODE SUPPORT */
+body.dark {
+  --card: #1e1e1e;
+  --bg: #121212;
+  --border: #2a2a2a;
+  --t2: #aaa;
+}
+
+/* HEADER ACTIONS */
+.top-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:1rem;
+}
+
+.icon-btn{
+  padding:.5rem .8rem;
+  border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--card);
+  cursor:pointer;
+  font-weight:700;
+  font-size:.8rem;
+}
+
+.logout-btn{
+  background:#c0392b;
+  color:#fff;
+  border:none;
+}
+
+/* PAGE */
+.page{padding:1rem 1.2rem;}
+
+/* PROFILE */
+.profile-card{
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;
+  padding:1rem;
+  box-shadow:var(--sh);
+  display:flex;
+  gap:1rem;
+  align-items:center;
+}
+
+.avatar{
+  width:70px;height:70px;border-radius:50%;
+  background:linear-gradient(135deg,#2D7D4F,#1f5c38);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.6rem;font-weight:800;
+}
+
+.badge{
+  display:inline-block;
+  margin-top:.3rem;
+  padding:.25rem .6rem;
+  border-radius:20px;
+  font-size:.7rem;
+  font-weight:800;
+  background:var(--green-lt);
+  color:var(--green);
+}
+
+/* WARN */
+.warn-box{
+  margin-top:1rem;
+  padding:1rem;
+  border-radius:14px;
+  background:#FFF4CC;
+  border:1px solid var(--gold);
+  font-weight:700;
+  color:#5a4300;
+}
+
+/* SECTION */
+.section{
+  margin-top:1rem;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;
+  padding:1rem;
+  box-shadow:var(--sh);
+}
+
+.section-title{
+  font-weight:800;
+  margin-bottom:.7rem;
+  font-size:.9rem;
+}
+
+/* SECURITY */
+.security{
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+}
+
+.input{
+  padding:.7rem;
+  border-radius:12px;
+  border:1.5px solid var(--border);
+  font-size:.85rem;
+  background:transparent;
+  color:inherit;
+}
+
+.save-btn{
+  background:var(--blue);
+  color:#fff;
+  padding:.7rem;
+  border:none;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+</style>
+@endpush
+
+@section('content')
+
+@php
+  $status = auth()->user()->verification_status ?? 'not_verified';
+@endphp
+
+<div class="page">
+
+  {{-- TOP ACTIONS --}}
+  <div class="top-actions">
+
+    {{-- DARK MODE --}}
+    <button class="icon-btn" onclick="toggleDarkMode()">
+      🌙 Dark Mode
+    </button>
+
+    {{-- LOGOUT --}}
+    <form method="POST" action="{{ route('logout') }}">
+      @csrf
+      <button type="submit" class="icon-btn logout-btn">
+        🚪 Logout
+      </button>
+    </form>
+
+  </div>
+
+  {{-- PROFILE --}}
+  <div class="profile-card">
+    <div class="avatar">
+      {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+    </div>
+
+    <div>
+      <h2>{{ auth()->user()->name }}</h2>
+      <p>{{ auth()->user()->email }}</p>
+      <p>{{ auth()->user()->phone ?? 'No phone number' }}</p>
+
+      <span class="badge">🏠 Owner Account</span>
+    </div>
+  </div>
+
+  {{-- WARNING --}}
+  @if($status !== 'verified')
+    <div class="warn-box">
+      ⚠️ Your account is not fully verified yet.  
+      Listing features are locked until verification is complete.
+    </div>
+  @endif
+
+  {{-- STATUS --}}
+  <div class="section">
+    <div class="section-title">🔐 Account Verification</div>
+
+    <div style="padding:.8rem;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);">
+
+      <div style="font-weight:800;">
+        @if($status === 'verified')
+          ✅ Verified Owner
+        @elseif($status === 'under_review')
+          ⏳ Under Review
+        @elseif($status === 'rejected')
+          ❌ Rejected
+        @else
+          ⛔ Not Verified
+        @endif
+      </div>
+
+      <small style="font-size:.75rem;color:var(--t2);">
+        @if($status === 'verified')
+          Your account is fully active.
+        @elseif($status === 'under_review')
+          Your documents are being reviewed.
+        @elseif($status === 'rejected')
+          Your application was rejected.
+        @else
+          Complete verification to unlock all features.
+        @endif
+      </small>
+
+    </div>
+  </div>
+
+  {{-- SECURITY --}}
+  <div class="section">
+    <div class="section-title">🔒 Security</div>
+
+    <div class="security">
+      <input type="password" class="input" placeholder="New Password">
+      <input type="password" class="input" placeholder="Confirm Password">
+      <button class="save-btn">Update Password</button>
+    </div>
+  </div>
+
+</div>
+
+@endsection
+
+{{-- DARK MODE SCRIPT --}}
+<script>
+function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+
+    if(document.body.classList.contains('dark')) {
+        localStorage.setItem('theme', 'dark');
+    } else {
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// load saved theme
+window.onload = function () {
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+    }
+};
+</script>

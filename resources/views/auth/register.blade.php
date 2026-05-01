@@ -1,0 +1,92 @@
+@extends('layouts.app')
+
+@section('title', 'Register - NearU')
+
+@section('content')
+<!-- SIGNUP PAGE -->
+<div id="signupPage" class="screen active">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <h1>Near<em>U</em></h1>
+        <p>Create your account</p>
+      </div>
+
+      @if($errors->any())
+      <div style="background:#FEE2E2;border:1px solid #FECACA;border-radius:8px;padding:12px;margin-bottom:1rem;color:#991B1B;">
+        <ul style="margin:0;padding:0;list-style:none;">
+          @foreach($errors->all() as $error)
+          <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+      @endif
+
+      <form method="POST" action="{{ route('register.post') }}">
+        @csrf
+        <div class="ig">
+          <label>I am a...</label>
+          <div style="display:flex;gap:.8rem;">
+            <div class="utype {{ old('user_type') === 'student' ? 'sel' : '' }}" onclick="selectUserType('student')" id="sOpt">
+              <div style="font-size:1.7rem;margin-bottom:.3rem;">🎓</div>
+              <div style="font-weight:800;font-size:.87rem;">Student</div>
+              <div style="font-size:.74rem;color:#6B7280;">Looking for dorm</div>
+            </div>
+            <div class="utype {{ old('user_type') === 'owner' ? 'sel' : '' }}" onclick="selectUserType('owner')" id="oOpt">
+              <div style="font-size:1.7rem;margin-bottom:.3rem;">🏠</div>
+              <div style="font-weight:800;font-size:.87rem;">Owner</div>
+              <div style="font-size:.74rem;color:#6B7280;">Listing property</div>
+            </div>
+          </div>
+          <input type="hidden" name="user_type" id="userTypeInput" value="{{ old('user_type', 'student') }}" required>
+        </div>
+
+        <div class="ig">
+          <label>Full Name</label>
+          <input type="text" name="name" value="{{ old('name') }}" placeholder="Juan Dela Cruz" required>
+        </div>
+        <div class="ig">
+          <label>Email</label>
+          <input type="email" name="email" value="{{ old('email') }}" placeholder="your@email.com" required>
+        </div>
+        <div class="ig">
+          <label>Phone</label>
+          <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="09XX XXX XXXX">
+        </div>
+        <div class="ig">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="••••••••" required>
+        </div>
+        <div class="ig">
+          <label>Confirm Password</label>
+          <input type="password" name="password_confirmation" placeholder="••••••••" required>
+        </div>
+
+        <button class="auth-btn" type="submit">Create Account →</button>
+      </form>
+
+      <div class="auth-link">Have an account? <a href="{{ route('login') }}">Login</a></div>
+    </div>
+  </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+function selectUserType(type) {
+  document.getElementById('sOpt').classList.remove('sel');
+  document.getElementById('oOpt').classList.remove('sel');
+
+  if (type === 'student') {
+    document.getElementById('sOpt').classList.add('sel');
+  } else {
+    document.getElementById('oOpt').classList.add('sel');
+  }
+
+  document.getElementById('userTypeInput').value = type;
+}
+
+// Initialize selection
+selectUserType(document.getElementById('userTypeInput').value);
+</script>
+@endpush
