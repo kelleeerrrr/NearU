@@ -13,6 +13,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DormController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\OwnerDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,19 +99,9 @@ Route::post('/logout', function (Request $request) {
 
 Route::middleware('auth')->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | STUDENT HOME
-    |--------------------------------------------------------------------------
-    */
     Route::get('/student/home', [DormController::class, 'indexStudent'])
         ->name('student.home');
 
-    /*
-    |--------------------------------------------------------------------------
-    | SAVED LISTINGS (FIXED VIEW NAME)
-    |--------------------------------------------------------------------------
-    */
     Route::get('/saved', function () {
 
         $savedListings = \App\Models\SavedListing::with('listing')
@@ -124,12 +115,12 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | VISITS (FIXED VIEW NAME)
+    | VISITS (STUDENT)
     |--------------------------------------------------------------------------
     */
     Route::get('/visits', function () {
 
-        $visits = \App\Models\VisitSchedule::with('listing')
+        $visits = \App\Models\VisitSchedule::with('dormListing')
             ->where('user_id', auth()->id())
             ->latest()
             ->get();
@@ -140,80 +131,13 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | PROFILE PHOTO UPDATE
+    | PROFILE
     |--------------------------------------------------------------------------
     */
-    Route::post('/profile/photo', function (Request $request) {
+    Route::get('/profile', fn () => view('student.profile', ['user' => auth()->user()]))
+        ->name('profile');
 
-        $request->validate([
-            'photo' => 'required|image|max:2048',
-        ]);
-
-        $user = auth()->user();
-
-        $path = $request->file('photo')->store('profiles', 'public');
-
-        $user->update([
-            'profile_photo_path' => $path
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'path' => asset('storage/' . $path)
-        ]);
-
-    })->name('profile.photo.update');
-
-    /*
-    |--------------------------------------------------------------------------
-    | CHECKLIST
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/checklist', function () {
-        return view('student.checklist');
-    })->name('checklist');
-
-    /*
-    |--------------------------------------------------------------------------
-    | MAP
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/map', [DormController::class, 'map'])
-        ->name('dorms.map');
-
-    /*
-    |--------------------------------------------------------------------------
-    | NOTIFICATIONS
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/notifications', function () {
-        return view('notifications.index', [
-            'notifications' => Notification::where('user_id', auth()->id())
-                ->latest()->get()
-        ]);
-    })->name('notifications.index');
-
-    /*
-    |--------------------------------------------------------------------------
-    | PROFILE (FIXED)
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/profile', function () {
-
-        $user = auth()->user();
-
-        return view('student.profile', compact('user'));
-
-    })->name('profile');
-
-    /*
-    |--------------------------------------------------------------------------
-    | PROFILE UPDATE
-    |--------------------------------------------------------------------------
-    */
     Route::put('/profile', function (Request $request) {
-
-        $user = auth()->user();
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -221,7 +145,7 @@ Route::middleware('auth')->group(function () {
             'phone' => 'nullable|string|max:20',
         ]);
 
-        $user->update($data);
+        auth()->user()->update($data);
 
         return back()->with('success', 'Profile updated successfully.');
 
@@ -232,14 +156,8 @@ Route::middleware('auth')->group(function () {
     | OWNER DASHBOARD
     |--------------------------------------------------------------------------
     */
-    Route::get('/owner/dashboard', function () {
-
-        if (auth()->user()->user_type !== 'owner') {
-            abort(403);
-        }
-
-        return view('owner.dashboard');
-    })->name('owner.dashboard');
+    Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])
+        ->name('owner.dashboard');
 
     /*
     |--------------------------------------------------------------------------
@@ -264,9 +182,8 @@ Route::middleware('auth')->group(function () {
     | OWNER VERIFICATION
     |--------------------------------------------------------------------------
     */
-    Route::get('/owner/verification', function () {
-        return view('owner.verification.form');
-    })->name('owner.verification.form');
+    Route::get('/owner/verification', fn () => view('owner.verification.form'))
+        ->name('owner.verification.form');
 
     Route::post('/owner/verification/upload', [VerificationController::class, 'upload'])
         ->name('owner.verification.upload');
@@ -316,20 +233,14 @@ Route::middleware('auth')->group(function () {
 
         })->name('store');
     });
+
     /*
-|--------------------------------------------------------------------------
-| OWNER ACCOUNT
-|--------------------------------------------------------------------------
-*/
-    Route::get('/owner/account', function () {
-
-        if (auth()->user()->user_type !== 'owner') {
-            abort(403);
-        }
-
-        return view('owner.account');
-
-    })->name('owner.account');
+    |--------------------------------------------------------------------------
+    | OWNER ACCOUNT
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/owner/account', fn () => view('owner.account'))
+        ->name('owner.account');
 
     /*
     |--------------------------------------------------------------------------
@@ -338,84 +249,86 @@ Route::middleware('auth')->group(function () {
     */
     Route::get('/messages', [MessageController::class, 'index'])
         ->name('messages.index');
+
+    /*
+    |--------------------------------------------------------------------------
+    | ✅ OWNER VISITS (NEW)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/owner/visits', function () {
+
+        $visits = \App\Models\VisitSchedule::with(['user', 'dormListing'])
+            ->whereHas('dormListing', function ($q) {
+                $q->where('owner_id', auth()->id());
+            })
+            ->latest()
+            ->get();
+
+        return view('owner.visits.index', compact('visits'));
+
+    })->name('owner.visits.index');
+
+    /*
+    |--------------------------------------------------------------------------
+    | ✅ OWNER STATISTICS (NEW)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/owner/statistics', function () {
+
+        $ownerId = auth()->id();
+
+        // LISTINGS
+        $listings = \App\Models\DormListing::where('owner_id', $ownerId)->get();
+
+        $totalListings = $listings->count();
+        $activeListings = $listings->where('status', 'Available')->count();
+        $takenListings = $listings->where('status', '!=', 'Available')->count();
+
+        // VISITS
+        $visits = \App\Models\VisitSchedule::whereHas('dormListing', function ($q) use ($ownerId) {
+            $q->where('owner_id', $ownerId);
+        })->get();
+
+        // MESSAGES
+        $messages = \App\Models\Message::where('receiver_id', $ownerId)->get();
+
+        $totalMessages = $messages->count();
+        $unreadMessages = $messages->where('is_read', 0)->count();
+
+        return view('owner.statistics.index', compact(
+            'listings',
+            'visits',
+            'messages',
+            'totalMessages',
+            'unreadMessages',
+            'totalListings',
+            'activeListings',
+            'takenListings'
+        ));
+
+    })->name('owner.statistics.index');
 });
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN ROUTES
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/admin/owner-verifications', function () {
 
-    if (auth()->user()->user_type !== 'admin') {
-        abort(403);
-    }
+    abort_unless(auth()->user()->user_type === 'admin', 403);
 
-    $owners = \App\Models\User::where('user_type', 'owner')
-        ->latest()
-        ->get();
+    $owners = \App\Models\User::where('user_type', 'owner')->latest()->get();
 
     return view('admin.owner-verifications.index', compact('owners'));
 
 })->name('admin.owner-verifications.index');
 
-
-Route::get('/admin/owner-verifications/{id}', function ($id) {
-
-    if (auth()->user()->user_type !== 'admin') {
-        abort(403);
-    }
-
-    $owner = \App\Models\User::findOrFail($id);
-
-    return view('admin.owner-verifications.review', compact('owner'));
-
-})->name('admin.owner-verifications.review');
-
-
 /*
 |--------------------------------------------------------------------------
-| APPROVE OWNER
+| DEBUG
 |--------------------------------------------------------------------------
 */
-Route::post('/admin/owner-verifications/{id}/approve', function ($id) {
 
-    if (auth()->user()->user_type !== 'admin') {
-        abort(403);
-    }
-
-    $owner = \App\Models\User::findOrFail($id);
-
-    $owner->update([
-        'verification_status' => 'approved'
-    ]);
-
-    return back()->with('success', 'Owner approved.');
-
-})->name('admin.owner-verifications.approve');
-
-
-/*
-|--------------------------------------------------------------------------
-| REJECT OWNER
-|--------------------------------------------------------------------------
-*/
-Route::post('/admin/owner-verifications/{id}/reject', function ($id) {
-
-    if (auth()->user()->user_type !== 'admin') {
-        abort(403);
-    }
-
-    $owner = \App\Models\User::findOrFail($id);
-
-    $owner->update([
-        'verification_status' => 'rejected'
-    ]);
-
-    return back()->with('success', 'Owner rejected.');
-
-})->name('admin.owner-verifications.reject');
-
-
-/*
-|--------------------------------------------------------------------------
-| DEBUG USER
-|--------------------------------------------------------------------------
-*/
-Route::get('/debug-user', function () {
-    return auth()->user()->user_type;
-});
+Route::get('/debug-user', fn () => auth()->user()->user_type);
