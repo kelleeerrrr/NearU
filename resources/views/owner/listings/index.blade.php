@@ -9,12 +9,11 @@
   --t1:#141F14;--t2:#5E6E5E;--border:#D6E8DC;
   --green:#2D7D4F;--green-lt:#E8F7EE;
   --gold:#F2B705;
-  --blue:#3B82F6;--red:#C8102E;
+  --blue:#3B82F6;
+  --red:#C8102E;
   --sh:0 2px 14px rgba(45,125,79,.08);
-  --sh2:0 6px 28px rgba(45,125,79,.16);
 }
 
-/* HEADER */
 .header-actions{
   display:flex;
   justify-content:space-between;
@@ -22,7 +21,6 @@
   padding:1rem 1.2rem .3rem;
 }
 
-/* CREATE BUTTON */
 .create-btn{
   background:var(--green);
   color:#fff;
@@ -39,7 +37,6 @@
   cursor:not-allowed;
 }
 
-/* WARNING BOX */
 .ver-warning{
   margin:1rem;
   padding:1rem;
@@ -50,20 +47,6 @@
   font-weight:700;
 }
 
-/* FILTER */
-.filter-bar{padding:.75rem 1.2rem .5rem;}
-.chips{display:flex;gap:.5rem;}
-.chip{
-  padding:.46rem 1rem;
-  border:1.5px solid var(--border);
-  border-radius:50px;
-  font-size:.77rem;
-  font-weight:700;
-  cursor:pointer;
-}
-.chip.on{background:var(--green);color:#fff;border-color:var(--green);}
-
-/* LISTINGS */
 .listing-card{
   background:var(--card);
   border-radius:18px;
@@ -73,7 +56,6 @@
   overflow:hidden;
 }
 
-/* DISABLED OVERLAY */
 .locked{
   opacity:.5;
   pointer-events:none;
@@ -84,8 +66,8 @@
 @section('content')
 
 @php
-  // You can replace this with real DB verification field later
-  $isVerified = auth()->user()->is_verified ?? false;
+    $status = auth()->user()->verification_status;
+    $isVerified = $status === 'verified';
 @endphp
 
 {{-- HEADER --}}
@@ -93,7 +75,7 @@
   <div style="font-weight:800;">🏠 My Listings</div>
 
   @if($isVerified)
-    <button class="create-btn" onclick="location.href='/owner/listings/create'">
+    <button class="create-btn" onclick="location.href='{{ route('owner.listings.create') }}'">
       + Create Listing
     </button>
   @else
@@ -103,42 +85,47 @@
   @endif
 </div>
 
-{{-- WARNING IF NOT VERIFIED --}}
+{{-- STATUS WARNING --}}
 @if(!$isVerified)
 <div class="ver-warning">
-  ⚠️ You are not fully verified yet.  
-  Complete your verification to unlock listing features.
+  ⚠️ Your account is currently: <b>{{ ucfirst($status) }}</b><br>
+  You must be fully verified to manage listings.
 </div>
 @endif
-
-{{-- FILTER --}}
-<div class="filter-bar">
-  <div class="chips">
-    <div class="chip on">All</div>
-    <div class="chip">Available</div>
-    <div class="chip">Taken</div>
-  </div>
-</div>
 
 {{-- LISTINGS --}}
 @if($isVerified)
 
-<div class="listing-card">
-  <div style="padding:1rem;">
-    <div style="font-weight:800;">Jupiter Street</div>
-    <div style="color:var(--green);font-weight:800;">₱3,200 /mo</div>
-    <p style="font-size:.8rem;color:#666;">🛏️ Room · 👥 Female · 🚶 9-min walk</p>
-  </div>
-</div>
+    @forelse($dormListings as $listing)
+        <div class="listing-card">
+            <div style="padding:1rem;">
+                <div style="font-weight:800;">{{ $listing->street }}</div>
+
+                <div style="color:var(--green);font-weight:800;">
+                    ₱{{ number_format($listing->price) }}/mo
+                </div>
+
+                <p style="font-size:.8rem;color:#666;">
+                    {{ $listing->type }} · {{ $listing->gender ?? 'Any' }}
+                </p>
+
+                <span style="font-size:.75rem;color:#5E6E5E;">
+                    {{ ucfirst($listing->status) }}
+                </span>
+            </div>
+        </div>
+    @empty
+        <div style="padding:1rem;color:#666;">
+            No listings yet.
+        </div>
+    @endforelse
 
 @else
 
-{{-- LOCKED STATE --}}
 <div class="listing-card locked">
-  <div style="padding:1rem;text-align:center;">
-    🔒 Listings locked  
-    <br><br>
-    Complete verification to access your listings
+  <div style="padding:1.2rem;text-align:center;">
+    🔒 Listings are locked<br><br>
+    Complete verification to unlock this feature
   </div>
 </div>
 
@@ -148,10 +135,8 @@
 
 @push('scripts')
 <script>
-
 function showVerifyAlert(){
-  alert("⚠️ Please complete your verification first to unlock all features.");
+    alert("⚠️ Please complete your account verification first.");
 }
-
 </script>
 @endpush

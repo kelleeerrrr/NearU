@@ -10,7 +10,7 @@
 
   <!-- MAP -->
   <div class="nav-i" id="nav-map"
-       onclick="window.location.href='{{ route('dorms.map') }}'">
+       onclick="window.location.href='{{ route('student.map') }}'">
     <span>📍</span>
     <div>Map</div>
   </div>
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // MAP
-    else if (path.startsWith("/map")) {
+    else if (path.startsWith("/student/map")) {
         document.getElementById('nav-map')?.classList.add('on');
     }
 

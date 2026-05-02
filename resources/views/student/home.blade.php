@@ -231,7 +231,7 @@
   {{-- BOTTOM NAV --}}
   <div class="bot-nav">
     <div class="nav-i on" id="nav-home"     onclick="window.location.href='/'"><span>🏠</span><div>Home</div></div>
-    <div class="nav-i"    id="nav-map"      onclick="window.location.href='/map'"><span>📍</span><div>Map</div></div>
+    <div class="nav-i"    id="nav-map"      onclick="window.location.href='{{ route('student.map') }}'"><span>📍</span><div>Map</div></div>
     <div class="nav-i"    id="nav-messages" onclick="window.location.href='/messages'"><span>💬</span><div>Messages</div></div>
     <div class="nav-i"    id="nav-profile"  onclick="window.location.href='/profile'"><span>👤</span><div>Profile</div></div>
   </div>

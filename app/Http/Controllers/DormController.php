@@ -11,23 +11,19 @@ use Illuminate\Support\Facades\Auth;
 class DormController extends Controller
 {
     /*
-    |--------------------------------------------------------------------------
-    | STUDENT HOME (✅ FULLY FIXED)
-    |--------------------------------------------------------------------------
+    | STUDENT HOME
     */
     public function indexStudent()
     {
         $dormListings = DormListing::where('status', 'Available')
-            ->with('owner')
+            ->with(['owner', 'images']) // ✅ include images if available
             ->latest()
             ->get();
 
-        // ✅ FIX: Prepare JSON for JS (map, frontend usage)
         $dormsDataJson = $dormListings->map(function ($dorm) {
 
-            $photos = is_array($dorm->photos)
-                ? $dorm->photos
-                : (json_decode($dorm->photos, true) ?? []);
+            // ✅ SAFE IMAGE HANDLING (NO CRASH)
+            $cover = $dorm->images->first();
 
             return [
                 'id' => $dorm->id,
@@ -37,11 +33,11 @@ class DormController extends Controller
                 'status' => $dorm->status,
                 'lat' => $dorm->latitude,
                 'lng' => $dorm->longitude,
-                'photo' => count($photos)
-                    ? asset('storage/' . $photos[0])
+
+                'photo' => $cover
+                    ? asset('storage/' . $cover->path)
                     : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400',
             ];
-
         });
 
         return view('student.home', [
@@ -51,14 +47,12 @@ class DormController extends Controller
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | PUBLIC DORMS PAGE
-    |--------------------------------------------------------------------------
+    | PUBLIC LIST
     */
     public function index()
     {
         $dormListings = DormListing::where('status', 'Available')
-            ->with('owner')
+            ->with(['owner', 'images'])
             ->latest()
             ->get();
 
@@ -66,27 +60,23 @@ class DormController extends Controller
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | SINGLE DORM VIEW
-    |--------------------------------------------------------------------------
+    | SINGLE VIEW
     */
     public function show($id)
     {
-        $dorm = DormListing::with('owner')->findOrFail($id);
+        $dorm = DormListing::with(['owner', 'images'])->findOrFail($id);
         return view('dorms.show', compact('dorm'));
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | SEARCH FILTER
-    |--------------------------------------------------------------------------
+    | SEARCH
     */
     public function search(Request $request)
     {
-        $query = DormListing::with('owner');
+        $query = DormListing::with(['owner', 'images']);
 
         if ($request->filled('search')) {
-            $query->where('street', 'like', '%' . $request->search . '%');
+            $query->where('street', 'like', "%{$request->search}%");
         }
 
         if ($request->filled('type')) {
@@ -101,18 +91,13 @@ class DormController extends Controller
             $query->where('price', '<=', $request->price_max);
         }
 
-        $dormListings = $query
-            ->where('status', 'Available')
-            ->latest()
-            ->get();
-
-        return view('dorms.index', compact('dormListings'));
+        return view('dorms.index', [
+            'dormListings' => $query->where('status', 'Available')->latest()->get()
+        ]);
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | SAVE LISTING
-    |--------------------------------------------------------------------------
+    | SAVE
     */
     public function save($id)
     {
@@ -127,9 +112,7 @@ class DormController extends Controller
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | UNSAVE LISTING
-    |--------------------------------------------------------------------------
+    | UNSAVE
     */
     public function unsave($id)
     {
@@ -137,13 +120,11 @@ class DormController extends Controller
             ->where('dorm_listing_id', $id)
             ->delete();
 
-        return back()->with('success', 'Dorm removed from saved list!');
+        return back()->with('success', 'Removed from saved list!');
     }
 
     /*
-    |--------------------------------------------------------------------------
     | SCHEDULE VISIT
-    |--------------------------------------------------------------------------
     */
     public function scheduleVisit(Request $request, $id)
     {
@@ -165,32 +146,28 @@ class DormController extends Controller
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | COMPARE LISTINGS
-    |--------------------------------------------------------------------------
+    | COMPARE
     */
     public function compare(Request $request)
     {
         $ids = array_filter(explode(',', $request->query('ids', '')));
 
-        $dormListings = DormListing::with('owner')
-            ->whereIn('id', $ids)
-            ->get();
-
-        return view('dorms.compare', compact('dormListings'));
+        return view('dorms.compare', [
+            'dormListings' => DormListing::with(['owner', 'images'])
+                ->whereIn('id', $ids)
+                ->get()
+        ]);
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | MAP VIEW
-    |--------------------------------------------------------------------------
+    | MAP
     */
     public function map()
     {
-        $dormListings = DormListing::where('status', 'Available')
-            ->with('owner')
-            ->get();
-
-        return view('student.dorms.map', compact('dormListings'));
+        return view('student.dorms.map', [
+            'dormListings' => DormListing::where('status', 'Available')
+                ->with(['owner', 'images'])
+                ->get()
+        ]);
     }
 }

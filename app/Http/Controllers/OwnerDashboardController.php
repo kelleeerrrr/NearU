@@ -19,7 +19,7 @@ class OwnerDashboardController extends Controller
         $activeListings = $listings->where('status', 'Available')->count();
 
         // ⭐ Rating
-        $avgRating = Review::whereIn('listing_id', $listings->pluck('id'))
+        $avgRating = Review::whereIn('dorm_listing_id', $listings->pluck('id'))
             ->avg('rating') ?? 0;
 
         // 💬 Messages
@@ -31,7 +31,7 @@ class OwnerDashboardController extends Controller
             ->count();
 
         // 📅 Visits (FIXED LOGIC)
-        $pendingVisits = VisitSchedule::whereIn('listing_id', $listings->pluck('id'))
+        $pendingVisits = VisitSchedule::whereIn('dorm_listing_id', $listings->pluck('id'))
             ->where('status', 'pending')
             ->count();
 

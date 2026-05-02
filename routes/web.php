@@ -112,6 +112,40 @@ Route::middleware('auth')->group(function () {
         return view('student.saved', compact('savedListings'));
 
     })->name('saved.listings');
+    
+    Route::get('/student/map', [DormController::class, 'map'])
+        ->name('student.map');
+
+    Route::get('/checklist', function () {
+        return view('student.checklist');
+    })->name('checklist');
+
+    Route::post('/profile/photo', function (Request $request) {
+
+        $request->validate([
+            'photo' => 'required|image|max:2048',
+        ]);
+
+        $user = auth()->user();
+
+        // delete old photo if exists
+        if ($user->photo) {
+            Storage::disk('public')->delete($user->photo);
+        }
+
+        // store new photo
+        $path = $request->file('photo')->store('profile_photos', 'public');
+
+        $user->update([
+            'photo' => $path,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'photo_url' => asset('storage/' . $path)
+        ]);
+
+    })->name('profile.photo.update');
 
     /*
     |--------------------------------------------------------------------------
@@ -198,19 +232,46 @@ Route::middleware('auth')->group(function () {
     */
     Route::prefix('owner/listings')->name('owner.listings.')->group(function () {
 
+        /*
+        |-----------------------------------------
+        | INDEX (LISTINGS PAGE)
+        | URL: /owner/listings
+        |-----------------------------------------
+        */
         Route::get('/', function () {
 
-            $dormListings = \App\Models\DormListing::where('owner_id', auth()->id())
+            $dormListings = \App\Models\DormListing::with('images')
+                ->where('owner_id', auth()->id())
                 ->latest()
                 ->get();
 
             return view('owner.listings.index', compact('dormListings'));
         })->name('index');
 
+
+        /*
+        |-----------------------------------------
+        | CREATE PAGE
+        | URL: /owner/listings/create
+        |-----------------------------------------
+        */
         Route::get('/create', fn () => view('owner.listings.create'))
             ->name('create');
 
+
+        /*
+        |-----------------------------------------
+        | STORE LISTING
+        | URL: POST /owner/listings
+        |-----------------------------------------
+        */
         Route::post('/', function (Request $request) {
+
+            $request->validate([
+                'street' => 'required|string|max:255',
+                'price'  => 'required|numeric',
+                'type'   => 'required|string',
+            ]);
 
             $listing = \App\Models\DormListing::create([
                 'owner_id' => auth()->id(),
@@ -222,18 +283,84 @@ Route::middleware('auth')->group(function () {
                 'longitude' => $request->longitude,
             ]);
 
-            Notification::create([
+            // Notification
+            \App\Models\Notification::create([
                 'user_id' => auth()->id(),
                 'title' => 'Listing Published',
                 'message' => "Your listing '{$listing->street}' is now live.",
                 'is_read' => false,
             ]);
 
-            return redirect()->route('owner.listings.index');
-
+            return redirect()
+                ->route('owner.listings.index')
+                ->with('success', '🎉 Listing published successfully!');
         })->name('store');
-    });
 
+
+        /*
+        |-----------------------------------------
+        | EDIT
+        | URL: /owner/listings/{id}/edit
+        |-----------------------------------------
+        */
+        Route::get('/{id}/edit', function ($id) {
+
+            $listing = \App\Models\DormListing::with('images')
+                ->where('owner_id', auth()->id())
+                ->findOrFail($id);
+
+            return view('owner.listings.edit', compact('listing'));
+
+        })->name('edit');
+
+
+        /*
+        |-----------------------------------------
+        | UPDATE
+        |-----------------------------------------
+        */
+        Route::put('/{id}', function (Request $request, $id) {
+
+            $listing = \App\Models\DormListing::where('owner_id', auth()->id())
+                ->findOrFail($id);
+
+            $listing->update($request->only([
+                'street',
+                'price',
+                'type',
+                'latitude',
+                'longitude',
+            ]));
+
+            return redirect()
+                ->route('owner.listings.index')
+                ->with('success', 'Listing updated successfully');
+
+        })->name('update');
+
+
+        /*
+        |-----------------------------------------
+        | DELETE
+        |-----------------------------------------
+        */
+        Route::delete('/{id}', function ($id) {
+
+            $listing = \App\Models\DormListing::where('owner_id', auth()->id())
+                ->with('images')
+                ->findOrFail($id);
+
+            foreach ($listing->images as $image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($image->image_path);
+                $image->delete();
+            }
+
+            $listing->delete();
+
+            return back()->with('success', 'Listing deleted successfully');
+
+        })->name('delete');
+    });
     /*
     |--------------------------------------------------------------------------
     | OWNER ACCOUNT
@@ -277,34 +404,15 @@ Route::middleware('auth')->group(function () {
 
         $ownerId = auth()->id();
 
-        // LISTINGS
         $listings = \App\Models\DormListing::where('owner_id', $ownerId)->get();
 
-        $totalListings = $listings->count();
-        $activeListings = $listings->where('status', 'Available')->count();
-        $takenListings = $listings->where('status', '!=', 'Available')->count();
-
-        // VISITS
         $visits = \App\Models\VisitSchedule::whereHas('dormListing', function ($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
         })->get();
 
-        // MESSAGES
-        $messages = \App\Models\Message::where('receiver_id', $ownerId)->get();
+        $messages = Message::where('receiver_id', $ownerId)->get();
 
-        $totalMessages = $messages->count();
-        $unreadMessages = $messages->where('is_read', 0)->count();
-
-        return view('owner.statistics.index', compact(
-            'listings',
-            'visits',
-            'messages',
-            'totalMessages',
-            'unreadMessages',
-            'totalListings',
-            'activeListings',
-            'takenListings'
-        ));
+        return view('owner.statistics.index', compact('listings', 'visits', 'messages'));
 
     })->name('owner.statistics.index');
 });
