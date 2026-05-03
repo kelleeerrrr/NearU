@@ -3,7 +3,7 @@
 
   <!-- HOME -->
   <div class="nav-i" id="nav-home"
-       onclick="window.location.href='{{ route('home') }}'">
+       onclick="window.location.href='{{ route('student.home') }}'">
     <span>🏠</span>
     <div>Home</div>
   </div>

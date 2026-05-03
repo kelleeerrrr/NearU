@@ -208,7 +208,7 @@
             @endif
           </p>
           
-            href="{{ route('dorms.index') }}"
+            href="{{ url('/students/dorms') }}"
             style="display:inline-block;margin-top:1rem;padding:.72rem 1.8rem;background:var(--green);color:#fff;border-radius:50px;font-weight:700;font-size:.88rem;text-decoration:none;"
           >← Browse Listings</a>
         </div>
@@ -220,16 +220,16 @@
 
   {{-- BOTTOM NAV --}}
   <div class="bot-nav">
-    <div class="nav-i" onclick="window.location.href='{{ route('dorms.index') }}'">
+    <div class="nav-i" onclick="window.location.href='{{ url('/student/dorms') }}'">
       <span>🏠</span><div>Home</div>
     </div>
-    <div class="nav-i" onclick="window.location.href='{{ route('map') }}'">
+    <div class="nav-i" onclick="window.location.href='{{ url('/student/map') }}'">
       <span>📍</span><div>Map</div>
     </div>
-    <div class="nav-i" onclick="window.location.href='{{ route('messages.index') }}'">
+    <div class="nav-i" onclick="window.location.href='{{ url('/student/messages') }}'">
       <span>💬</span><div>Messages</div>
     </div>
-    <div class="nav-i" onclick="window.location.href='{{ route('profile') }}'">
+    <div class="nav-i" onclick="window.location.href='{{ url('/student/profile') }}'">
       <span>👤</span><div>Profile</div>
     </div>
   </div>

@@ -60,17 +60,17 @@
       <div id="dormList">
 
         @forelse($dormListings as $dorm)
-
           @php
-            $photos = is_array($dorm->photos)
-              ? $dorm->photos
-              : (json_decode($dorm->photos, true) ?? []);
+            $photos = $dorm->images->pluck('path')->toArray();
+
             $cover  = count($photos)
               ? asset('storage/' . $photos[0])
               : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400';
+
             $inCmp  = in_array($dorm->id, session('compare', []));
-            $saved  = in_array($dorm->id, session('saved',   []));
-            $rating = round($dorm->rating ?? 0);
+            $saved  = in_array($dorm->id, session('saved', []));
+            $rating = $dorm->rating ? round($dorm->rating) : 0;
+            $avgRating = $dorm->rating ?? 0;
             $empty  = 5 - $rating;
           @endphp
 
@@ -123,7 +123,7 @@
             <div class="rat-row">
               <span class="stars">{!! str_repeat('★', $rating) !!}{!! str_repeat('☆', $empty) !!}</span>
               <span class="rv">{{ number_format($dorm->rating ?? 0, 1) }}</span>
-              <span class="rc">({{ $dorm->reviews_count ?? 0 }} reviews)</span>
+              <span class="rc">({{ $dorm->reviews()->count() }} reviews)</span>
             </div>
 
             {{-- TYPE BADGE + HEART --}}
@@ -181,8 +181,8 @@
             {{-- BUTTONS ROW 1: Reviews + Directions --}}
             <div class="btn-row">
               <button class="btn btn-out"
-                onclick="Reviews.show({{ $dorm->id }}, '{{ addslashes($dorm->street) }}')">
-                ⭐ Reviews ({{ $dorm->reviews_count ?? 0 }})
+                onclick="Reviews.show({{ $dorm->id }}, @js($dorm->street))">
+                ⭐ Reviews ({{ $dorm->reviews()->count() }})
               </button>
               <button class="btn btn-green"
                 onclick="Directions.get({{ $dorm->id }}, {{ $dorm->latitude ?? 0 }}, {{ $dorm->longitude ?? 0 }}, '{{ addslashes($dorm->street) }}')">
@@ -620,7 +620,7 @@ const Compare = {
   },
   open() {
     if (this._list.length < 2) { showToast('⚠️ Select at least 2', 'warn'); return; }
-    window.location.href = '/dorms/compare?ids=' + this._list.join(',');
+  window.location.href = '/student/dorms/compare?ids=' + this._list.join(',');
   },
 };
 
@@ -843,119 +843,210 @@ const Directions = {
   _destMarker: null,
   _userMarker: null,
 
-  _fmtM: m => m < 1000 ? `${Math.round(m)}m` : `${(m/1000).toFixed(1)}km`,
-  _fmtS: s => { const mn=Math.round(s/60); return mn<60?`${mn} min`:`${Math.floor(mn/60)}h ${mn%60}m`; },
+  _watchId: null,
+  _lastUserLoc: null,
+  _destLat: null,
+  _destLng: null,
+  _lastUpdate: 0,
+
+  // 👉 YOUR WAYPOINT (GCH Gate near 7/11 Alangilan)
+  _waypointLat: 13.786612110666772,
+  _waypointLng: 121.06926620190735,
+
+  _fmtM: m => m < 1000 ? `${Math.round(m)}m` : `${(m / 1000).toFixed(1)}km`,
+  _fmtS: s => {
+    const mn = Math.round(s / 60);
+    return mn < 60 ? `${mn} min` : `${Math.floor(mn / 60)}h ${mn % 60}m`;
+  },
+
   _turnEmoji(type, mod) {
     if (type === 'arrive') return '🏁';
     if (type === 'depart') return '🚶';
     if (!mod) return '⬆️';
     const m = mod.toLowerCase();
-    if (m.includes('uturn'))  return '↩️';
-    if (m.includes('right'))  return '➡️';
-    if (m.includes('left'))   return '⬅️';
+    if (m.includes('uturn')) return '↩️';
+    if (m.includes('right')) return '➡️';
+    if (m.includes('left')) return '⬅️';
     return '⬆️';
   },
 
   async get(dormId, destLat, destLng, street) {
-    if (!destLat || !destLng) { showToast('⚠️ No map location set for this listing', 'warn'); return; }
+    if (!destLat || !destLng) {
+      showToast('⚠️ No map location set for this listing', 'warn');
+      return;
+    }
+
+    this._destLat = destLat;
+    this._destLng = destLng;
+    this._lastUserLoc = null;
+    this._lastUpdate = 0;
 
     document.getElementById('dirModalTitle').textContent = `🧭 To ${street}`;
-    document.getElementById('dirStats').innerHTML = '<div style="color:var(--t2);font-size:.82rem;">📍 Getting your location…</div>';
+    document.getElementById('dirStats').innerHTML =
+      '<div style="color:var(--t2);font-size:.82rem;">📍 Waiting for live GPS...</div>';
     document.getElementById('dirSteps').innerHTML = '';
     document.getElementById('directionsModal').classList.add('active');
 
     const userLoc = await new Promise(resolve => {
-      if (!navigator.geolocation) { resolve(null); return; }
+      if (!navigator.geolocation) return resolve(null);
+
       navigator.geolocation.getCurrentPosition(
-        pos => resolve({ lat:pos.coords.latitude, lng:pos.coords.longitude }),
-        ()   => resolve(null),
-        { enableHighAccuracy:true, timeout:8000 }
+        pos => resolve({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        }),
+        () => resolve(null),
+        { enableHighAccuracy: true, timeout: 8000 }
       );
     });
 
     if (!userLoc) {
       document.getElementById('dirStats').innerHTML =
-        '<div style="color:var(--red);font-size:.82rem;">⚠️ Could not get your location. Please enable GPS.</div>';
+        '<div style="color:var(--red);font-size:.82rem;">⚠️ Enable GPS to continue</div>';
       return;
     }
 
     await this._buildMap(userLoc, destLat, destLng, street);
 
+    this._watchId = navigator.geolocation.watchPosition(
+      pos => {
+        const loc = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+        this._updateLiveRoute(loc, street);
+      },
+      () => showToast('⚠️ GPS tracking error', 'warn'),
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+    );
+  },
+
+  async _updateLiveRoute(userLoc, street) {
+    if (!this._map || !this._destLat) return;
+
+    const now = Date.now();
+    if (now - this._lastUpdate < 3000) return;
+    this._lastUpdate = now;
+
+    if (!this._userMarker) {
+      this._userMarker = L.circleMarker([userLoc.lat, userLoc.lng], {
+        radius: 8,
+        fillColor: '#C8102E',
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 1
+      }).addTo(this._map);
+    } else {
+      this._userMarker.setLatLng([userLoc.lat, userLoc.lng]);
+    }
+
     try {
-      const url = `https://router.project-osrm.org/route/v1/foot/${userLoc.lng},${userLoc.lat};${destLng},${destLat}?steps=true&geometries=geojson&overview=full`;
-      const json = await fetch(url).then(r => r.json());
-      if (!json.routes?.length) throw new Error('no route');
+      // 🔥 SEGMENT 1: USER → WAYPOINT
+      const url1 =
+        `https://router.project-osrm.org/route/v1/foot/` +
+        `${userLoc.lng},${userLoc.lat};${this._waypointLng},${this._waypointLat}` +
+        `?steps=false&geometries=geojson&overview=full`;
 
-      const route = json.routes[0];
-      const pts   = route.geometry.coordinates.map(c => [c[1], c[0]]);
+      // 🔥 SEGMENT 2: WAYPOINT → DESTINATION
+      const url2 =
+        `https://router.project-osrm.org/route/v1/foot/` +
+        `${this._waypointLng},${this._waypointLat};${this._destLng},${this._destLat}` +
+        `?steps=false&geometries=geojson&overview=full`;
 
-      if (this._routeLayer) this._map.removeLayer(this._routeLayer);
-      if (this._glowLayer)  this._map.removeLayer(this._glowLayer);
-      this._routeLayer = L.polyline(pts, { color:'#2D7D4F', weight:6, opacity:.92, lineJoin:'round' }).addTo(this._map);
-      this._glowLayer  = L.polyline(pts, { color:'#74C69D', weight:3, opacity:.5,  dashArray:'12,9' }).addTo(this._map);
-      this._map.fitBounds(this._routeLayer.getBounds(), { padding:[40,40] });
+      const [r1, r2] = await Promise.all([
+        fetch(url1).then(r => r.json()),
+        fetch(url2).then(r => r.json())
+      ]);
 
-      document.getElementById('dirStats').innerHTML = `
-        <div class="dir-stat"><div class="dir-stat-v">${this._fmtM(route.distance)}</div><div class="dir-stat-l">Distance</div></div>
-        <div class="dir-stat"><div class="dir-stat-v">${this._fmtS(route.duration)}</div><div class="dir-stat-l">Walk Time</div></div>`;
+      if (!r1.routes?.length || !r2.routes?.length) return;
 
-      const steps = route.legs.flatMap(l => l.steps);
-      document.getElementById('dirSteps').innerHTML = steps.map(s => {
-        const isArr = s.maneuver.type === 'arrive';
-        const em    = this._turnEmoji(s.maneuver.type, s.maneuver.modifier);
-        const nm    = s.name || (isArr ? street : 'Continue');
-        const dist  = s.distance > 5 ? `<div class="step-dist">${this._fmtM(s.distance)}</div>` : '';
-        return `<div class="dir-step">
-          <div class="step-ic${isArr?' arr':''}">${em}</div>
-          <div class="step-txt">${isArr?`Arrive at <strong>${street}</strong>`:nm}${dist}</div>
-        </div>`;
-      }).join('');
+      const coords1 = r1.routes[0].geometry.coordinates;
+      const coords2 = r2.routes[0].geometry.coordinates;
 
-    } catch {
-      const R = 6371000;
-      const dLat = (destLat-userLoc.lat)*Math.PI/180;
-      const dLng = (destLng-userLoc.lng)*Math.PI/180;
-      const a = Math.sin(dLat/2)**2 + Math.cos(userLoc.lat*Math.PI/180)*Math.cos(destLat*Math.PI/180)*Math.sin(dLng/2)**2;
-      const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      const mn   = Math.max(1, Math.round(dist/80));
+      // 🔥 MERGE ROUTES (LOCKED PATH)
+      const merged = [...coords1, ...coords2];
+      const pts = merged.map(c => [c[1], c[0]]);
 
       if (this._routeLayer) this._map.removeLayer(this._routeLayer);
-      this._routeLayer = L.polyline([[userLoc.lat,userLoc.lng],[destLat,destLng]],
-        { color:'#2D7D4F', weight:5, dashArray:'10,6' }).addTo(this._map);
-      this._map.fitBounds([[userLoc.lat,userLoc.lng],[destLat,destLng]], { padding:[40,40] });
+      if (this._glowLayer) this._map.removeLayer(this._glowLayer);
+
+      this._routeLayer = L.polyline(pts, {
+        color: '#2D7D4F',
+        weight: 6,
+        opacity: 0.9
+      }).addTo(this._map);
+
+      this._glowLayer = L.polyline(pts, {
+        color: '#74C69D',
+        weight: 3,
+        opacity: 0.5,
+        dashArray: '10,8'
+      }).addTo(this._map);
+
+      const totalDist = r1.routes[0].distance + r2.routes[0].distance;
+      const totalDur = r1.routes[0].duration + r2.routes[0].duration;
 
       document.getElementById('dirStats').innerHTML = `
-        <div class="dir-stat"><div class="dir-stat-v">${this._fmtM(dist)}</div><div class="dir-stat-l">~Distance</div></div>
-        <div class="dir-stat"><div class="dir-stat-v">~${mn} min</div><div class="dir-stat-l">Est. Walk</div></div>`;
-      document.getElementById('dirSteps').innerHTML = `
-        <div class="dir-step"><div class="step-ic">🚶</div><div class="step-txt">Head towards <strong>${street}</strong><div class="step-dist">${this._fmtM(dist)} away</div></div></div>
-        <div class="dir-step"><div class="step-ic arr">🏁</div><div class="step-txt">Arrive at <strong>${street}</strong></div></div>`;
+        <div class="dir-stat">
+          <div class="dir-stat-v">${this._fmtM(totalDist)}</div>
+          <div class="dir-stat-l">Remaining</div>
+        </div>
+        <div class="dir-stat">
+          <div class="dir-stat-v">${this._fmtS(totalDur)}</div>
+          <div class="dir-stat-l">ETA</div>
+        </div>
+      `;
+
+    } catch (err) {
+      console.log('Route update failed:', err);
     }
   },
 
   async _buildMap(userLoc, destLat, destLng, street) {
-    if (this._map) { try { this._map.remove(); } catch(_){} this._map = null; }
+    if (this._map) {
+      try { this._map.remove(); } catch (_) {}
+      this._map = null;
+    }
+
     await new Promise(r => setTimeout(r, 80));
 
-    this._map = L.map('dirMap', { zoomControl:true }).setView([userLoc.lat, userLoc.lng], 16);
+    this._map = L.map('dirMap', { zoomControl: true })
+      .setView([userLoc.lat, userLoc.lng], 16);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:'© OpenStreetMap', maxZoom:19,
+      attribution: '© OpenStreetMap',
+      maxZoom: 19
     }).addTo(this._map);
 
     L.circleMarker([userLoc.lat, userLoc.lng], {
-      radius:10, fillColor:'#C8102E', color:'#fff', weight:3, fillOpacity:1,
+      radius: 10,
+      fillColor: '#C8102E',
+      color: '#fff',
+      weight: 3,
+      fillOpacity: 1
     }).addTo(this._map).bindPopup('📍 You are here');
 
-    L.marker([destLat, destLng], {
+    this._destMarker = L.marker([destLat, destLng], {
       icon: L.divIcon({
-        className:'',
-        html:`<div style="background:#2D7D4F;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.28)"></div>`,
-        iconSize:[28,28], iconAnchor:[14,28],
-      }),
+        className: '',
+        html: `<div style="background:#2D7D4F;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.28)"></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 28]
+      })
     }).addTo(this._map).bindPopup(street);
   },
 
-  close() { document.getElementById('directionsModal').classList.remove('active'); },
+  stopTracking() {
+    if (this._watchId !== null) {
+      navigator.geolocation.clearWatch(this._watchId);
+      this._watchId = null;
+    }
+  },
+
+  close() {
+    this.stopTracking();
+    document.getElementById('directionsModal').classList.remove('active');
+  }
 };
 
 const Schedule = {

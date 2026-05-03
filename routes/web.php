@@ -21,8 +21,16 @@ use App\Http\Controllers\OwnerDashboardController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', function () {
 
+        if (auth()->check()) {
+            return auth()->user()->user_type === 'owner'
+                ? redirect()->route('owner.dashboard')
+                : redirect()->route('student.home');
+        }
+
+        return redirect()->route('login');
+    });
 /*
 |--------------------------------------------------------------------------
 | GUEST AUTH ROUTES
@@ -77,6 +85,11 @@ Route::middleware('guest')->group(function () {
     })->name('register.post');
 });
 
+    Route::post('/dorms/{id}/reviews', [DormController::class, 'storeReview']);
+    Route::get('/dorms/{id}/reviews', [DormController::class, 'getReviews']);
+
+    Route::get('/student/dorms/compare', [DormController::class, 'compare'])
+    ->name('dorms.compare');
 /*
 |--------------------------------------------------------------------------
 | LOGOUT
@@ -152,16 +165,16 @@ Route::middleware('auth')->group(function () {
     | VISITS (STUDENT)
     |--------------------------------------------------------------------------
     */
-    Route::get('/visits', function () {
+Route::get('/visits', function () {
 
-        $visits = \App\Models\VisitSchedule::with('dormListing')
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get();
+    $visits = \App\Models\VisitSchedule::with(['dormListing.owner'])
+        ->where('user_id', auth()->id())
+        ->latest()
+        ->get();
 
-        return view('student.visits', compact('visits'));
+    return view('student.visits', compact('visits'));
 
-    })->name('visit.schedules');
+})->name('visit.schedules')->middleware('auth');
 
     /*
     |--------------------------------------------------------------------------
@@ -265,37 +278,8 @@ Route::middleware('auth')->group(function () {
         | URL: POST /owner/listings
         |-----------------------------------------
         */
-        Route::post('/', function (Request $request) {
-
-            $request->validate([
-                'street' => 'required|string|max:255',
-                'price'  => 'required|numeric',
-                'type'   => 'required|string',
-            ]);
-
-            $listing = \App\Models\DormListing::create([
-                'owner_id' => auth()->id(),
-                'street' => $request->street,
-                'price' => $request->price,
-                'type' => $request->type,
-                'status' => 'Available',
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-            ]);
-
-            // Notification
-            \App\Models\Notification::create([
-                'user_id' => auth()->id(),
-                'title' => 'Listing Published',
-                'message' => "Your listing '{$listing->street}' is now live.",
-                'is_read' => false,
-            ]);
-
-            return redirect()
-                ->route('owner.listings.index')
-                ->with('success', '🎉 Listing published successfully!');
-        })->name('store');
-
+        Route::post('/', [\App\Http\Controllers\DormController::class, 'store'])
+            ->name('store');
 
         /*
         |-----------------------------------------
@@ -351,7 +335,7 @@ Route::middleware('auth')->group(function () {
                 ->findOrFail($id);
 
             foreach ($listing->images as $image) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($image->image_path);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($image->path);
                 $image->delete();
             }
 

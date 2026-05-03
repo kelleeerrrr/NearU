@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'GCH Live Navigation Map')
+@section('title', 'Live Navigation Map')
 
 @section('content')
 
@@ -10,28 +10,36 @@
 
     <div class="screen active">
 
-        {{-- INFO PANEL --}}
+        {{-- INFO --}}
         <div class="map-info-card">
-            <strong>Golden Country Homes Map</strong><br>
+            <strong>🚀 Live Navigation Mode</strong><br>
             <small id="statusText">Detecting location...</small>
         </div>
 
-        {{-- NEAR ME BUTTON --}}
-        <button class="near-btn" onclick="locateMe()">
-            📍 Near Me
-        </button>
+        {{-- NEAR ME --}}
+        <button class="near-btn" onclick="locateMe()">📍 Near Me</button>
 
         {{-- MAP --}}
         <div id="map"></div>
 
-        {{-- DORM PREVIEW CARD (LIKE GOOGLE MAPS) --}}
+        {{-- NAVIGATION STEPS PANEL --}}
+        <div id="navPanel" class="nav-panel hidden">
+            <h4>🧭 Directions</h4>
+            <div id="steps">Calculating route...</div>
+        </div>
+
+        {{-- POPUP CARD --}}
         <div id="dormPreview" class="preview hidden">
-            <h4 id="pTitle"></h4>
+
+            <img id="pImage">
+
+            <h4 id="pStreet"></h4>
             <p id="pPrice"></p>
-            <p id="pLocation"></p>
+            <p id="pType"></p>
 
             <div class="preview-actions">
-                <a id="viewBtn" href="#" class="btn blue">View</a>
+                <a id="msgBtn" class="btn blue">💬 Message</a>
+                <a id="dirBtn" target="_blank" class="btn green">🧭 Directions</a>
                 <button onclick="closePreview()" class="btn gray">Close</button>
             </div>
         </div>
@@ -47,14 +55,16 @@
 
 <style>
 
-.screen{
-    height:calc(100vh - 120px);
-    position:relative;
-}
-
+/* MAP */
 #map{
     width:100%;
     height:100%;
+}
+
+/* SCREEN */
+.screen{
+    height:calc(100vh - 120px);
+    position:relative;
 }
 
 /* INFO */
@@ -70,7 +80,7 @@
     box-shadow:0 6px 18px rgba(0,0,0,.1);
 }
 
-/* NEAR ME BUTTON */
+/* NEAR */
 .near-btn{
     position:absolute;
     bottom:140px;
@@ -81,10 +91,9 @@
     border:none;
     padding:10px 14px;
     border-radius:50px;
-    cursor:pointer;
 }
 
-/* PREVIEW CARD */
+/* POPUP */
 .preview{
     position:absolute;
     bottom:90px;
@@ -93,122 +102,141 @@
     background:#fff;
     padding:12px;
     border-radius:14px;
-    box-shadow:0 6px 18px rgba(0,0,0,.15);
     z-index:1000;
 }
 
-.preview.hidden{ display:none; }
+.preview.hidden{display:none;}
+.preview img{width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px;}
 
-.preview h4{ margin:0; font-size:1rem; }
-.preview p{ margin:2px 0; font-size:.85rem; }
-
-.preview-actions{
-    display:flex;
-    gap:.5rem;
-    margin-top:.5rem;
+/* NAV PANEL */
+.nav-panel{
+    position:absolute;
+    top:90px;
+    right:10px;
+    width:220px;
+    background:#fff;
+    border-radius:12px;
+    padding:10px;
+    z-index:1000;
+    box-shadow:0 6px 18px rgba(0,0,0,.15);
+    font-size:.85rem;
 }
+.nav-panel.hidden{display:none;}
 
+/* BUTTONS */
 .btn{
     padding:8px 12px;
     border-radius:10px;
-    text-decoration:none;
     font-size:.8rem;
     font-weight:700;
+    text-decoration:none;
+    border:none;
 }
+.btn.blue{background:#2563eb;color:#fff;}
+.btn.green{background:#16a34a;color:#fff;}
+.btn.gray{background:#e5e7eb;}
 
-.btn.blue{ background:#2563eb; color:#fff; }
-.btn.gray{ background:#e5e7eb; color:#000; border:none; }
+/* ZOOM CONTROL MOVE */
+.leaflet-control-zoom{
+    position: fixed !important;
+    bottom: 120px;
+    right: 10px;
+}
 
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
+    // 🟡 GOLDEN COUNTRY HOMES CENTER
     const CENTER = { lat: 13.7816, lng: 121.0659 };
 
-    const map = L.map('map').setView([CENTER.lat, CENTER.lng], 17);
+    const map = L.map('map', {
+        zoomControl: false
+    }).setView([CENTER.lat, CENTER.lng], 17);
+
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
     }).addTo(map);
 
-    let userMarker = null;
     let userLatLng = null;
     let routeLine = null;
-    let activeDestination = null;
     let selectedMarker = null;
 
+    // 🔴 YOU ICON
+    const youIcon = L.divIcon({
+        className: 'you-icon',
+        html: '🔴'
+    });
+
+    // 🟢 🔵 ICONS
+    const greenIcon = new L.Icon({
+        iconUrl: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+        iconSize: [32,32]
+    });
+
+    const blueIcon = new L.Icon({
+        iconUrl: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+        iconSize: [32,32]
+    });
+
+    // 📌 DORM DATA
     let dorms = [
         @foreach($dormListings as $dorm)
         {
             id: {{ $dorm->id }},
-            title: @json($dorm->title),
+            street: @json($dorm->street),
             price: {{ $dorm->price }},
-            location: @json($dorm->location),
+            type: @json($dorm->type),
             lat: {{ $dorm->latitude ?? 'null' }},
-            lng: {{ $dorm->longitude ?? 'null' }}
+            lng: {{ $dorm->longitude ?? 'null' }},
+            image: @json(optional($dorm->images->first())->path
+                ? asset('storage/' . $dorm->images->first()->path)
+                : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400'
+            )
         },
         @endforeach
     ];
 
-    // MARKERS
+    // 📍 MARKERS
     dorms.forEach(d => {
+
         if(!d.lat || !d.lng) return;
 
-        const marker = L.marker([d.lat, d.lng]).addTo(map);
+        // type color
+        let icon = greenIcon;
+        if(d.type === 'Unit') icon = blueIcon;
 
-        marker.on('click', function () {
+        const marker = L.marker([d.lat, d.lng], {icon}).addTo(map);
 
+        marker.on('click', () => {
             showPreview(d);
-
-            activeDestination = d;
-
-            if(userLatLng){
-                drawRoute(d.lat, d.lng);
-            }
-
-            if(selectedMarker){
-                selectedMarker.setOpacity(1);
-            }
-
-            marker.setOpacity(0.6);
-            selectedMarker = marker;
+            drawRoute(d.lat, d.lng);
         });
     });
 
-    // GPS TRACKING
+    // 🔴 USER LOCATION
     if(navigator.geolocation){
 
-        navigator.geolocation.watchPosition(function(pos){
+        navigator.geolocation.watchPosition(pos => {
 
-            userLatLng = [
-                pos.coords.latitude,
-                pos.coords.longitude
-            ];
+            userLatLng = [pos.coords.latitude, pos.coords.longitude];
 
-            if(!userMarker){
-                userMarker = L.circleMarker(userLatLng,{
-                    radius:8,
-                    color:"#2563eb",
-                    fillColor:"#2563eb",
-                    fillOpacity:1
-                }).addTo(map);
-            } else {
-                userMarker.setLatLng(userLatLng);
-            }
+            L.marker(userLatLng, {icon: youIcon}).addTo(map);
 
             document.getElementById('statusText').innerText =
                 "Live location active";
 
         });
 
-    } else {
-        document.getElementById('statusText').innerText =
-            "Location not supported";
     }
 
-    // ROUTE
+    // 🧭 ROUTE + LIVE NAV STYLE
     function drawRoute(lat,lng){
+
+        if(!userLatLng) return;
 
         const url =
         `https://router.project-osrm.org/route/v1/walking/${userLatLng[1]},${userLatLng[0]};${lng},${lat}?overview=full&geometries=geojson`;
@@ -218,45 +246,49 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
 
             const coords = data.routes[0].geometry.coordinates;
-
             const latlngs = coords.map(c => [c[1], c[0]]);
 
-            if(routeLine){
-                map.removeLayer(routeLine);
-            }
+            if(routeLine) map.removeLayer(routeLine);
 
             routeLine = L.polyline(latlngs,{
                 color:"#2563eb",
                 weight:5
             }).addTo(map);
+
+            // 🚀 fake step UI (can upgrade later to real steps API)
+            document.getElementById('navPanel').classList.remove('hidden');
+            document.getElementById('steps').innerHTML = `
+                <b>Step 1:</b> Head towards destination<br>
+                <b>Step 2:</b> Walk straight ~${Math.round(data.routes[0].distance)}m<br>
+                <b>Step 3:</b> Arrive at location
+            `;
         });
     }
 
-    // PREVIEW CARD
+    // 🧾 POPUP
     window.showPreview = function(d){
 
-        document.getElementById('pTitle').innerText = d.title;
-        document.getElementById('pPrice').innerText = "₱" + d.price;
-        document.getElementById('pLocation').innerText = d.location;
+        document.getElementById('pStreet').innerText = d.street;
+        document.getElementById('pPrice').innerText = "₱" + d.price + "/mo";
+        document.getElementById('pType').innerText = d.type;
+        document.getElementById('pImage').src = d.image;
 
-        document.getElementById('viewBtn').href = "/dorms/" + d.id;
+        document.getElementById('msgBtn').href =
+            "/messages/create?dorm_id=" + d.id;
+
+        document.getElementById('dirBtn').href =
+            `https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}`;
 
         document.getElementById('dormPreview').classList.remove('hidden');
     }
 
-    window.closePreview = function(){
+    window.closePreview = () =>
         document.getElementById('dormPreview').classList.add('hidden');
-    }
 
-    // NEAR ME
+    // 📍 CENTER USER
     window.locateMe = function(){
-
-        if(!userLatLng) return alert("Location not found yet");
-
-        map.flyTo(userLatLng, 18, {
-            animate:true,
-            duration:1.2
-        });
+        if(!userLatLng) return;
+        map.flyTo(userLatLng, 18);
     }
 
 });

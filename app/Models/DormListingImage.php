@@ -11,14 +11,14 @@ class DormListingImage extends Model
 
     protected $fillable = [
         'dorm_listing_id',
-        'path',        // ✅ FIXED (was image_path)
+        'path',
         'is_cover',
     ];
 
     /**
-     * Each image belongs to a listing
+     * Each image belongs to a dorm listing
      */
-    public function listing()
+    public function dormListing()
     {
         return $this->belongsTo(DormListing::class, 'dorm_listing_id');
     }

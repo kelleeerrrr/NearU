@@ -34,56 +34,48 @@ class DormListing extends Model
         'pets_allowed' => 'boolean',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONSHIPS
-    |--------------------------------------------------------------------------
-    */
-
-    // Owner
+    // OWNER
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    // Saved listings
+    // SAVED
     public function savedByUsers()
     {
         return $this->belongsToMany(User::class, 'saved_listings');
     }
 
-    // Visits
+    // VISITS
     public function visitSchedules()
     {
         return $this->hasMany(VisitSchedule::class);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | IMAGES (REAL DATABASE SYSTEM)
-    |--------------------------------------------------------------------------
-    */
-
-    // All images
+    // IMAGES
     public function images()
     {
         return $this->hasMany(DormListingImage::class, 'dorm_listing_id');
     }
 
-    // Cover image
     public function coverImage()
     {
         return $this->hasOne(DormListingImage::class, 'dorm_listing_id')
             ->where('is_cover', true);
     }
 
-    // Helper: get first image safely
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    // ✅ FIXED ACCESSOR (THIS IS THE IMPORTANT FIX)
     public function getFirstImageUrlAttribute()
     {
         $image = $this->images()->first();
 
         return $image
-            ? asset('storage/' . $image->image_path)
+            ? asset('storage/' . $image->path)   // ✅ FIXED HERE
             : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400';
     }
 }
