@@ -2,13 +2,38 @@
 
 @section('title', 'Saved Listings - NearU')
 
+@push('styles')
+<style>
+.icon-btn{
+  padding:.5rem .8rem;
+  border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--card);
+  cursor:pointer;
+  font-weight:700;
+  font-size:.8rem;
+}
+
+.back-btn{
+  background:var(--green);
+  color:#fff;
+  border:none;
+}
+</style>
+@endpush
+
 @section('content')
 <div class="wrap">
   @include('partials.navbar')
 
   <div class="screen active">
-    <div style="padding: 1.2rem;">
-      <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">❤️ Saved Listings</h2>
+    <div class="cs">
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <button class="icon-btn back-btn" onclick="window.location.href='/profile'">
+          ← Back
+        </button>
+        <h2 style="font-size: 1.3rem; font-weight: 800; margin: 0;">❤️ Saved Listings</h2>
+      </div>
 
       @if($savedListings->isEmpty())
         <div class="empty">

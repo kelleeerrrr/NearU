@@ -74,19 +74,51 @@
 @push('scripts')
 <script>
 function selectUserType(type) {
+  console.log('Selecting user type:', type);
+  
+  // Remove selected class from both options
   document.getElementById('sOpt').classList.remove('sel');
   document.getElementById('oOpt').classList.remove('sel');
 
+  // Add selected class to chosen option
   if (type === 'student') {
     document.getElementById('sOpt').classList.add('sel');
   } else {
     document.getElementById('oOpt').classList.add('sel');
   }
 
-  document.getElementById('userTypeInput').value = type;
+  // Set hidden input value
+  var userTypeInput = document.getElementById('userTypeInput');
+  userTypeInput.value = type;
+  console.log('User type input set to:', userTypeInput.value);
 }
 
-// Initialize selection
-selectUserType(document.getElementById('userTypeInput').value);
+// Initialize selection on page load
+document.addEventListener('DOMContentLoaded', function() {
+  var initialType = document.getElementById('userTypeInput').value || 'student';
+  console.log('Initial user type:', initialType);
+  selectUserType(initialType);
+});
+
+// Fallback initialization
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    selectUserType('student');
+  });
+} else {
+  selectUserType('student');
+}
+
+// Form validation before submission
+document.querySelector('form').addEventListener('submit', function(e) {
+  var userType = document.getElementById('userTypeInput').value;
+  console.log('Form submitting with user type:', userType);
+  
+  if (!userType || (userType !== 'student' && userType !== 'owner')) {
+    e.preventDefault();
+    alert('Please select whether you are a Student or Owner');
+    return false;
+  }
+});
 </script>
 @endpush

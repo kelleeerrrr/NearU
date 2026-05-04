@@ -73,11 +73,11 @@
     /* ── DARK MODE ── */
     body.dark {
       --bg:       #0a1410;
-      --surface:  #111d14;
-      --card:     #162019;
+      --surface:  #1a2a1f;
+      --card:     #243429;
       --t1:       #dfeee4;
       --t2:       #6a8a72;
-      --border:   #1e3024;
+      --border:   #2e4034;
       --green-lt: #0d2219;
       --gold-lt:  #1a1500;
       --blue-lt:  #0d1826;
@@ -312,19 +312,20 @@
     /* ── BOTTOM NAV ── */
     .bot-nav {
       position: fixed;
-      bottom: 0;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      max-width: 480px;
-      width: 100%;
-      background: var(--card);
+      width: calc(100% - 40px);
+      max-width: 440px;
+      background: rgba(242, 183, 5, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
       display: flex;
       justify-content: space-around;
-      padding: .5rem 0 .55rem;
-      box-shadow: 0 -3px 20px rgba(0, 0, 0, .1);
-      border-radius: 22px 22px 0 0;
-      z-index: 200;
-      border-top: 1px solid var(--border);
+      padding: 8px 16px;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(242, 183, 5, 0.25);
+      border: 1px solid rgba(242, 183, 5, 0.3);
     }
 
     .nav-i {
@@ -332,53 +333,29 @@
       flex-direction: column;
       align-items: center;
       gap: .15rem;
-      color: var(--t2);
+      color: var(--t1);
       font-size: .62rem;
       font-weight: 700;
+      padding: 0.5rem;
+      border-radius: 12px;
       cursor: pointer;
-      padding: .35rem .75rem;
-      border-radius: 14px;
-      transition: all var(--transition);
       position: relative;
-      min-width: 60px;
+      transition: all 0.2s ease;
       text-decoration: none; {{-- safe for <a> tags --}}
     }
 
     .nav-i span { font-size: 1.22rem; transition: transform .2s; }
 
-    .nav-i.on { color: var(--green); }
+    .nav-i.on { 
+      color: var(--t1); 
+      background: rgba(255, 255, 255, 0.3);
+    }
     .nav-i.on span { transform: scale(1.15); }
 
-    /* Active pill behind icon */
-    .nav-i.on::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 44px;
-      height: 100%;
-      background: var(--green-lt);
-      border-radius: 12px;
-      z-index: -1;
-    }
-
-    /* Active dot under label */
-    .nav-i.on::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--green);
-    }
-
     .nav-i:hover:not(.on) {
-      color: var(--green);
-      background: var(--green-lt);
+      color: var(--t1);
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
     }
 
     /* ── TOAST NOTIFICATION ── */

@@ -5,13 +5,6 @@
 @push('styles')
 <style>
 
-/* DARK MODE SUPPORT */
-body.dark {
-  --card: #1e1e1e;
-  --bg: #121212;
-  --border: #2a2a2a;
-  --t2: #aaa;
-}
 
 /* HEADER ACTIONS */
 .top-actions{
@@ -33,6 +26,18 @@ body.dark {
 
 .logout-btn{
   background:#c0392b;
+  color:#fff;
+  border:none;
+}
+
+.back-btn{
+  background:var(--card);
+  color:var(--green);
+  border:1.5px solid var(--border);
+}
+
+body.dark .back-btn{
+  background:var(--green);
   color:#fff;
   border:none;
 }
@@ -138,7 +143,7 @@ body.dark {
   <div class="top-actions">
 
     {{-- DARK MODE --}}
-    <button class="icon-btn" onclick="toggleDarkMode()">
+    <button class="icon-btn back-btn" onclick="toggleDark()">
       🌙 Dark Mode
     </button>
 
@@ -222,23 +227,3 @@ body.dark {
 </div>
 
 @endsection
-
-{{-- DARK MODE SCRIPT --}}
-<script>
-function toggleDarkMode() {
-    document.body.classList.toggle('dark');
-
-    if(document.body.classList.contains('dark')) {
-        localStorage.setItem('theme', 'dark');
-    } else {
-        localStorage.setItem('theme', 'light');
-    }
-}
-
-// load saved theme
-window.onload = function () {
-    if(localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark');
-    }
-};
-</script>

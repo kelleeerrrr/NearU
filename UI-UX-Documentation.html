@@ -1,0 +1,2163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NearU - Complete UI/UX Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F0F7F2;
+            --surface: #fff;
+            --card: #fff;
+            --t1: #141F14;
+            --t2: #5E6E5E;
+            --border: #D6E8DC;
+            --green: #2D7D4F;
+            --green-dk: #1f5c38;
+            --green-lt: #E8F7EE;
+            --gold: #F2B705;
+            --gold-dk: #c99200;
+            --gold-lt: #FFFBEB;
+            --blue: #3B82F6;
+            --blue-lt: #EFF6FF;
+            --red: #C8102E;
+            --red-lt: #FFF0F2;
+            --sh: 0 2px 14px rgba(45, 125, 79, .08);
+            --sh2: 0 6px 28px rgba(45, 125, 79, .16);
+            --rad: 18px;
+            --transition: .2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--t1);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(145deg, #0a1f0e, #1a4d2e, #0f2d4a);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+            border-radius: var(--rad);
+        }
+
+        .header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .header h1 em {
+            color: var(--gold);
+            font-style: normal;
+        }
+
+        .section {
+            background: var(--surface);
+            border-radius: var(--rad);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--sh);
+        }
+
+        .section h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .screen-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: var(--green-lt);
+            border-radius: var(--rad);
+            border-left: 4px solid var(--green);
+        }
+
+        .screen-section h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 15px;
+        }
+
+        .ui-element {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .ui-element h4 {
+            font-weight: 600;
+            color: var(--t1);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .element-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .detail-item {
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .detail-item strong {
+            color: var(--green);
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        .detail-item span {
+            font-size: 0.85rem;
+            color: var(--t2);
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            border: 2px solid var(--border);
+        }
+
+        .component-preview {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--rad);
+            border: 1px solid var(--border);
+            margin: 15px 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            transition: all var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--green-dk);
+        }
+
+        .btn-secondary {
+            background: var(--gold);
+            color: var(--t1);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gold-dk);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--green);
+            border: 2px solid var(--green);
+        }
+
+        .btn-outline:hover {
+            background: var(--green);
+            color: white;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            margin: 8px 0;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 3px;
+        }
+
+        .badge-green {
+            background: var(--green-lt);
+            color: var(--green);
+        }
+
+        .badge-gold {
+            background: var(--gold-lt);
+            color: var(--gold-dk);
+        }
+
+        .badge-red {
+            background: var(--red-lt);
+            color: var(--red);
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--rad);
+            padding: 20px;
+            box-shadow: var(--sh);
+            margin: 15px 0;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .alert-success {
+            background: var(--green-lt);
+            color: var(--green);
+            border-left: 4px solid var(--green);
+        }
+
+        .alert-error {
+            background: var(--red-lt);
+            color: var(--red);
+            border-left: 4px solid var(--red);
+        }
+
+        .navigation {
+            background: var(--green);
+            color: white;
+            padding: 15px;
+            border-radius: var(--rad);
+            margin: 15px 0;
+        }
+
+        .nav-item {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item.active {
+            background: var(--gold);
+            color: var(--t1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .element-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Near<em>U</em></h1>
+            <p>Complete UI/UX Documentation - All Screens & Components</p>
+            <p style="opacity: 0.8; font-size: 0.9rem;">Housing Marketplace Application Analysis</p>
+        </header>
+
+        <!-- Design System Overview -->
+        <section class="section">
+            <h2>🎨 Design System Overview</h2>
+            
+            <div class="screen-section">
+                <h3>Color Palette</h3>
+                <div class="color-palette">
+                    <div class="color-swatch" style="background: #2D7D4F;">Primary<br>Green</div>
+                    <div class="color-swatch" style="background: #F2B705;">Gold<br>Accent</div>
+                    <div class="color-swatch" style="background: #F0F7F2; color: #141F14;">Light<br>Background</div>
+                    <div class="color-swatch" style="background: #141F14;">Dark<br>Text</div>
+                    <div class="color-swatch" style="background: #5E6E5E;">Secondary<br>Text</div>
+                    <div class="color-swatch" style="background: #D6E8DC; color: #141F14;">Border<br>Color</div>
+                    <div class="color-swatch" style="background: #0a1f0e;">Hero<br>Gradient</div>
+                    <div class="color-swatch" style="background: #3B82F6;">Blue<br>Accent</div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Typography</h3>
+                <div class="ui-element">
+                    <h4>Font Families</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Primary Font</strong>
+                            <span>Syne (Logo, Headers)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Body Font</strong>
+                            <span>DM Sans (Content, Forms)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Logo Style</strong>
+                            <span>Weight 800, Letter-spacing -2px</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Text Hierarchy</strong>
+                            <span>H1: 4rem, H2: 1.8rem, H3: 1.4rem</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Spacing & Layout</h3>
+                <div class="ui-element">
+                    <h4>Layout System</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Container Width</strong>
+                            <span>Max-width: 480px (Mobile-first)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Border Radius</strong>
+                            <span>18px (Cards, Buttons)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Padding</strong>
+                            <span>16px (Forms), 20px (Cards)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Shadows</strong>
+                            <span>Subtle green-tinted shadows</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Landing Page -->
+        <section class="section">
+            <h2>🏠 Landing Page (welcome.blade.php)</h2>
+            
+            <div class="screen-section">
+                <h3>Screen Overview</h3>
+                <div class="ui-element">
+                    <h4>Layout & Background</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Background</strong>
+                            <span>Dark gradient (green-blue mix)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Layout Type</strong>
+                            <span>Centered, Full-height flexbox</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Container</strong>
+                            <span>Same gradient as background</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Responsive</strong>
+                            <span>Mobile-first design</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>UI Elements</h3>
+                
+                <div class="ui-element">
+                    <h4>Logo Component</h4>
+                    <div class="component-preview">
+                        <div style="font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: white;">
+                            Near<em style="color: #F2B705;">U</em>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Font</strong>
+                            <span>Syne, Weight 800</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>"Near" Color</strong>
+                            <span>White (#fff)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>"U" Color</strong>
+                            <span>Gold (#F2B705)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Size</strong>
+                            <span>4rem (64px)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Tagline</h4>
+                    <div class="component-preview">
+                        <div style="color: rgba(255, 255, 255, 0.8); font-size: 1.2rem;">
+                            Find Housing Near Campus
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Text</strong>
+                            <span>"Find Housing Near Campus"</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Color</strong>
+                            <span>Semi-transparent white</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Font Size</strong>
+                            <span>1.2rem</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Position</strong>
+                            <span>Below logo, 20px margin</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Action Buttons</h4>
+                    <div class="component-preview">
+                        <button class="btn btn-primary">Login</button>
+                        <button class="btn btn-secondary">Sign Up</button>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Login Button</strong>
+                            <span>Green background, White text</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Sign Up Button</strong>
+                            <span>Gold background, Dark text</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Shape</strong>
+                            <span>Rounded (50px radius)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Hover Effects</strong>
+                            <span>Lift up, Darken color</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Authentication State</h4>
+                    <div class="component-preview">
+                        <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">
+                            Logged in as <strong>John Doe</strong>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Guest State</strong>
+                            <span>Login & Sign Up buttons</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Auth State</strong>
+                            <span>Dashboard & Logout buttons</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>User Display</strong>
+                            <span>Shows logged-in user name</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Implementation</strong>
+                            <span>Blade @auth/@guest directives</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Authentication Screens -->
+        <section class="section">
+            <h2>🔐 Authentication Screens</h2>
+            
+            <div class="screen-section">
+                <h3>Login Screen (auth/login.blade.php)</h3>
+                
+                <div class="ui-element">
+                    <h4>Layout Structure</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Container</strong>
+                            <span>auth-wrap (centered)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Form Box</strong>
+                            <span>auth-box (white background)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Max Width</strong>
+                            <span>480px</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Background</strong>
+                            <span>#F0F7F2 (light green)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Logo Section</h4>
+                    <div class="component-preview">
+                        <div style="text-align: center; margin: 20px 0;">
+                            <div style="font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: #2D7D4F;">
+                                Near<em style="color: #F2B705;">U</em>
+                            </div>
+                            <p style="color: #5E6E5E;">Welcome back! 👋</p>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Logo Color</strong>
+                            <span>Green (#2D7D4F)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Greeting</strong>
+                            <span>"Welcome back! 👋"</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Greeting Color</strong>
+                            <span>Secondary text (#5E6E5E)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Alignment</strong>
+                            <span>Center</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Alert Messages</h4>
+                    <div class="component-preview">
+                        <div class="alert alert-success">✅ Login successful!</div>
+                        <div class="alert alert-error">⚠️ Invalid credentials</div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Success Alert</strong>
+                            <span>Green background, Check icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Error Alert</strong>
+                            <span>Red background, Warning icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Border Style</strong>
+                            <span>Left border, 4px solid</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Padding</strong>
+                            <span>15px, rounded corners</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Form Fields</h4>
+                    <div class="component-preview">
+                        <div style="margin: 15px 0;">
+                            <label style="font-size: 12px; font-weight: 700; color: #5E6E5E; text-transform: uppercase;">Email</label>
+                            <input type="email" class="input-field" placeholder="your@email.com" value="john@example.com">
+                        </div>
+                        <div style="margin: 15px 0;">
+                            <label style="font-size: 12px; font-weight: 700; color: #5E6E5E; text-transform: uppercase;">Password</label>
+                            <input type="password" class="input-field" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Label Style</strong>
+                            <span>Uppercase, 12px, Secondary color</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Input Style</strong>
+                            <span>2px border, 10px radius</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Border Color</strong>
+                            <span>#D6E8DC (light green)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Focus State</strong>
+                            <span>Green border highlight</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Submit Button</h4>
+                    <div class="component-preview">
+                        <button class="btn btn-primary" style="width: 100%;">Login</button>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Width</strong>
+                            <span>100% (full width)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Background</strong>
+                            <span>Green (#2D7D4F)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Text Color</strong>
+                            <span>White</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Hover Effect</strong>
+                            <span>Darken green (#1f5c38)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Footer Links</h4>
+                    <div class="component-preview">
+                        <div style="text-align: center; margin-top: 20px; color: #5E6E5E;">
+                            <a href="#" style="color: #2D7D4F; text-decoration: none;">Forgot Password?</a>
+                            <span style="margin: 0 10px;">•</span>
+                            <a href="#" style="color: #2D7D4F; text-decoration: none;">Create Account</a>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Link Color</strong>
+                            <span>Green (#2D7D4F)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Separator</strong>
+                            <span>Bullet (•)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Alignment</strong>
+                            <span>Center</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Text Decoration</strong>
+                            <span>None (clean links)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Register Screen (auth/register.blade.php)</h3>
+                
+                <div class="ui-element">
+                    <h4>Registration Form Fields</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Full Name</strong>
+                            <span>Text input, required</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Email</strong>
+                            <span>Email input, unique validation</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Phone</strong>
+                            <span>Optional text input</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>User Type</strong>
+                            <span>Radio buttons (Student/Owner)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Password</strong>
+                            <span>Password input, 8+ chars</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Confirm Password</strong>
+                            <span>Password input, must match</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>User Type Selection</h4>
+                    <div class="component-preview">
+                        <div style="margin: 15px 0;">
+                            <label style="display: block; margin: 10px 0; cursor: pointer;">
+                                <input type="radio" name="user_type" value="student" checked> Student
+                            </label>
+                            <label style="display: block; margin: 10px 0; cursor: pointer;">
+                                <input type="radio" name="user_type" value="owner"> Property Owner
+                            </label>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Options</strong>
+                            <span>Student, Property Owner</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Default</strong>
+                            <span>Student selected</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Validation</strong>
+                            <span>Required field</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Impact</strong>
+                            <span>Determines dashboard type</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Student Dashboard & Screens -->
+        <section class="section">
+            <h2>🎓 Student Dashboard & Screens</h2>
+            
+            <div class="screen-section">
+                <h3>Student Home (student/home.blade.php)</h3>
+                
+                <div class="ui-element">
+                    <h4>Navigation Structure</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Top Bar</strong>
+                            <span>NearU logo, sticky position</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Bottom Nav</strong>
+                            <span>Mobile navigation bar</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Screen System</strong>
+                            <span>Single-page app style screens</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Active State</strong>
+                            <span>Screen.active class</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Hero Section</h4>
+                    <div class="component-preview">
+                        <div style="background: linear-gradient(145deg, #0a1f0e, #1a4d2e, #0f2d4a); color: white; padding: 30px; border-radius: 12px; text-align: center;">
+                            <h1 style="font-family: 'Syne', sans-serif; font-size: 1.5rem;">Find a place <span style="color: #F2B705;">near campus</span></h1>
+                            <div style="margin-top: 15px;">
+                                <span class="badge" style="background: rgba(255,255,255,0.2);">🛏️ Dorms</span>
+                                <span class="badge" style="background: rgba(255,255,255,0.2);">🛌 Bedspaces</span>
+                                <span class="badge" style="background: rgba(255,255,255,0.2);">🏠 Units</span>
+                                <span class="badge" style="background: rgba(255,255,255,0.2);">🚶 Walking distance</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Background</strong>
+                            <span>Dark gradient (same as landing)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Headline</strong>
+                            <span>"Find a place near campus"</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Accent Color</strong>
+                            <span>Gold for "near campus"</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Badges</strong>
+                            <span>Service categories with icons</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Search Component</h4>
+                    <div class="component-preview">
+                        <div style="position: relative; margin: 20px 0;">
+                            <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%);">🔍</span>
+                            <input type="text" class="input-field" style="padding-left: 45px;" placeholder="Search by street, type, or owner…">
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Icon</strong>
+                            <span>Search emoji (🔍)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Placeholder</strong>
+                            <span>"Search by street, type, or owner…"</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Icon Position</strong>
+                            <span>Left side of input</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Autocomplete</strong>
+                            <span>Disabled for performance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Filter Chips</h4>
+                    <div class="component-preview">
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0;">
+                            <div class="badge badge-green" style="cursor: pointer;">💰 Price</div>
+                            <div class="badge badge-green" style="cursor: pointer;">🏠 Type</div>
+                            <div class="badge badge-green" style="cursor: pointer;">🚶 Distance</div>
+                            <div class="badge badge-green" style="cursor: pointer;">👥 Gender</div>
+                            <div class="badge badge-green" style="cursor: pointer;">⚙️ More</div>
+                            <div class="badge" style="background: #2D7D4F; color: white; cursor: pointer;">✅ Available</div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Chip Style</strong>
+                            <span>Pill-shaped, light green</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Active State</strong>
+                            <span>Available chip is dark green</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Icons</strong>
+                            <span>Emoji for each filter type</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Interaction</strong>
+                            <span>Click to open filter modal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Dorm Listings (student/dorms/index.blade.php)</h3>
+                
+                <div class="ui-element">
+                    <h4>Dorm Card Component</h4>
+                    <div class="component-preview">
+                        <div class="card">
+                            <div style="position: relative; border-radius: 12px; overflow: hidden; height: 200px; background: #f0f0f0; margin-bottom: 15px;">
+                                <img src="https://via.placeholder.com/400x200" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem;">
+                                    5 min walk
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div class="badge badge-green">Dorm</div>
+                                <div style="cursor: pointer; font-size: 1.2rem;">🤍</div>
+                            </div>
+                            <h4 style="margin: 10px 0;">University Avenue</h4>
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #2D7D4F;">₱3,500<small>/month</small></div>
+                            <div style="margin-top: 10px;">
+                                <span class="badge" style="background: #E8F7EE; color: #2D7D4F;">Private Bath</span>
+                                <span class="badge" style="background: #E8F7EE; color: #2D7D4F;">Female Only</span>
+                                <span class="badge" style="background: #E8F7EE; color: #2D7D4F;">5 min walk</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Image Carousel</strong>
+                            <span>Multiple photos with navigation</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Distance Badge</strong>
+                            <span>Top-right, dark overlay</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Save Button</strong>
+                            <span>Heart icon (🤍/❤️)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Price Display</strong>
+                            <span>Large, prominent, ₱ symbol</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Type Badge</strong>
+                            <span>Color-coded by dorm type</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Meta Pills</strong>
+                            <span>Features in pill format</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Rating System</h4>
+                    <div class="component-preview">
+                        <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+                            <div style="color: #F2B705;">★★★★★</div>
+                            <div style="font-weight: bold;">4.8</div>
+                            <div style="color: #5E6E5E; font-size: 0.9rem;">(12 reviews)</div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Star Display</strong>
+                            <span>Gold stars (★)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Numeric Rating</strong>
+                            <span>Bold, large font</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Review Count</strong>
+                            <span>Secondary text color</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Layout</strong>
+                            <span>Horizontal flex alignment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Dorm Details (student/dorms/show.blade.php)</h3>
+                
+                <div class="ui-element">
+                    <h4>Image Gallery</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Carousel</strong>
+                            <span>Full-width image slider</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Navigation</strong>
+                            <span>Swipe/dot indicators</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Fallback</strong>
+                            <span>Placeholder image if no photos</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Aspect Ratio</strong>
+                            <span>16:9 (400x200px)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Price & Type Header</h4>
+                    <div class="component-preview">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #2D7D4F;">₱3,500<small>/month</small></div>
+                            <div class="badge badge-green">Dorm</div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Price Position</strong>
+                            <span>Left side, large font</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Type Position</strong>
+                            <span>Right side, badge</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Spacing</strong>
+                            <span>20px margin</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Flex Layout</strong>
+                            <span>Space-between alignment</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Action Buttons</h4>
+                    <div class="component-preview">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0;">
+                            <button class="btn btn-primary">📞 Contact Owner</button>
+                            <button class="btn btn-secondary">📅 Schedule Visit</button>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Contact Button</strong>
+                            <span>Green, phone icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Visit Button</strong>
+                            <span>Gold, calendar icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Layout</strong>
+                            <span>2-column grid</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Icons</strong>
+                            <span>Emoji for visual clarity</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Owner Dashboard & Screens -->
+        <section class="section">
+            <h2>🏢 Owner Dashboard & Screens</h2>
+            
+            <div class="screen-section">
+                <h3>Owner Dashboard (owner/dashboard.blade.php)</h3>
+                
+                <div class="ui-element">
+                    <h4>Hero Section</h4>
+                    <div class="component-preview">
+                        <div style="background: linear-gradient(145deg, #0a1f0e, #1a4d2e, #0f2d4a); color: white; padding: 30px; border-radius: 0 0 22px 22px; margin: -20px -20px 20px -20px;">
+                            <div style="font-size: 0.8rem; opacity: 0.7;">Welcome back,</div>
+                            <div style="font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; margin-top: 5px;">
+                                John <em style="color: #F2B705;">Doe</em>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <span class="badge" style="background: #F2B705; color: #141F14;">✅ Verified</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Background</strong>
+                            <span>Dark gradient, same as student</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Greeting</strong>
+                            <span>"Welcome back," (small, opaque)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Name Display</strong>
+                            <span>Syne font, gold accent</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Verification Badge</strong>
+                            <span>Gold background, check icon</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Locked State (Unverified)</h4>
+                    <div class="component-preview">
+                        <div class="alert" style="background: #FFF7CC; border: 2px solid #F2B705; color: #141F14;">
+                            <h4 style="margin-bottom: 10px;">🔒 Account Verification Required</h4>
+                            <p>Please complete verification to access all features.</p>
+                            <button class="btn btn-secondary" style="margin-top: 10px;">Complete Verification</button>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Background</strong>
+                            <span>Light gold (#FFF7CC)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Border</strong>
+                            <span>2px solid gold</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Icon</strong>
+                            <span>Lock emoji (🔒)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Call to Action</strong>
+                            <span>Gold verification button</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Statistics Cards</h4>
+                    <div class="component-preview">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0;">
+                            <div class="card" style="text-align: center;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #2D7D4F;">12</div>
+                                <div style="color: #5E6E5E;">Total Listings</div>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #F2B705;">48</div>
+                                <div style="color: #5E6E5E;">Total Views</div>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #3B82F6;">5</div>
+                                <div style="color: #5E6E5E;">Inquiries</div>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #C8102E;">3</div>
+                                <div style="color: #5E6E5E;">Visits Scheduled</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Layout</strong>
+                            <span>2x2 grid</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Number Display</strong>
+                            <span>Large, bold, colored</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Label</strong>
+                            <span>Secondary text color</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Color Coding</strong>
+                            <span>Green, Gold, Blue, Red</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Create Listing (owner/listings/create.blade.php)</h3>
+                
+                <div class="ui-element">
+                    <h4>Form Layout</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Container</strong>
+                            <span>480px max-width, centered</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Top Bar</strong>
+                            <span>Green background, sticky</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Form Sections</strong>
+                            <span>Grouped by category</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Progress</strong>
+                            <span>Step-by-step flow</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Photo Upload Grid</h4>
+                    <div class="component-preview">
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0;">
+                            <div style="aspect-ratio: 1; background: #f0f0f0; border: 2px dashed #D6E8DC; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                <div style="text-align: center; color: #5E6E5E;">
+                                    <div style="font-size: 2rem;">📷</div>
+                                    <div style="font-size: 0.8rem;">Add Photo</div>
+                                </div>
+                            </div>
+                            <div style="aspect-ratio: 1; background: #f0f0f0; border-radius: 8px; overflow: hidden;">
+                                <img src="https://via.placeholder.com/150x150" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div style="aspect-ratio: 1; background: #f0f0f0; border-radius: 8px; overflow: hidden;">
+                                <img src="https://via.placeholder.com/150x150" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Grid Layout</strong>
+                            <span>3 columns, equal height</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Add Button</strong>
+                            <span>Dashed border, camera icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Photo Preview</strong>
+                            <span>Cropped, centered</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Aspect Ratio</strong>
+                            <span>1:1 (square)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Form Sections</h4>
+                    <div class="component-preview">
+                        <div style="margin: 20px 0;">
+                            <div style="font-weight: 800; margin: 18px 0 10px; color: #5E6E5E; font-size: 12px; text-transform: uppercase;">Basic Information</div>
+                            <input type="text" class="input-field" placeholder="Street Address">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                                <input type="number" class="input-field" placeholder="Price">
+                                <select class="input-field">
+                                    <option>Select Type</option>
+                                    <option>Dorm</option>
+                                    <option>Bedspace</option>
+                                    <option>Unit</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Section Headers</strong>
+                            <span>Uppercase, 12px, secondary</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Field Layout</strong>
+                            <span>Full-width and 2-column</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Input Style</strong>
+                            <span>Consistent with auth forms</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Spacing</strong>
+                            <span>18px margin before sections</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Map Integration</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Library</strong>
+                            <span>Leaflet.js</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Interaction</strong>
+                            <span>Click to set location</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Marker</strong>
+                            <span>Green pin icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Height</strong>
+                            <span>300px fixed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation & Layout Components -->
+        <section class="section">
+            <h2>🧭 Navigation & Layout Components</h2>
+            
+            <div class="screen-section">
+                <h3>Mobile Navigation (partials/navbar.blade.php)</h3>
+                
+                <div class="ui-element">
+                    <h4>Bottom Navigation Bar</h4>
+                    <div class="component-preview">
+                        <div class="navigation" style="position: fixed; bottom: 0; left: 0; right: 0; border-radius: 18px 18px 0 0;">
+                            <div style="display: flex; justify-content: space-around; padding: 10px 0;">
+                                <div class="nav-item active">🏠</div>
+                                <div class="nav-item">🔍</div>
+                                <div class="nav-item">❤️</div>
+                                <div class="nav-item">💬</div>
+                                <div class="nav-item">👤</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Position</strong>
+                            <span>Fixed bottom</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Background</strong>
+                            <span>Green (#2D7D4F)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Icons</strong>
+                            <span>Emoji navigation items</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Active State</strong>
+                            <span>Gold background</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Layout</strong>
+                            <span>Space-between flex</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Navigation Items</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Home</strong>
+                            <span>🏠 Main dashboard</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Search</strong>
+                            <span>🔍 Dorm listings</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Saved</strong>
+                            <span>❤️ Saved listings</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Messages</strong>
+                            <span>💬 Chat/inquiries</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Profile</strong>
+                            <span>👤 User settings</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Screen Navigation System</h3>
+                
+                <div class="ui-element">
+                    <h4>Single-Page App Navigation</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Container</strong>
+                            <span>.wrap (480px max-width)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Screens</strong>
+                            <span>.screen class</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Active State</strong>
+                            <span>.active class</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Transitions</strong>
+                            <span>JavaScript controlled</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Layout Structure</h4>
+                    <div class="component-preview">
+                        <div style="background: #fff; border: 1px solid #D6E8DC; border-radius: 12px; padding: 15px;">
+                            <div style="background: #2D7D4F; color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px;">Top Bar</div>
+                            <div style="background: #F0F7F2; padding: 60px 20px; border-radius: 8px; text-align: center; margin-bottom: 10px;">Screen Content</div>
+                            <div style="background: #2D7D4F; color: white; padding: 10px; border-radius: 8px;">Bottom Navigation</div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Top Bar</strong>
+                            <span>Green, sticky, logo</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Content Area</strong>
+                            <span>Light green background</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Bottom Nav</strong>
+                            <span>Fixed, green background</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Height</strong>
+                            <span>100vh minus nav bars</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popups, Modals & Interactive Elements -->
+        <section class="section">
+            <h2>🔔 Popups, Modals & Interactive Elements</h2>
+            
+            <div class="screen-section">
+                <h3>Filter Modals</h3>
+                
+                <div class="ui-element">
+                    <h4>Filter Popup System</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Trigger</strong>
+                            <span>Filter chip clicks</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Animation</strong>
+                            <span>Slide up from bottom</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Overlay</strong>
+                            <span>Semi-transparent black</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Close Action</strong>
+                            <span>Tap overlay or X button</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Filter Types</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Price</strong>
+                            <span>Range slider (₱0 - ₱10,000)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Type</strong>
+                            <span>Checkboxes (Dorm, Bedspace, Unit)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Distance</strong>
+                            <span>Radio buttons (5, 10, 15+ min)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Gender</strong>
+                            <span>Male, Female, Co-ed</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Advanced</strong>
+                            <span>Bathroom, Amenities, etc.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Message System</h3>
+                
+                <div class="ui-element">
+                    <h4>Chat Interface</h4>
+                    <div class="component-preview">
+                        <div style="background: #fff; border: 1px solid #D6E8DC; border-radius: 12px; height: 400px; display: flex; flex-direction: column;">
+                            <div style="background: #2D7D4F; color: white; padding: 15px; border-radius: 12px 12px 0 0;">
+                                <div style="font-weight: bold;">John Doe</div>
+                                <div style="font-size: 0.8rem; opacity: 0.8;">Property Owner</div>
+                            </div>
+                            <div style="flex: 1; padding: 15px; background: #F0F7F2;">
+                                <div style="margin-bottom: 15px;">
+                                    <div style="background: #2D7D4F; color: white; padding: 10px; border-radius: 18px 18px 4px 18px; max-width: 70%;">
+                                        Hi! Is the dorm still available?
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 15px; text-align: right;">
+                                    <div style="background: white; padding: 10px; border-radius: 18px 18px 18px 4px; max-width: 70%; margin-left: auto;">
+                                        Yes! Would you like to schedule a visit?
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="padding: 15px; border-top: 1px solid #D6E8DC;">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" class="input-field" placeholder="Type a message..." style="flex: 1;">
+                                    <button class="btn btn-primary">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Header</strong>
+                            <span>Green, user info</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Messages</strong>
+                            <span>Bubble style, left/right aligned</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Input Area</strong>
+                            <span>Fixed bottom, send button</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Colors</strong>
+                            <span>Sent: white, Received: green</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Visit Scheduling</h3>
+                
+                <div class="ui-element">
+                    <h4>Calendar Modal</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Trigger</strong>
+                            <span>"Schedule Visit" button</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Calendar</strong>
+                            <span>Monthly grid view</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Time Slots</strong>
+                            <span>9AM - 6PM, hourly</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Confirmation</strong>
+                            <span>Success message after booking</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Visit Status</h4>
+                    <div class="component-preview">
+                        <div class="card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div>
+                                    <div style="font-weight: bold;">Visit to University Avenue</div>
+                                    <div style="color: #5E6E5E; font-size: 0.9rem;">Tomorrow, 2:00 PM</div>
+                                </div>
+                                <div class="badge badge-green">Confirmed</div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-outline">Reschedule</button>
+                                <button class="btn" style="background: #C8102E;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Status Badge</strong>
+                            <span>Green for confirmed</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Actions</strong>
+                            <span>Reschedule (outline), Cancel (red)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Info Display</strong>
+                            <span>Address, date, time</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Layout</strong>
+                            <span>Card format, flex layout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Notification System</h3>
+                
+                <div class="ui-element">
+                    <h4>Notification Types</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>New Inquiry</strong>
+                            <span>Blue background, message icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Visit Scheduled</strong>
+                            <span>Green background, calendar icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Verification Status</strong>
+                            <span>Gold background, check icon</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>System Updates</strong>
+                            <span>Gray background, info icon</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Notification Display</h4>
+                    <div class="component-preview">
+                        <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 1.2rem;">💬</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">New Inquiry</div>
+                                    <div style="font-size: 0.9rem; color: #5E6E5E;">Sarah Chen asked about your dorm listing</div>
+                                </div>
+                                <div style="font-size: 0.8rem; color: #5E6E5E;">2m ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Layout</strong>
+                            <span>Horizontal flex, icon + content</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Timestamp</strong>
+                            <span>Right side, small text</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Click Action</strong>
+                            <span>Open related screen</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Dismiss</strong>
+                            <span>Swipe or X button</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Responsive Design & Accessibility -->
+        <section class="section">
+            <h2>📱 Responsive Design & Accessibility</h2>
+            
+            <div class="screen-section">
+                <h3>Mobile-First Approach</h3>
+                
+                <div class="ui-element">
+                    <h4>Breakpoints</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Mobile</strong>
+                            <span>320px - 480px (primary)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Tablet</strong>
+                            <span>481px - 768px</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Desktop</strong>
+                            <span>769px+ (limited support)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Container</strong>
+                            <span>Max 480px on all screens</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Touch Interactions</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Tap Targets</strong>
+                            <span>Minimum 44px (Apple HIG)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Gestures</strong>
+                            <span>Swipe for carousels, taps for actions</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Feedback</strong>
+                            <span>Visual hover states, transitions</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Scrolling</strong>
+                            <span>Natural momentum scrolling</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Accessibility Features</h3>
+                
+                <div class="ui-element">
+                    <h4>Semantic HTML</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Headings</strong>
+                            <span>Proper h1-h6 hierarchy</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Forms</strong>
+                            <span>Labels for all inputs</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Buttons</strong>
+                            <span>Descriptive text, aria-labels</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Navigation</strong>
+                            <span>Skip links, landmarks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Visual Accessibility</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Contrast</strong>
+                            <span>WCAG AA compliant ratios</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Font Sizes</strong>
+                            <span>Minimum 16px for body text</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Color Independence</strong>
+                            <span>Icons + colors for meaning</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Focus States</strong>
+                            <span>Visible keyboard navigation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance & Technical Considerations -->
+        <section class="section">
+            <h2>⚡ Performance & Technical Considerations</h2>
+            
+            <div class="screen-section">
+                <h3>Image Optimization</h3>
+                
+                <div class="ui-element">
+                    <h4>Image Handling</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Storage</strong>
+                            <span>Laravel Storage (local/public)</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Sizes</strong>
+                            <span>400x200 for cards, larger for gallery</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Formats</strong>
+                            <span>JPEG for photos, PNG for graphics</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Fallbacks</strong>
+                            <span>Placeholder images when missing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Loading Strategy</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Lazy Loading</strong>
+                            <span>Images below fold</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Progressive</strong>
+                            <span>Low-quality placeholders</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Caching</strong>
+                            <span>Browser cache headers</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>CDN</strong>
+                            <span>Static assets optimization</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>JavaScript Interactions</h3>
+                
+                <div class="ui-element">
+                    <h4>Frontend Framework</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Library</strong>
+                            <span>Vanilla JavaScript</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>State Management</strong>
+                            <span>Simple object-based</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Transitions</strong>
+                            <span>CSS animations + JS triggers</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Bundling</strong>
+                            <span>Laravel Mix/Vite</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Key Interactions</h4>
+                    <div class="element-item">
+                        <strong>Screen Navigation</strong>
+                        <span>SPA-style screen switching</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Filter System</strong>
+                        <span>Dynamic filtering, AJAX updates</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Form Validation</strong>
+                        <span>Real-time validation feedback</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Search</strong>
+                        <span>Autocomplete, instant results</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Improvement Opportunities -->
+        <section class="section">
+            <h2>🔧 Improvement Opportunities & Recommendations</h2>
+            
+            <div class="screen-section">
+                <h3>UI/UX Enhancements</h3>
+                
+                <div class="ui-element">
+                    <h4>Navigation Improvements</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Breadcrumb Navigation</strong>
+                            <span>Add context for deep screens</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Search History</strong>
+                            <span>Recent searches quick access</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Quick Filters</strong>
+                            <span>Preset filter combinations</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Gesture Navigation</strong>
+                            <span>Swipe back between screens</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Visual Enhancements</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Loading States</strong>
+                            <span>Skeleton screens, spinners</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Micro-interactions</strong>
+                            <span>Button animations, transitions</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Empty States</strong>
+                            <span>Helpful illustrations, CTAs</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Error Handling</strong>
+                            <span>Friendly error messages, recovery</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Feature Additions</h3>
+                
+                <div class="ui-element">
+                    <h4>Student Features</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Compare Tool</strong>
+                            <span>Side-by-side dorm comparison</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Virtual Tours</strong>
+                            <span>360° photos, video walkthroughs</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Review System</strong>
+                            <span>Star ratings, written reviews</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Wishlist Sharing</strong>
+                            <span>Share saved listings with friends</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Owner Features</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Analytics Dashboard</strong>
+                            <span>Views, inquiries, conversion rates</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Bulk Operations</strong>
+                            <span>Multiple listing management</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Auto-Responses</strong>
+                            <span>Canned message templates</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Calendar Integration</strong>
+                            <span>Sync with external calendars</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Technical Improvements</h3>
+                
+                <div class="ui-element">
+                    <h4>Performance</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Image Optimization</strong>
+                            <span>WebP format, responsive images</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Code Splitting</strong>
+                            <span>Lazy load JS per screen</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Caching Strategy</strong>
+                            <span>Service worker, offline support</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Bundle Optimization</strong>
+                            <span>Tree shaking, minification</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Accessibility</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Screen Reader Support</strong>
+                            <span>ARIA labels, live regions</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Keyboard Navigation</strong>
+                            <span>Full keyboard accessibility</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>High Contrast Mode</strong>
+                            <span>Alternative color schemes</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Reduced Motion</strong>
+                            <span>Respects user preferences</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="section">
+            <h2>📋 Summary & Next Steps</h2>
+            
+            <div class="screen-section">
+                <h3>Current State Analysis</h3>
+                
+                <div class="ui-element">
+                    <h4>Strengths</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Consistent Design</strong>
+                            <span>Cohesive color scheme & typography</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Mobile-First</strong>
+                            <span>Optimized for mobile experience</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Clear Navigation</strong>
+                            <span>Intuitive bottom navigation</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Brand Identity</strong>
+                            <span>Strong NearU branding throughout</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Areas for Improvement</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Loading Performance</strong>
+                            <span>Image optimization needed</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Error Handling</strong>
+                            <span>More robust error states</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Accessibility</strong>
+                            <span>Enhanced screen reader support</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Content Strategy</strong>
+                            <span>Better empty states & onboarding</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-section">
+                <h3>Implementation Priority</h3>
+                
+                <div class="ui-element">
+                    <h4>High Priority</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Performance</strong>
+                            <span>Image optimization, lazy loading</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Error States</strong>
+                            <span>Network errors, validation feedback</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Search UX</strong>
+                            <span>Autocomplete, instant results</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Medium Priority</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>Enhanced Filters</strong>
+                            <span>Advanced filtering options</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Social Features</strong>
+                            <span>Reviews, sharing, recommendations</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Analytics</strong>
+                            <span>User behavior tracking</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-element">
+                    <h4>Low Priority</h4>
+                    <div class="element-details">
+                        <div class="detail-item">
+                            <strong>PWA Features</strong>
+                            <span>Offline support, install prompts</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Advanced Animations</strong>
+                            <span>Micro-interactions, transitions</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>A/B Testing</strong>
+                            <span>Conversion optimization</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Add some interactivity to the documentation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scroll for internal links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add click handlers for interactive elements
+            document.querySelectorAll('.badge, .btn, .nav-item').forEach(element => {
+                element.addEventListener('click', function() {
+                    // Simple visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 100);
+                });
+            });
+
+            // Add hover effects for cards
+            document.querySelectorAll('.card, .ui-element').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = 'var(--sh2)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'var(--sh)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

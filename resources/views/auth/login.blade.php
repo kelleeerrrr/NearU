@@ -28,6 +28,13 @@
       </div>
     @endif
 
+    {{-- Registration Success Message --}}
+    @if (session('success'))
+      <div class="auth-alert auth-alert--success">
+        ✅ {{ session('success') }}
+      </div>
+    @endif
+
     {{-- Login Form --}}
     <form method="POST" action="{{ route('login.post') }}">
       @csrf

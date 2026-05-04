@@ -63,6 +63,14 @@ Route::middleware('guest')->group(function () {
 
     Route::post('/register', function (Request $request) {
 
+        // Debug: Log all request data
+        \Log::info('Registration attempt', [
+            'all_data' => $request->all(),
+            'user_type' => $request->input('user_type'),
+            'name' => $request->input('name'),
+            'email' => $request->input('email')
+        ]);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
@@ -70,6 +78,14 @@ Route::middleware('guest')->group(function () {
             'user_type' => 'required|in:student,owner',
             'password' => 'required|min:8|confirmed',
         ]);
+
+        // Fallback: Ensure user_type is set
+        if (empty($data['user_type']) || !in_array($data['user_type'], ['student', 'owner'])) {
+            $data['user_type'] = 'student'; // Default fallback
+            \Log::warning('User type was missing or invalid, defaulted to student');
+        }
+
+        \Log::info('Creating user with data', $data);
 
         User::create([
             'name' => $data['name'],
@@ -79,6 +95,8 @@ Route::middleware('guest')->group(function () {
             'password' => Hash::make($data['password']),
             'verification_status' => 'not_verified',
         ]);
+
+        \Log::info('User created successfully', ['email' => $data['email'], 'user_type' => $data['user_type']]);
 
         return redirect()->route('login')
             ->with('success', 'Account created successfully.');
@@ -184,6 +202,9 @@ Route::get('/visits', function () {
     Route::get('/profile', fn () => view('student.profile', ['user' => auth()->user()]))
         ->name('profile');
 
+    Route::get('/profile/edit', fn () => view('student.edit', ['user' => auth()->user()]))
+        ->name('profile.edit');
+
     Route::put('/profile', function (Request $request) {
 
         $data = $request->validate([
@@ -197,6 +218,27 @@ Route::get('/visits', function () {
         return back()->with('success', 'Profile updated successfully.');
 
     })->name('profile.update');
+
+    Route::put('/password', function (Request $request) {
+        
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = auth()->user();
+        
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return back()->with('success', 'Password updated successfully.');
+
+    })->name('password.update');
 
     /*
     |--------------------------------------------------------------------------

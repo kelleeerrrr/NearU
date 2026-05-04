@@ -1,198 +1,254 @@
 @extends('layouts.app')
 
-@section('title', 'Profile - NearU')
+@section('title', 'Student Profile - NearU')
+
+@push('styles')
+<style>
+/* DARK MODE SUPPORT */
+body.dark {
+  --card: #1e1e1e;
+  --bg: #121212;
+  --border: #2a2a2a;
+  --t2: #aaa;
+}
+
+/* HEADER ACTIONS */
+.top-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:1rem;
+}
+
+.icon-btn{
+  padding:.5rem .8rem;
+  border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--card);
+  cursor:pointer;
+  font-weight:700;
+  font-size:.8rem;
+}
+
+.logout-btn{
+  background:#c0392b;
+  color:#fff;
+  border:none;
+}
+
+/* PAGE */
+.page{padding:1rem 1.2rem; max-width: 480px; margin: 0 auto;}
+
+/* PROFILE */
+.profile-card{
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;
+  padding:1rem;
+  box-shadow:var(--sh);
+  display:flex;
+  gap:1rem;
+  align-items:center;
+}
+
+.avatar{
+  width:70px;height:70px;border-radius:50%;
+  background:linear-gradient(135deg,#2D7D4F,#1f5c38);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.6rem;font-weight:800;
+  overflow:hidden;
+}
+
+.avatar img{
+  width:100%;height:100%;object-fit:cover;
+}
+
+.badge{
+  display:inline-block;
+  margin-top:.3rem;
+  padding:.25rem .6rem;
+  border-radius:20px;
+  font-size:.7rem;
+  font-weight:800;
+  background:var(--green-lt);
+  color:var(--green);
+}
+
+/* SECTION */
+.section{
+  margin-top:1rem;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:18px;
+  padding:1rem;
+  box-shadow:var(--sh);
+}
+
+.section-title{
+  font-weight:800;
+  margin-bottom:.7rem;
+  font-size:.9rem;
+}
+
+/* MENU ITEMS */
+.menu-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:1rem 0;
+  cursor:pointer;
+  border-bottom:1px solid var(--border);
+  transition:background 0.2s;
+}
+
+.menu-item:hover{
+  background:var(--bg);
+  margin:0 -1rem;
+  padding:1rem;
+}
+
+.menu-item:last-child{
+  border-bottom:none;
+}
+
+.menu-item.logout{
+  color:#c0392b;
+}
+
+/* EDIT FORM */
+.edit-form{
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+}
+
+.input{
+  padding:.7rem;
+  border-radius:12px;
+  border:1.5px solid var(--border);
+  font-size:.85rem;
+  background:transparent;
+  color:inherit;
+}
+
+.save-btn{
+  background:var(--blue);
+  color:#fff;
+  padding:.7rem;
+  border:none;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+/* PHOTO UPLOAD */
+.photo-upload{
+  margin-top:1rem;
+  padding-top:1rem;
+  border-top:1px solid var(--border);
+}
+
+.photo-preview{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  margin-top:.5rem;
+  overflow:hidden;
+}
+
+.photo-preview img{
+  width:100%;height:100%;object-fit:cover;
+}
+</style>
+@endpush
 
 @section('content')
 <div class="wrap">
   @include('partials.navbar')
 
-  <div class="screen active" style="max-width: 600px; margin: auto; padding: 2rem;">
+  <div class="screen active">
 
-    <!-- PROFILE HEADER -->
-    <div class="u-hero" style="display:flex; align-items:center; flex-direction:column; text-align:center; padding-bottom:1.5rem; border-bottom:1px solid #ddd;">
+    <div class="cs">
+      {{-- TOP ACTIONS --}}
+      <div class="top-actions">
 
-      <div class="u-av" style="width:70px;height:70px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;overflow:hidden;">
-
-        @if(auth()->user()->profile_photo_path)
-          <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}"
-               style="width:100%;height:100%;object-fit:cover;">
-        @else
-          {{ substr(auth()->user()->name, 0, 1) }}
-        @endif
-
-      </div>
-
-      <div style="margin-top:1rem;">
-        <h3>{{ auth()->user()->name }}</h3>
-        <p>Phone: {{ auth()->user()->phone ?? 'Not set' }}</p>
-        <p>Member Since: {{ auth()->user()->created_at->format('M Y') }}</p>
-      </div>
-
-    </div>
-
-    <!-- EDIT BUTTON -->
-    <div style="margin-top:1.5rem;text-align:center;">
-      <button onclick="toggleEditProfile()"
-              style="padding:.7rem 1.2rem;background:#007bff;color:#fff;border:none;border-radius:6px;">
-        Edit Profile
-      </button>
-    </div>
-
-    <!-- EDIT PANEL -->
-    <div id="editProfileContainer" style="display:none;margin-top:2rem;border:1px solid #ddd;padding:1rem;border-radius:8px;">
-
-      <h3>Edit Profile</h3>
-
-      <form action="{{ route('profile.update') }}" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div style="margin-bottom:1rem;">
-          <label>Name</label>
-          <input type="text" name="name" value="{{ auth()->user()->name }}"
-                 style="width:100%;padding:.5rem;">
-        </div>
-
-        <div style="margin-bottom:1rem;">
-          <label>Email</label>
-          <input type="email" name="email" value="{{ auth()->user()->email }}"
-                 style="width:100%;padding:.5rem;">
-        </div>
-
-        <div style="margin-bottom:1rem;">
-          <label>Phone</label>
-          <input type="text" name="phone" value="{{ auth()->user()->phone }}"
-                 style="width:100%;padding:.5rem;">
-        </div>
-
-        <button type="submit"
-                style="background:green;color:#fff;padding:.5rem 1rem;border:none;border-radius:5px;">
-          Save Changes
+        {{-- DARK MODE --}}
+        <button class="icon-btn" onclick="toggleDark()">
+          🌙 Dark Mode
         </button>
-      </form>
 
-      <!-- PHOTO UPLOAD -->
-      <div style="margin-top:2rem;">
-        <h4>Profile Photo (Auto Upload)</h4>
+        {{-- LOGOUT --}}
+        <form method="POST" action="{{ route('logout') }}">
+          @csrf
+          <button type="submit" class="icon-btn logout-btn">
+            🚪 Logout
+          </button>
+        </form>
 
-        <input type="file" id="photoInput" accept="image/*">
-
-        <p id="uploadStatus" style="font-size:12px;color:gray;"></p>
-
-        <div style="margin-top:1rem;">
-          <img id="photoPreview"
-               src="{{ auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : '' }}"
-               style="width:120px;height:120px;border-radius:50%;object-fit:cover;">
-        </div>
       </div>
 
+      {{-- PROFILE --}}
+      <div class="profile-card">
+    <div class="avatar">
+      @if(auth()->user()->profile_photo_path)
+        <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" alt="Profile">
+      @else
+        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+      @endif
     </div>
 
-    <!-- MENU -->
-    <div style="margin-top:2rem;">
+    <div>
+      <h2>{{ auth()->user()->name }}</h2>
+      <p>{{ auth()->user()->email }}</p>
+      <p>{{ auth()->user()->phone ?? 'No phone number' }}</p>
 
-      <div onclick="window.location.href='/saved'"
-           style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;cursor:pointer;border-bottom:1px solid #f0f0f0;">
-        <div>❤️ Saved Listings</div>
-        <div>→</div>
-      </div>
-
-      <div onclick="window.location.href='/visits'"
-           style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;cursor:pointer;border-bottom:1px solid #f0f0f0;">
-        <div>📅 Scheduled Visits</div>
-        <div>→</div>
-      </div>
-
-      <!-- CHECKLIST FIXED -->
-      <div onclick="window.location.href='{{ route('checklist') }}'"
-           style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;cursor:pointer;border-bottom:1px solid #f0f0f0;">
-        <div>📋 Move-in Checklist</div>
-        <div>→</div>
-      </div>
-
-      <!-- DARK MODE -->
-      <div onclick="toggleDarkMode()"
-           style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;cursor:pointer;border-bottom:1px solid #f0f0f0;">
-        <div>🌙 Dark Mode</div>
-        <div>→</div>
-      </div>
-
-      <!-- LOGOUT -->
-      <div onclick="logoutUser()"
-           style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;cursor:pointer;color:red;">
-        <div>🚪 Log Out</div>
-        <div>→</div>
-      </div>
-
+      <span class="badge">🎓 Student Account</span>
     </div>
-
   </div>
 
-  @include('partials.footer')
-</div>
+  {{-- EDIT PROFILE BUTTON --}}
+  <div class="section">
+    <button class="icon-btn" style="width: 100%; justify-content: center;" onclick="window.location.href='/profile/edit'">
+      ✏️ Edit Profile
+    </button>
+  </div>
 
-<!-- LOGOUT FORM -->
-<form id="logout-form" method="POST" action="{{ route('logout') }}" style="display:none;">
-  @csrf
-</form>
+  {{-- QUICK LINKS --}}
+  <div class="section">
+    <div class="section-title">⚡ Quick Links</div>
+
+    <div class="menu-item" onclick="window.location.href='/saved'">
+      <div>❤️ Saved Listings</div>
+      <div>→</div>
+    </div>
+
+    <div class="menu-item" onclick="window.location.href='/visits'">
+      <div>📅 Scheduled Visits</div>
+      <div>→</div>
+    </div>
+
+    <div class="menu-item" onclick="window.location.href='{{ route('checklist') }}'">
+      <div>📋 Move-in Checklist</div>
+      <div>→</div>
+    </div>
+
+      </div>{{-- /.cs --}}
+  </div>{{-- /.screen --}}
+
+  {{-- BOTTOM NAV --}}
+  <div class="bot-nav">
+    <div class="nav-i" id="nav-home" onclick="window.location.href='/'"><span>🏠</span><div>Home</div></div>
+    <div class="nav-i" id="nav-map" onclick="window.location.href='{{ route('student.map') }}'"><span>📍</span><div>Map</div></div>
+    <div class="nav-i" id="nav-messages" onclick="window.location.href='/messages'"><span>💬</span><div>Messages</div></div>
+    <div class="nav-i active" id="nav-profile" onclick="window.location.href='/profile'"><span>👤</span><div>Profile</div></div>
+  </div>
+
+</div>{{-- /.wrap --}}
 
 @endsection
 
 @push('scripts')
 <script>
-
-// EDIT PROFILE
-function toggleEditProfile(){
-  const el = document.getElementById('editProfileContainer');
-  if(el) el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-}
-
-// PHOTO UPLOAD
-document.getElementById('photoInput')?.addEventListener('change', function(e){
-
-  const file = e.target.files[0];
-  if(!file) return;
-
-  const formData = new FormData();
-  formData.append('profile_photo', file);
-  formData.append('_token', '{{ csrf_token() }}');
-
-  document.getElementById('uploadStatus').innerText = "Uploading...";
-
-  const reader = new FileReader();
-  reader.onload = function(){
-    document.getElementById('photoPreview').src = reader.result;
-  }
-  reader.readAsDataURL(file);
-
-  fetch("{{ route('profile.photo.update') }}", {
-    method: "POST",
-    body: formData
-  })
-  .then(() => {
-    document.getElementById('uploadStatus').innerText = "Uploaded successfully!";
-  })
-  .catch(() => {
-    document.getElementById('uploadStatus').innerText = "Upload failed.";
-  });
-
-});
-
-// LOGOUT
-function logoutUser(){
-  document.getElementById('logout-form').submit();
-}
-
-// DARK MODE
-function toggleDarkMode(){
-  document.body.classList.toggle('dark');
-  localStorage.setItem('darkMode', document.body.classList.contains('dark'));
-}
-
-// LOAD DARK MODE
-if(localStorage.getItem('darkMode') === 'true'){
-  document.body.classList.add('dark');
-}
-
+// Use global dark mode function from app layout
 </script>
 @endpush
