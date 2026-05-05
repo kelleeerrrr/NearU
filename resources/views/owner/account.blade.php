@@ -114,18 +114,28 @@ body.dark .back-btn{
   border-radius:12px;
   border:1.5px solid var(--border);
   font-size:.85rem;
-  background:transparent;
-  color:inherit;
+  background:var(--surface);
+  color:var(--t1);
+}
+
+.input::placeholder{
+  color:var(--t2);
 }
 
 .save-btn{
-  background:var(--blue);
+  background:var(--green);
   color:#fff;
   padding:.7rem;
   border:none;
   border-radius:12px;
   font-weight:800;
   cursor:pointer;
+  transition:all 0.2s ease;
+}
+
+.save-btn:hover{
+  background:var(--green-dk);
+  transform:translateY(-1px);
 }
 
 </style>
@@ -189,11 +199,29 @@ body.dark .back-btn{
   <div class="section">
     <div class="section-title">🔒 Security</div>
     
-    <div class="security">
-      <input type="password" class="input" placeholder="New Password">
-      <input type="password" class="input" placeholder="Confirm Password">
-      <button class="save-btn">Update Password</button>
-    </div>
+    @if(session('success'))
+      <div style="background: #E8F7EE; color: #1B5E20; padding: 0.75rem; border-radius: 12px; margin-bottom: 1rem; font-weight: 600;">
+        {{ session('success') }}
+      </div>
+    @endif
+    
+    @if($errors->any())
+      <div style="background: #FEF2F2; color: #991B1B; padding: 0.75rem; border-radius: 12px; margin-bottom: 1rem; font-weight: 600;">
+        @foreach($errors->all() as $error)
+          {{ $error }} @if(!$loop->last), @endif
+        @endforeach
+      </div>
+    @endif
+    
+    <form method="POST" action="{{ route('password.update') }}" class="security">
+      @csrf
+      @method('PUT')
+      
+      <input type="password" name="current_password" class="input" placeholder="Current Password" required>
+      <input type="password" name="password" class="input" placeholder="New Password" required>
+      <input type="password" name="password_confirmation" class="input" placeholder="Confirm New Password" required>
+      <button type="submit" class="save-btn">Update Password</button>
+    </form>
   </div>
 
 </div>
