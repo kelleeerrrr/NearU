@@ -1,24 +1,16 @@
 @extends('layouts.owner')
 
-@section('title', 'Owner Dashboard — NearU')
+@section('title', 'Owner Dashboard')
 
 @push('styles')
 <style>
-:root{
-  --bg:#F0F7F2;--surface:#fff;
-  --t1:#141F14;--t2:#5E6E5E;--border:#D6E8DC;
-  --green:#2D7D4F;--gold:#F2B705;--blue:#3B82F6;--red:#C8102E;
-  --green-lt:#E8F7EE;--gold-lt:#FFFBEB;
-}
 
-body{background:var(--bg);}
 
 /* HERO */
 .dash-hero{
   background:linear-gradient(145deg,#0a1f0e,#1a4d2e,#0f2d4a);
   padding:1.6rem 1.2rem 2.4rem;
   color:#fff;
-  border-radius:0 0 22px 22px;
 }
 
 .dash-greeting{font-size:.8rem;opacity:.7;}
@@ -28,6 +20,17 @@ body{background:var(--bg);}
   font-size:1.5rem;
   font-weight:800;
   margin-top:.3rem;
+}
+
+/* MAIN WHITE CONTENT AREA */
+.main-content{
+  background:var(--surface);
+  border-radius:22px 22px 0 0;
+  overflow:hidden;
+  margin-top: -20px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 10;
 }
 
 .dash-name em{color:var(--gold);font-style:normal;}
@@ -57,9 +60,9 @@ body{background:var(--bg);}
 }
 
 .verification-banner.under-review{
-  background:#E8F4FD;
-  border:2px solid var(--blue);
-  color:#0D47A1;
+  background:#FFF7CC;
+  border:2px solid var(--gold);
+  color:#5A4500;
 }
 
 .verification-banner.approved{
@@ -88,8 +91,8 @@ body{background:var(--bg);}
 }
 
 .dash-stat{
-  background:#fff;
-  border:1px solid var(--border);
+  background: rgba(46, 125, 50, 0.1);
+  border:2px solid var(--green);
   border-radius:16px;
   padding:1rem;
   display:flex;
@@ -181,18 +184,16 @@ body{background:var(--bg);}
   @endif
 </div>
 
-<!-- ✅ VERIFICATION BANNER (ALWAYS VISIBLE) -->
+<!-- ✅ DASHBOARD ALWAYS ACCESSIBLE -->
+
+<div class="main-content">
+<!-- VERIFICATION BANNER -->
 @if($status === 'under_review')
     <div class="verification-banner under-review">
         <div class="banner-title">⏳ Documents Under Review</div>
         <div class="banner-text">Your verification documents are being reviewed by our admin team. This usually takes 1-3 business days.</div>
     </div>
-
 @elseif($status === 'not_verified' || $status === 'rejected')
-     <div class="verification-banner not-verified">
-        <div class="banner-title">⚠ Complete Your Verification</div>
-        <div class="banner-text">Upload your documents to get verified and unlock all features like creating listings.</div>
-        <a href="{{ route('owner.verification.form') }}" class="banner-btn" style="background:var(--gold);color:#000;">Complete Verification →</a>
     <div class="verification-banner not-verified">
         <div class="banner-title">⚠ Complete Your Verification</div>
         <div class="banner-text">Upload your documents to get verified and unlock all features like creating listings.</div>
@@ -200,13 +201,11 @@ body{background:var(--bg);}
     </div>
 @endif
 
-<!-- ✅ DASHBOARD ALWAYS ACCESSIBLE -->
-
 <!-- STATS -->
 <div class="dash-stats">
 
   <div class="dash-stat">
-    <div class="ds-ico green">🏠</div>
+    <div class="ds-ico gold">🏠</div>
     <div>
       <div class="ds-v">{{ $activeListings ?? 0 }}</div>
       <div class="ds-l">Active Listings</div>
@@ -222,7 +221,7 @@ body{background:var(--bg);}
   </div>
 
   <div class="dash-stat">
-    <div class="ds-ico red">💬</div>
+    <div class="ds-ico gold">💬</div>
     <div>
       <div class="ds-v">{{ $totalMessages ?? 0 }}</div>
       <div class="ds-l">{{ $unreadMessages ?? 0 }} unread</div>
@@ -230,7 +229,7 @@ body{background:var(--bg);}
   </div>
 
   <div class="dash-stat">
-    <div class="ds-ico blue">📅</div>
+    <div class="ds-ico gold">📅</div>
     <div>
       <div class="ds-v">{{ $pendingVisits ?? 0 }}</div>
       <div class="ds-l">Visit Requests</div>
@@ -266,6 +265,8 @@ body{background:var(--bg);}
   @else
     <span class="q-btn outline disabled" title="Complete verification to access statistics">📊 Statistics</span>
   @endif
+</div>
+
 </div>
 
 @endsection

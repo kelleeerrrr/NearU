@@ -5,18 +5,6 @@
 @section('content')
 
 <style>
-:root{
-  --bg:#F0F7F2;
-  --card:#fff;
-  --t2:#5E6E5E;
-  --border:#D6E8DC;
-  --green:#2D7D4F;
-}
-
-body{
-  background:var(--bg);
-  font-family:system-ui;
-}
 
 /* HEADER */
 .header{

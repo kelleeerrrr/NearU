@@ -5,8 +5,6 @@
 @section('content')
 <div class="wrap">
 
-    @include('partials.navbar')
-
     <div class="screen active" style="max-width:600px;margin:auto;padding:1.5rem;">
 
         <h2>Notifications 🔔</h2>

@@ -4,9 +4,12 @@
 
 @push('styles')
 <style>
-:root{
-  --bg:#F0F7F2;--card:#fff;--border:#D6E8DC;
-  --green:#2D7D4F;--blue:#3B82F6;--red:#C8102E;
+
+.page-title{
+    font-family:'Syne';
+    font-size:1.1rem;
+    font-weight:800;
+    margin-bottom:.8rem;
 }
 
 .header-actions{
@@ -65,7 +68,7 @@
 
 {{-- HEADER --}}
 <div class="header-actions">
-  <div style="font-weight:800;">🏠 My Listings</div>
+  <div class="page-title">🏠 My Listings</div>
 
   <button class="create-btn"
           onclick="location.href='{{ route('owner.listings.create') }}'">

@@ -4,13 +4,6 @@
 
 @push('styles')
 <style>
-:root{
-  --bg:#F0F7F2;
-  --card:#fff;
-  --border:#D6E8DC;
-  --green:#2D7D4F;
-  --blue:#3B82F6;
-}
 
 .container{
   padding:1rem;

@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-<title>@yield('title', 'Owner Dashboard — NearU')</title>
+<title>@yield('title', 'Owner Dashboard')</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
 
@@ -18,7 +18,7 @@
 }
 
 :root{
-  --bg:#F0F7F2;
+  --bg:var(--green);
   --surface:#fff;
 
   --t1:#141F14;
@@ -53,7 +53,10 @@ body{
   font-family:'DM Sans',sans-serif;
   background:var(--bg);
   color:var(--t1);
+  position: relative;
+  transition: background .3s, color .3s;
 }
+
 
 .wrap{
   max-width:480px;
@@ -92,15 +95,21 @@ body{
   transform:translateX(-50%);
   width:calc(100% - 40px);
   max-width:440px;
-  background:rgba(242, 183, 5, 0.85);
+  background: rgba(255, 251, 235, 0.9);
   backdrop-filter:blur(10px);
   border-radius:25px;
   display:flex;
   justify-content:space-around;
   padding:8px 16px;
-  z-index:100;
+  z-index:1500;
   box-shadow:0 4px 20px rgba(242, 183, 5, 0.25);
-  border:1px solid rgba(242, 183, 5, 0.3);
+  border:2px solid #F2B705;
+}
+
+body.dark .bot-nav{
+  background: rgba(45, 35, 20, 0.9);
+  border:2px solid rgba(242, 183, 5, 0.5);
+  box-shadow:0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .nav-i{
