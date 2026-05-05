@@ -5,20 +5,15 @@
 @push('styles')
 <style>
 :root{
-  --bg:#F0F7F2;--surface:#fff;--card:#fff;
-  --t1:#141F14;--t2:#5E6E5E;--border:#D6E8DC;
-  --green:#2D7D4F;--green-lt:#E8F7EE;
-  --gold:#F2B705;
-  --blue:#3B82F6;
-  --red:#C8102E;
-  --sh:0 2px 14px rgba(45,125,79,.08);
+  --bg:#F0F7F2;--card:#fff;--border:#D6E8DC;
+  --green:#2D7D4F;--blue:#3B82F6;--red:#C8102E;
 }
 
 .header-actions{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:1rem 1.2rem .3rem;
+  padding:1rem 1.2rem;
 }
 
 .create-btn{
@@ -28,37 +23,36 @@
   padding:.6rem 1rem;
   border-radius:50px;
   font-weight:800;
-  font-size:.8rem;
   cursor:pointer;
 }
 
-.create-btn.disabled{
-  background:#ccc;
-  cursor:not-allowed;
+.filter-bar{
+  display:flex;
+  gap:.5rem;
+  padding:0 1.2rem 1rem;
 }
 
-.ver-warning{
-  margin:1rem;
-  padding:1rem;
-  border-radius:14px;
-  background:#FFF4CC;
-  border:1px solid var(--gold);
-  color:#5a4300;
-  font-weight:700;
+.filter-bar a{
+  padding:.4rem .8rem;
+  border-radius:20px;
+  text-decoration:none;
+  font-size:.8rem;
+  border:1px solid var(--border);
+  color:#333;
+}
+
+.filter-bar a.active{
+  background:var(--green);
+  color:#fff;
+  border:none;
 }
 
 .listing-card{
   background:var(--card);
-  border-radius:18px;
-  margin:0 1.2rem .85rem;
-  border:1.5px solid var(--border);
-  box-shadow:var(--sh);
-  overflow:hidden;
-}
-
-.locked{
-  opacity:.5;
-  pointer-events:none;
+  margin:0 1.2rem .8rem;
+  padding:1rem;
+  border-radius:14px;
+  border:1px solid var(--border);
 }
 </style>
 @endpush
@@ -66,77 +60,111 @@
 @section('content')
 
 @php
-    $status = auth()->user()->verification_status;
-    $isVerified = $status === 'verified';
+    $statusFilter = request('status'); // available / unavailable / null
 @endphp
 
 {{-- HEADER --}}
 <div class="header-actions">
   <div style="font-weight:800;">🏠 My Listings</div>
 
-  @if($isVerified)
-    <button class="create-btn" onclick="location.href='{{ route('owner.listings.create') }}'">
-      + Create Listing
-    </button>
-  @else
-    <button class="create-btn disabled" onclick="showVerifyAlert()">
-      + Create Listing
-    </button>
-  @endif
+  <button class="create-btn"
+          onclick="location.href='{{ route('owner.listings.create') }}'">
+    + Create Listing
+  </button>
 </div>
 
-{{-- STATUS WARNING --}}
-@if(!$isVerified)
-<div class="ver-warning">
-  ⚠️ Your account is currently: <b>{{ ucfirst($status) }}</b><br>
-  You must be fully verified to manage listings.
+{{-- FILTER --}}
+<div class="filter-bar">
+
+    <a href="{{ route('owner.listings.index') }}"
+       class="{{ !$statusFilter ? 'active' : '' }}">
+        All
+    </a>
+
+    <a href="{{ route('owner.listings.index', ['status' => 'available']) }}"
+       class="{{ $statusFilter === 'available' ? 'active' : '' }}">
+        Available
+    </a>
+
+    <a href="{{ route('owner.listings.index', ['status' => 'unavailable']) }}"
+       class="{{ $statusFilter === 'unavailable' ? 'active' : '' }}">
+        Unavailable
+    </a>
+
 </div>
-@endif
 
 {{-- LISTINGS --}}
-@if($isVerified)
+@forelse($dormListings as $listing)
 
-    @forelse($dormListings as $listing)
-        <div class="listing-card">
-            <div style="padding:1rem;">
-                <div style="font-weight:800;">{{ $listing->street }}</div>
+<div class="listing-card">
 
-                <div style="color:var(--green);font-weight:800;">
-                    ₱{{ number_format($listing->price) }}/mo
-                </div>
+    <div style="font-weight:800;">
+        {{ $listing->street }}
+    </div>
 
-                <p style="font-size:.8rem;color:#666;">
-                    {{ $listing->type }} · {{ $listing->gender ?? 'Any' }}
-                </p>
+    <div style="color:var(--green);font-weight:800;">
+        ₱{{ number_format($listing->price) }}/mo
+    </div>
 
-                <span style="font-size:.75rem;color:#5E6E5E;">
-                    {{ ucfirst($listing->status) }}
-                </span>
-            </div>
-        </div>
-    @empty
-        <div style="padding:1rem;color:#666;">
-            No listings yet.
-        </div>
-    @endforelse
+    <div style="font-size:.8rem;color:#666;">
+        Status: {{ ucfirst($listing->status) }}
+    </div>
 
-@else
+    {{-- ACTIONS --}}
+    <div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;">
 
-<div class="listing-card locked">
-  <div style="padding:1.2rem;text-align:center;">
-    🔒 Listings are locked<br><br>
-    Complete verification to unlock this feature
-  </div>
+        {{-- EDIT --}}
+        <a href="{{ route('owner.listings.edit', $listing->id) }}"
+           style="padding:.4rem .7rem;background:var(--blue);color:#fff;border-radius:8px;font-size:.75rem;text-decoration:none;">
+            Edit
+        </a>
+
+        {{-- DELETE --}}
+        <form method="POST"
+              action="{{ route('owner.listings.delete', $listing->id) }}"
+              onsubmit="return confirm('Are you sure you want to delete this listing?')">
+            @csrf
+            @method('DELETE')
+
+            <button type="submit"
+                    style="padding:.4rem .7rem;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:.75rem;">
+                Delete
+            </button>
+        </form>
+
+        {{-- STATUS TOGGLE (2 STATES ONLY) --}}
+        @if($listing->status === 'available')
+
+            <form method="POST"
+                  action="{{ route('owner.listings.unavailable', $listing->id) }}">
+                @csrf
+                <button type="submit"
+                        style="padding:.4rem .7rem;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:.75rem;">
+                    Mark Unavailable
+                </button>
+            </form>
+
+        @else
+
+            <form method="POST"
+                  action="{{ route('owner.listings.available', $listing->id) }}">
+                @csrf
+                <button type="submit"
+                        style="padding:.4rem .7rem;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:.75rem;">
+                    Mark Available
+                </button>
+            </form>
+
+        @endif
+
+    </div>
+
 </div>
 
-@endif
+@empty
+<div style="padding:1rem;color:#666;">
+    No listings found.
+</div>
+@endforelse
 
 @endsection
-
-@push('scripts')
-<script>
-function showVerifyAlert(){
-    alert("⚠️ Please complete your account verification first.");
-}
-</script>
-@endpush

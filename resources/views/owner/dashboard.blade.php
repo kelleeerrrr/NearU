@@ -41,27 +41,42 @@ body{background:var(--bg);}
   font-weight:700;
 }
 
-/* LOCKED */
-.locked-box{
+/* VERIFICATION BANNER */
+.verification-banner{
   margin:1rem;
   padding:1.2rem;
   border-radius:16px;
-  background:#FFF7CC;
-  border:2px solid var(--gold);
+  font-weight:600;
+  text-align:center;
 }
 
-.locked-title{font-weight:800;color:#5A4500;}
-.locked-sub{font-size:.8rem;margin-top:.4rem;color:#5A4500;}
+.verification-banner.not-verified{
+  background:#FFF7CC;
+  border:2px solid var(--gold);
+  color:#5A4500;
+}
 
-.locked-btn{
+.verification-banner.under-review{
+  background:#E8F4FD;
+  border:2px solid var(--blue);
+  color:#0D47A1;
+}
+
+.verification-banner.approved{
+  background:#E8F7EE;
+  border:2px solid var(--green);
+  color:#1B5E20;
+}
+
+.banner-title{font-weight:800;margin-bottom:.4rem;}
+.banner-text{font-size:.9rem;margin-bottom:.8rem;}
+.banner-btn{
   display:inline-block;
-  margin-top:.8rem;
-  background:var(--gold);
   padding:.6rem 1rem;
   border-radius:10px;
   font-weight:800;
   text-decoration:none;
-  color:#000;
+  color:#fff;
 }
 
 /* STATS */
@@ -120,13 +135,20 @@ body{background:var(--bg);}
 .q-btn.gold{background:var(--gold);color:#111;}
 .q-btn.blue{background:var(--blue);color:#fff;}
 .q-btn.outline{border:2px solid var(--green);color:var(--green);}
+.q-btn.disabled{
+  background:#ccc !important;
+  color:#666 !important;
+  cursor:not-allowed;
+  pointer-events:none;
+}
 </style>
 @endpush
 
 @section('content')
 
 @php
-    $status = auth()->user()->verification_status ?? 'not_verified';
+    // ✅ Use the fresh $owner data from controller instead of stale auth()->user()
+    $status = $owner->verification_status ?? 'not_verified';
 @endphp
 
 <!-- HERO -->
@@ -134,10 +156,10 @@ body{background:var(--bg);}
   <div class="dash-greeting">Good day,</div>
 
   <div class="dash-name">
-    Welcome back, <em>{{ auth()->user()->name }}</em> 👋
+    Welcome back, <em>{{ $owner->name }}</em> 👋
   </div>
 
-  @if($status === 'verified')
+  @if($status === 'approved')
       <div class="dash-ver" style="background:rgba(0,200,100,.2);color:#7CFFB2;">
           ✓ Verified Owner
       </div>
@@ -159,42 +181,26 @@ body{background:var(--bg);}
   @endif
 </div>
 
-<!-- 🔒 LOCKED STATES -->
-@if($status !== 'verified')
+<!-- ✅ VERIFICATION BANNER (ALWAYS VISIBLE) -->
+@if($status === 'under_review')
+    <div class="verification-banner under-review">
+        <div class="banner-title">⏳ Documents Under Review</div>
+        <div class="banner-text">Your verification documents are being reviewed by our admin team. This usually takes 1-3 business days.</div>
+    </div>
 
-<div class="locked-box">
+@elseif($status === 'not_verified' || $status === 'rejected')
+     <div class="verification-banner not-verified">
+        <div class="banner-title">⚠ Complete Your Verification</div>
+        <div class="banner-text">Upload your documents to get verified and unlock all features like creating listings.</div>
+        <a href="{{ route('owner.verification.form') }}" class="banner-btn" style="background:var(--gold);color:#000;">Complete Verification →</a>
+    <div class="verification-banner not-verified">
+        <div class="banner-title">⚠ Complete Your Verification</div>
+        <div class="banner-text">Upload your documents to get verified and unlock all features like creating listings.</div>
+        <a href="{{ route('owner.verification.form') }}" class="banner-btn" style="background:var(--gold);color:#000;">Complete Verification →</a>
+    </div>
+@endif
 
-  <div class="locked-title">
-    @if($status === 'under_review')
-        Your Verification is Under Review
-    @elseif($status === 'rejected')
-        Verification Rejected
-    @else
-        Complete Your Verification
-    @endif
-  </div>
-
-  <div class="locked-sub">
-    @if($status === 'under_review')
-        Please wait while admin reviews your documents.
-    @elseif($status === 'rejected')
-        Your submission was rejected. Please resubmit your documents.
-    @else
-        You must complete verification before accessing dashboard features.
-    @endif
-  </div>
-
-  @if($status === 'not_verified' || $status === 'rejected')
-      <a href="{{ route('owner.verification.form') }}" class="locked-btn">
-          Go to Verification →
-      </a>
-  @endif
-
-</div>
-
-@else
-
-<!-- ✅ FULLY VERIFIED DASHBOARD (COMPLETE RESTORED) -->
+<!-- ✅ DASHBOARD ALWAYS ACCESSIBLE -->
 
 <!-- STATS -->
 <div class="dash-stats">
@@ -237,15 +243,29 @@ body{background:var(--bg);}
 <div class="sec-hdr">Quick Actions</div>
 
 <div class="quick-grid">
-  <a href="{{ route('owner.listings.create') }}" class="q-btn green">➕ Add Listing</a>
-  <a href="{{ route('owner.inquiries.index') }}" class="q-btn gold">💬 Inquiries</a>
-  <a href="{{ route('owner.visits.index') }}" class="q-btn blue">📅 Visit Requests</a>
-  <a href="{{ route('owner.statistics.index') }}" class="q-btn outline">📊 Statistics</a>
+  @if($status === 'approved')
+    <a href="{{ route('owner.listings.create') }}" class="q-btn green">➕ Add Listing</a>
+  @else
+    <span class="q-btn green disabled" title="Complete verification to create listings">➕ Add Listing</span>
+  @endif
+
+  @if($status === 'approved')
+    <a href="{{ route('owner.inquiries.index') }}" class="q-btn gold">💬 Inquiries</a>
+  @else
+    <span class="q-btn gold disabled" title="Complete verification to access inquiries">💬 Inquiries</span>
+  @endif
+
+  @if($status === 'approved')
+    <a href="{{ route('owner.visits.index') }}" class="q-btn blue">📅 Visit Requests</a>
+  @else
+    <span class="q-btn blue disabled" title="Complete verification to access visit requests">📅 Visit Requests</span>
+  @endif
+
+  @if($status === 'approved')
+    <a href="{{ route('owner.statistics.index') }}" class="q-btn outline">📊 Statistics</a>
+  @else
+    <span class="q-btn outline disabled" title="Complete verification to access statistics">📊 Statistics</span>
+  @endif
 </div>
-
-<!-- OPTIONAL: YOU CAN ADD LISTINGS + INQUIRIES PREVIEW HERE AGAIN -->
-<!-- (kept optional so UI stays clean but nothing is lost from system) -->
-
-@endif
 
 @endsection

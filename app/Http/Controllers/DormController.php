@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Auth;
 
 class DormController extends Controller
 {
+    /*
+    |----------------------------------------
+    | VISIT SCHEDULING
+    |----------------------------------------
+    */
     public function scheduleVisit(Request $request)
     {
         $request->validate([
@@ -23,7 +28,6 @@ class DormController extends Controller
 
         $dorm = DormListing::with('owner')->findOrFail($request->dorm_id);
 
-        // 🚫 prevent duplicate same-day booking
         $exists = VisitSchedule::where('user_id', Auth::id())
             ->where('dorm_listing_id', $dorm->id)
             ->where('visit_date', $request->date)
@@ -37,15 +41,14 @@ class DormController extends Controller
         }
 
         $visit = VisitSchedule::create([
-            'user_id'          => Auth::id(),
-            'dorm_listing_id'  => $dorm->id,
-            'visit_date'       => $request->date,
-            'visit_time'       => $request->time,
-            'notes'            => $request->notes,
-            'status'           => 'pending', // 🔥 important
+            'user_id' => Auth::id(),
+            'dorm_listing_id' => $dorm->id,
+            'visit_date' => $request->date,
+            'visit_time' => $request->time,
+            'notes' => $request->notes,
+            'status' => 'pending',
         ]);
 
-        // 🔔 NOTIFY OWNER (if you already created notification class)
         if ($dorm->owner) {
             $dorm->owner->notify(new \App\Notifications\NewVisitScheduled($visit));
         }
@@ -57,16 +60,50 @@ class DormController extends Controller
         ]);
     }
 
+    public function toggleSave(Request $request, $id)
+    {
+        $userId = auth()->id();
+
+        if (!$userId) {
+            return response()->json(['error' => 'unauthenticated'], 401);
+        }
+
+        $saved = SavedListing::where('user_id', $userId)
+            ->where('dorm_listing_id', $id)
+            ->first();
+
+        if ($saved) {
+            $saved->delete();
+
+            return response()->json([
+                'saved' => false,
+                'message' => 'Removed'
+            ]);
+        }
+
+        SavedListing::create([
+            'user_id' => $userId,
+            'dorm_listing_id' => $id
+        ]);
+
+        return response()->json([
+            'saved' => true,
+            'message' => 'Saved'
+        ]);
+    }
+
+    /*
+    |----------------------------------------
+    | REVIEWS
+    |----------------------------------------
+    */
     public function storeReview(Request $request, $dormId)
     {
         $request->validate([
-            'rating'  => 'required|integer|min:1|max:5',
+            'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|max:1000',
         ]);
 
-        $dorm = DormListing::findOrFail($dormId);
-
-        // Prevent duplicate review (optional but recommended)
         $existing = Review::where('user_id', Auth::id())
             ->where('dorm_listing_id', $dormId)
             ->first();
@@ -78,19 +115,17 @@ class DormController extends Controller
             ]);
         }
 
-        // Save review
         $review = Review::create([
-            'user_id'          => Auth::id(),
-            'dorm_listing_id'  => $dormId,
-            'rating'           => $request->rating,
-            'comment'          => $request->comment,
+            'user_id' => Auth::id(),
+            'dorm_listing_id' => $dormId,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
         ]);
 
-        // Recalculate rating
         $avg = Review::where('dorm_listing_id', $dormId)->avg('rating');
         $count = Review::where('dorm_listing_id', $dormId)->count();
 
-        $dorm->update([
+        DormListing::find($dormId)->update([
             'rating' => round($avg, 1)
         ]);
 
@@ -101,80 +136,114 @@ class DormController extends Controller
             'review' => $review->load('user')
         ]);
     }
+
     public function getReviews($dormId)
     {
-        $reviews = Review::with('user')
+        return Review::with('user')
             ->where('dorm_listing_id', $dormId)
             ->latest()
             ->get()
             ->map(function ($r) {
                 return [
-                    'user_name'   => $r->user->name,
-                    'rating'      => $r->rating,
-                    'comment'     => $r->comment,
-                    'created_at'  => $r->created_at->format('M d, Y'),
+                    'user_name' => $r->user->name,
+                    'rating' => $r->rating,
+                    'comment' => $r->comment,
+                    'created_at' => $r->created_at->format('M d, Y'),
                     'is_verified' => $r->user->is_verified ?? false,
                 ];
             });
-
-        return response()->json($reviews);
     }
 
     /*
-    | STORE LISTING (WITH IMAGES)
+    |----------------------------------------
+    | CREATE LISTING (FULL SAVE)
+    |----------------------------------------
     */
     public function store(Request $request)
     {
+        if (Auth::user()->verification_status !== 'approved') {
+            return redirect()->route('owner.dashboard')
+                ->with('error', 'You must be verified to create listings.');
+        }
 
         $request->validate([
             'street' => 'required|string|max:255',
             'price' => 'required|numeric',
             'type' => 'required|string',
+
+            'gender_policy' => 'nullable|string',
+            'walk_minutes' => 'nullable|integer',
+            'bathroom' => 'nullable|string',
+
+            'furnishings' => 'nullable|string',
+            'appliances' => 'nullable|string',
+            'bills_included' => 'nullable|string',
+            'curfew' => 'nullable|string',
+
+            'wifi' => 'nullable',
+            'pets' => 'nullable',
+
+            'nearby_landmarks' => 'nullable|string',
+
             'latitude' => 'nullable',
             'longitude' => 'nullable',
+
             'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        // Create listing
         $dorm = DormListing::create([
             'owner_id' => Auth::id(),
+
             'street' => $request->street,
             'price' => $request->price,
             'type' => $request->type,
-            'status' => 'Available',
+
+            'gender_policy' => $request->gender_policy,
+            'walk_minutes' => $request->walk_minutes,
+            'bathroom' => $request->bathroom,
+
+            'furnishings' => $request->furnishings,
+            'appliances' => $request->appliances,
+            'bills_included' => $request->bills_included,
+            'curfew' => $request->curfew,
+
+            'wifi' => $request->has('wifi') ? 1 : 0,
+            'pets' => $request->has('pets') ? 1 : 0,
+
+            'nearby_landmarks' => $request->nearby_landmarks,
+
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
+
+            // IMPORTANT FIX
+            'status' => 'available',
         ]);
 
-        // Save images
         if ($request->hasFile('photos')) {
-
             foreach ($request->file('photos') as $index => $file) {
 
-                // store in public storage
                 $path = $file->store('dorms', 'public');
 
-                // save in DB
                 DormListingImage::create([
                     'dorm_listing_id' => $dorm->id,
                     'path' => $path,
                     'is_cover' => $index === 0,
                 ]);
             }
-        } else {
-            dd('NO FILES RECEIVED');
         }
 
-    return redirect()->route('owner.listings.index')
-        ->with('success', 'Dorm listing created successfully!');
+        return redirect()->route('owner.listings.index')
+            ->with('success', 'Listing created successfully!');
     }
 
     /*
+    |----------------------------------------
     | STUDENT HOME
+    |----------------------------------------
     */
     public function indexStudent()
     {
-        $dormListings = DormListing::where('status', 'Available')
+        $dormListings = DormListing::where('status', 'available')
             ->with(['owner', 'images'])
             ->latest()
             ->get();
@@ -191,7 +260,6 @@ class DormController extends Controller
                 'status' => $dorm->status,
                 'lat' => $dorm->latitude,
                 'lng' => $dorm->longitude,
-
                 'photo' => $cover
                     ? asset('storage/' . $cover->path)
                     : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400',
@@ -205,11 +273,13 @@ class DormController extends Controller
     }
 
     /*
+    |----------------------------------------
     | PUBLIC LIST
+    |----------------------------------------
     */
     public function index()
     {
-        $dormListings = DormListing::where('status', 'Available')
+        $dormListings = DormListing::where('status', 'available')
             ->with(['owner', 'images'])
             ->latest()
             ->get();
@@ -218,16 +288,9 @@ class DormController extends Controller
     }
 
     /*
-    | SINGLE VIEW
-    */
-    public function show($id)
-    {
-        $dorm = DormListing::with(['owner', 'images'])->findOrFail($id);
-        return view('dorms.show', compact('dorm'));
-    }
-
-    /*
+    |----------------------------------------
     | SEARCH
+    |----------------------------------------
     */
     public function search(Request $request)
     {
@@ -250,39 +313,41 @@ class DormController extends Controller
         }
 
         return view('dorms.index', [
-            'dormListings' => $query->where('status', 'Available')->latest()->get()
+            'dormListings' => $query
+                ->where('status', 'available')
+                ->latest()
+                ->get()
         ]);
     }
 
     /*
-    | SAVE
+    |----------------------------------------
+    | SAVE / UNSAVE
+    |----------------------------------------
     */
     public function save($id)
     {
-        DormListing::findOrFail($id);
-
         SavedListing::firstOrCreate([
             'user_id' => Auth::id(),
             'dorm_listing_id' => $id,
         ]);
 
-        return back()->with('success', 'Dorm saved successfully!');
+        return back()->with('success', 'Saved successfully!');
     }
 
-    /*
-    | UNSAVE
-    */
     public function unsave($id)
     {
         SavedListing::where('user_id', Auth::id())
             ->where('dorm_listing_id', $id)
             ->delete();
 
-        return back()->with('success', 'Removed from saved list!');
+        return back()->with('success', 'Removed successfully!');
     }
 
     /*
+    |----------------------------------------
     | COMPARE
+    |----------------------------------------
     */
     public function compare(Request $request)
     {
@@ -296,12 +361,14 @@ class DormController extends Controller
     }
 
     /*
+    |----------------------------------------
     | MAP
+    |----------------------------------------
     */
     public function map()
     {
         return view('student.dorms.map', [
-            'dormListings' => DormListing::where('status', 'Available')
+            'dormListings' => DormListing::where('status', 'available')
                 ->with(['owner', 'images'])
                 ->get()
         ]);

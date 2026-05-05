@@ -129,7 +129,9 @@ body.dark {
 @section('content')
 
 @php
-  $status = auth()->user()->verification_status ?? 'not_verified';
+  // ✅ Use fresh DB data instead of stale session cache
+  $user = \App\Models\User::find(auth()->id());
+  $status = $user->verification_status ?? 'not_verified';
 @endphp
 
 <div class="page">
@@ -155,22 +157,22 @@ body.dark {
   {{-- PROFILE --}}
   <div class="profile-card">
     <div class="avatar">
-      {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+      {{ strtoupper(substr($user->name, 0, 1)) }}
     </div>
 
     <div>
-      <h2>{{ auth()->user()->name }}</h2>
-      <p>{{ auth()->user()->email }}</p>
-      <p>{{ auth()->user()->phone ?? 'No phone number' }}</p>
+      <h2>{{ $user->name }}</h2>
+      <p>{{ $user->email }}</p>
+      <p>{{ $user->phone ?? 'No phone number' }}</p>
 
       <span class="badge">🏠 Owner Account</span>
     </div>
   </div>
 
   {{-- WARNING --}}
-  @if($status !== 'verified')
+  @if($status !== 'approved')
     <div class="warn-box">
-      ⚠️ Your account is not fully verified yet.  
+      ⚠️ Your account is not fully verified yet.
       Listing features are locked until verification is complete.
     </div>
   @endif
@@ -182,7 +184,7 @@ body.dark {
     <div style="padding:.8rem;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);">
 
       <div style="font-weight:800;">
-        @if($status === 'verified')
+        @if($status === 'approved')
           ✅ Verified Owner
         @elseif($status === 'under_review')
           ⏳ Under Review
@@ -194,7 +196,7 @@ body.dark {
       </div>
 
       <small style="font-size:.75rem;color:var(--t2);">
-        @if($status === 'verified')
+        @if($status === 'approved')
           Your account is fully active.
         @elseif($status === 'under_review')
           Your documents are being reviewed.

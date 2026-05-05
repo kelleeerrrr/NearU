@@ -5,6 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
+// ✅ Add missing model imports
+use App\Models\DormListing;
+use App\Models\Message;
+use App\Models\SavedListing;
+use App\Models\VisitSchedule;
 use App\Models\VerificationDocument;
 
 class User extends Authenticatable
@@ -12,7 +18,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Mass assignable
      */
     protected $fillable = [
         'name',
@@ -21,9 +27,7 @@ class User extends Authenticatable
         'user_type',
         'password',
         'profile_photo_path',
-
-        // ✅ ADD THIS (IMPORTANT)
-        'verification_status',
+        'verification_status', // ✅ already correct
     ];
 
     /**
@@ -43,7 +47,14 @@ class User extends Authenticatable
     ];
 
     /**
-     * Profile photo URL
+     * Optional: Default values (VERY USEFUL)
+     */
+    protected $attributes = [
+        'verification_status' => 'not_verified', // ✅ ensures default
+    ];
+
+    /**
+     * Profile photo accessor
      */
     public function getProfilePhotoUrlAttribute()
     {
@@ -52,10 +63,18 @@ class User extends Authenticatable
             : null;
     }
 
+    /**
+     * Verification status accessor (for backward compatibility)
+     */
+    public function getIsVerifiedAttribute()
+    {
+        return $this->verification_status === 'approved';
+    }
+
     /*
-    |--------------------------------------------------------------------------
+    |------------------------------------------------------------------
     | RELATIONSHIPS
-    |--------------------------------------------------------------------------
+    |------------------------------------------------------------------
     */
 
     public function dormListings()
@@ -84,13 +103,44 @@ class User extends Authenticatable
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | VERIFICATION RELATIONSHIP (IMPORTANT)
-    |--------------------------------------------------------------------------
+    |------------------------------------------------------------------
+    | VERIFICATION
+    |------------------------------------------------------------------
     */
 
     public function verificationDocuments()
     {
         return $this->hasMany(VerificationDocument::class);
+    }
+
+    /*
+    |------------------------------------------------------------------
+    | HELPER METHODS (🔥 VERY USEFUL)
+    |------------------------------------------------------------------
+    */
+
+    public function isOwner()
+    {
+        return $this->user_type === 'owner';
+    }
+
+    public function isAdmin()
+    {
+        return $this->user_type === 'admin';
+    }
+
+        public function isNotVerified()
+    {
+        return $this->verification_status === 'not_verified';
+    }
+
+    public function isApproved()
+    {
+        return $this->verification_status === 'approved';
+    }
+
+    public function isUnderReview()
+    {
+        return $this->verification_status === 'under_review';
     }
 }

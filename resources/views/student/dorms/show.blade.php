@@ -16,7 +16,7 @@
           @if($dorm->photos)
             @foreach($dorm->photos as $photo)
             <div class="carousel-slide">
-              <img src="{{ asset('storage/' . $photo) }}" alt="Dorm image">
+              <img src="{{ asset('storage/dorms/' . $photo) }}" alt="Dorm image">
             </div>
             @endforeach
           @else
@@ -97,7 +97,7 @@
       </div>
 
       @auth
-      <a href="{{ route('messages.show', $dorm->owner->id) }}" class="btn btn-blue btn-full">💬 Message Owner</a>
+      <a href="{{ route('messages.show', [$dorm->id, $dorm->owner->id]) }}" class="btn btn-blue btn-full">💬 Message Owner</a>
       @endauth
     </div>
   </div>

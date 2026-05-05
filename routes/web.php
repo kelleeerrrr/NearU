@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\User;
 use App\Models\Notification;
@@ -12,8 +13,12 @@ use App\Models\Message;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DormController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\OwnerDashboardController;
+use App\Http\Controllers\VisitScheduleController;
+use App\Http\Controllers\Admin\OwnerVerificationController;
+use App\Http\Controllers\StatisticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,15 +54,20 @@ Route::middleware('guest')->group(function () {
         ]);
 
         if (Auth::attempt($credentials)) {
+
             $request->session()->regenerate();
 
-            return Auth::user()->user_type === 'owner'
+            $user = Auth::user();
+
+            // ✅ ALL OWNERS CAN LOGIN - NO VERIFICATION RESTRICTIONS
+            return $user->user_type === 'owner'
                 ? redirect()->route('owner.dashboard')
                 : redirect()->route('student.home');
         }
 
         return back()->withErrors(['email' => 'Invalid credentials']);
     })->name('login.post');
+});
 
     Route::get('/register', fn () => view('auth.register'))->name('register');
 
@@ -83,7 +93,6 @@ Route::middleware('guest')->group(function () {
         return redirect()->route('login')
             ->with('success', 'Account created successfully.');
     })->name('register.post');
-});
 
     Route::post('/dorms/{id}/reviews', [DormController::class, 'storeReview']);
     Route::get('/dorms/{id}/reviews', [DormController::class, 'getReviews']);
@@ -112,12 +121,40 @@ Route::post('/logout', function (Request $request) {
 
 Route::middleware('auth')->group(function () {
 
+    Route::middleware(['auth'])->group(function () {
+
+        // OWNER VISITS
+        Route::get('/owner/visits', function () {
+
+            // ✅ VERIFICATION CHECK: Only approved owners can access visits
+            if (auth()->user()->verification_status !== 'approved') {
+                return redirect()->route('owner.dashboard')
+                    ->with('error', 'You must be verified to access visit requests. Please complete your verification first.');
+            }
+
+            return app(VisitScheduleController::class)->index();
+        })
+            ->name('owner.visits.index');
+
+        // STUDENT VISITS (optional but recommended)
+        Route::get('/visits', [VisitScheduleController::class, 'studentIndex'])
+            ->name('visits.student');
+
+        Route::post('/visits', [VisitScheduleController::class, 'store'])
+            ->name('visits.store');
+
+        Route::post('/owner/visits/{id}/status', [VisitScheduleController::class, 'updateStatus'])
+        ->name('owner.visits.status.update');
+
+
+    });
+
     Route::get('/student/home', [DormController::class, 'indexStudent'])
         ->name('student.home');
 
     Route::get('/saved', function () {
 
-        $savedListings = \App\Models\SavedListing::with('listing')
+        $savedListings = \App\Models\SavedListing::with('dormListing')
             ->where('user_id', auth()->id())
             ->latest()
             ->get();
@@ -125,6 +162,8 @@ Route::middleware('auth')->group(function () {
         return view('student.saved', compact('savedListings'));
 
     })->name('saved.listings');
+
+    Route::post('/dorms/{id}/save', [DormController::class, 'toggleSave']);
     
     Route::get('/student/map', [DormController::class, 'map'])
         ->name('student.map');
@@ -160,22 +199,9 @@ Route::middleware('auth')->group(function () {
 
     })->name('profile.photo.update');
 
-    /*
-    |--------------------------------------------------------------------------
-    | VISITS (STUDENT)
-    |--------------------------------------------------------------------------
-    */
-Route::get('/visits', function () {
-
-    $visits = \App\Models\VisitSchedule::with(['dormListing.owner'])
-        ->where('user_id', auth()->id())
-        ->latest()
-        ->get();
-
-    return view('student.visits', compact('visits'));
-
-})->name('visit.schedules')->middleware('auth');
-
+    Route::get('/visits', [VisitScheduleController::class, 'studentIndex'])
+        ->name('visits.index');
+    Route::post('/visits', [VisitScheduleController::class, 'store'])->name('visits.store');
     /*
     |--------------------------------------------------------------------------
     | PROFILE
@@ -208,24 +234,6 @@ Route::get('/visits', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | OWNER INQUIRIES
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/owner/inquiries', function () {
-
-        $messages = Message::with('listing')
-            ->where('receiver_id', auth()->id())
-            ->latest()
-            ->get();
-
-        $grouped = $messages->groupBy('listing_id');
-
-        return view('owner.inquiries.index', compact('grouped'));
-
-    })->name('owner.inquiries.index');
-
-    /*
-    |--------------------------------------------------------------------------
     | OWNER VERIFICATION
     |--------------------------------------------------------------------------
     */
@@ -251,14 +259,20 @@ Route::get('/visits', function () {
         | URL: /owner/listings
         |-----------------------------------------
         */
-        Route::get('/', function () {
+        Route::get('/', function (Request $request) {
 
-            $dormListings = \App\Models\DormListing::with('images')
-                ->where('owner_id', auth()->id())
-                ->latest()
-                ->get();
+            $query = \App\Models\DormListing::with('images')
+                ->where('owner_id', auth()->id());
+
+            // FILTER
+            if ($request->status) {
+                $query->where('status', $request->status);
+            }
+
+            $dormListings = $query->latest()->get();
 
             return view('owner.listings.index', compact('dormListings'));
+
         })->name('index');
 
 
@@ -268,8 +282,16 @@ Route::get('/visits', function () {
         | URL: /owner/listings/create
         |-----------------------------------------
         */
-        Route::get('/create', fn () => view('owner.listings.create'))
-            ->name('create');
+        Route::get('/create', function () {
+
+            // ✅ VERIFICATION CHECK: Only approved owners can create listings
+            if (auth()->user()->verification_status !== 'approved') {
+                return redirect()->route('owner.dashboard')
+                    ->with('error', 'You must be verified to create listings. Please complete your verification first.');
+            }
+
+            return view('owner.listings.create');
+        })->name('create');
 
 
         /*
@@ -289,6 +311,12 @@ Route::get('/visits', function () {
         */
         Route::get('/{id}/edit', function ($id) {
 
+            // ✅ VERIFICATION CHECK: Only approved owners can edit listings
+            if (auth()->user()->verification_status !== 'approved') {
+                return redirect()->route('owner.dashboard')
+                    ->with('error', 'You must be verified to edit listings. Please complete your verification first.');
+            }
+
             $listing = \App\Models\DormListing::with('images')
                 ->where('owner_id', auth()->id())
                 ->findOrFail($id);
@@ -305,6 +333,12 @@ Route::get('/visits', function () {
         */
         Route::put('/{id}', function (Request $request, $id) {
 
+            // ✅ VERIFICATION CHECK: Only approved owners can update listings
+            if (auth()->user()->verification_status !== 'approved') {
+                return redirect()->route('owner.dashboard')
+                    ->with('error', 'You must be verified to update listings. Please complete your verification first.');
+            }
+
             $listing = \App\Models\DormListing::where('owner_id', auth()->id())
                 ->findOrFail($id);
 
@@ -314,6 +348,7 @@ Route::get('/visits', function () {
                 'type',
                 'latitude',
                 'longitude',
+                'status'
             ]));
 
             return redirect()
@@ -321,7 +356,30 @@ Route::get('/visits', function () {
                 ->with('success', 'Listing updated successfully');
 
         })->name('update');
+        Route::post('/{id}/available', function ($id) {
 
+            $listing = \App\Models\DormListing::where('owner_id', auth()->id())
+                ->findOrFail($id);
+
+            $listing->status = 'available';
+            $listing->save();
+
+            return back();
+
+        })->name('available');
+
+
+        Route::post('/{id}/unavailable', function ($id) {
+
+            $listing = \App\Models\DormListing::where('owner_id', auth()->id())
+                ->findOrFail($id);
+
+            $listing->status = 'unavailable';
+            $listing->save();
+
+            return back();
+
+        })->name('unavailable');
 
         /*
         |-----------------------------------------
@@ -358,47 +416,40 @@ Route::get('/visits', function () {
     | MESSAGES
     |--------------------------------------------------------------------------
     */
-    Route::get('/messages', [MessageController::class, 'index'])
-        ->name('messages.index');
+    Route::post('/messages/send/{listingId}/{userId}', [MessageController::class, 'send'])->name('messages.send');
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{listingId}/{userId}', [MessageController::class, 'show'])->name('messages.show');
 
-    /*
-    |--------------------------------------------------------------------------
-    | ✅ OWNER VISITS (NEW)
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/owner/visits', function () {
+// STUDENT
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
 
-        $visits = \App\Models\VisitSchedule::with(['user', 'dormListing'])
-            ->whereHas('dormListing', function ($q) {
-                $q->where('owner_id', auth()->id());
-            })
-            ->latest()
-            ->get();
+    // OWNER
+    Route::get('/owner/notifications', [NotificationController::class, 'owner'])
+        ->name('notifications.owner');
 
-        return view('owner.visits.index', compact('visits'));
+    // SHARED ACTIONS
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])
+        ->name('notifications.markAllRead');
 
-    })->name('owner.visits.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])
+        ->name('notifications.read');
+    Route::get('/owner/inquiries', [MessageController::class, 'ownerInquiries'])
+        ->name('owner.inquiries.index');
 
+    Route::get('/owner/inquiries/{listingId}/{userId}', [MessageController::class, 'ownerConversation'])
+        ->name('owner.inquiries.show');
+
+    Route::post('/owner/inquiries/{listingId}/{userId}', [MessageController::class, 'ownerReply'])
+        ->name('owner.inquiries.reply');
     /*
     |--------------------------------------------------------------------------
     | ✅ OWNER STATISTICS (NEW)
     |--------------------------------------------------------------------------
     */
-    Route::get('/owner/statistics', function () {
+    Route::get('/owner/statistics', [StatisticsController::class, 'index'])
+    ->name('owner.statistics.index');
 
-        $ownerId = auth()->id();
-
-        $listings = \App\Models\DormListing::where('owner_id', $ownerId)->get();
-
-        $visits = \App\Models\VisitSchedule::whereHas('dormListing', function ($q) use ($ownerId) {
-            $q->where('owner_id', $ownerId);
-        })->get();
-
-        $messages = Message::where('receiver_id', $ownerId)->get();
-
-        return view('owner.statistics.index', compact('listings', 'visits', 'messages'));
-
-    })->name('owner.statistics.index');
 });
 
 /*
@@ -407,15 +458,24 @@ Route::get('/visits', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/admin/owner-verifications', function () {
+Route::prefix('admin')->middleware('auth')->group(function () {
 
-    abort_unless(auth()->user()->user_type === 'admin', 403);
+    // LIST
+    Route::get('/owner-verifications', [OwnerVerificationController::class, 'index'])
+        ->name('admin.owner-verifications.index');
 
-    $owners = \App\Models\User::where('user_type', 'owner')->latest()->get();
+    // REVIEW
+    Route::get('/owner-verifications/{id}/review', [OwnerVerificationController::class, 'review'])
+        ->name('admin.owner-verifications.review');
 
-    return view('admin.owner-verifications.index', compact('owners'));
+    // APPROVE
+    Route::post('/owner-verifications/{id}/approve', [OwnerVerificationController::class, 'approve'])
+        ->name('admin.owner-verifications.approve');
 
-})->name('admin.owner-verifications.index');
+    // REJECT
+    Route::post('/owner-verifications/{id}/reject', [OwnerVerificationController::class, 'reject'])
+        ->name('admin.owner-verifications.reject');
+});
 
 /*
 |--------------------------------------------------------------------------

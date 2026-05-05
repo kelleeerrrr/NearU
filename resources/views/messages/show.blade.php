@@ -23,6 +23,9 @@
                         <p class="chat-role">
                             {{ $otherUser->user_type === 'owner' ? 'Property Owner' : 'Student' }}
                         </p>
+                        <p class="chat-listing" style="font-size: 0.85rem; color: #666; margin-top: 0.25rem;">
+                            📍 {{ $listing->street }}
+                        </p>
                     </div>
                 </div>
             </header>
@@ -45,9 +48,10 @@
             <!-- Input -->
             <footer class="chat-input-wrap">
                 <form method="POST"
-                      action="{{ route('messages.send', $otherUser->id) }}"
+                      action="{{ route('messages.send', [$listing->id, $otherUser->id]) }}"
                       class="chat-form">
                     @csrf
+                    <input type="hidden" name="listing_id" value="{{ $listing->id }}">
 
                     <label for="message" class="sr-only">Type your message</label>
 

@@ -4,12 +4,10 @@
 
 @push('styles')
 <style>
-/* PAGE WRAPPER */
 .page{
     padding:1rem;
 }
 
-/* HEADER */
 .page-title{
     font-family:'Syne';
     font-size:1.1rem;
@@ -17,7 +15,6 @@
     margin-bottom:.8rem;
 }
 
-/* CHIPS FILTER */
 .chip-bar{
     display:flex;
     gap:.5rem;
@@ -45,7 +42,6 @@
     border-color:#2D7D4F;
 }
 
-/* LISTING CARD */
 .listing-card{
     background:#fff;
     border:1.5px solid #D6E8DC;
@@ -55,6 +51,9 @@
     box-shadow:0 2px 10px rgba(45,125,79,.06);
     cursor:pointer;
     transition:.2s;
+    display:block;
+    text-decoration:none;
+    color:inherit;
 }
 
 .listing-card:hover{
@@ -92,7 +91,6 @@
     color:#2D7D4F;
 }
 
-/* EMPTY */
 .empty{
     text-align:center;
     padding:2rem 1rem;
@@ -110,22 +108,27 @@
     <!-- FILTER CHIPS -->
     <div class="chip-bar">
 
-        <div class="chip active" onclick="filterListing('all')">
+        <div class="chip active" onclick="filterListing('all', event)">
             All
         </div>
 
-        @foreach($grouped as $listingId => $messages)
+        @foreach($grouped as $key => $messages)
+
             @php
-                $listing = $messages->first()->listing;
+                $first = $messages->first();
+                $listing = $first?->resolvedListing;
                 $unread = $messages->where('is_read', false)->count();
             @endphp
 
-            <div class="chip" onclick="filterListing('{{ $listingId }}')">
-                {{ $listing->title ?? 'Listing '.$listingId }}
-                @if($unread > 0)
-                    ({{ $unread }})
-                @endif
-            </div>
+            @if($listing)
+                <div class="chip" onclick="filterListing('{{ $listing->id }}', event)">
+                    {{ $listing->title ?? 'Listing '.$listing->id }}
+                    @if($unread > 0)
+                        ({{ $unread }})
+                    @endif
+                </div>
+            @endif
+
         @endforeach
 
     </div>
@@ -133,24 +136,40 @@
     <!-- LISTINGS -->
     <div id="listingContainer">
 
-        @foreach($grouped as $listingId => $messages)
+        @forelse($grouped as $key => $messages)
 
             @php
-                $listing = $messages->first()->listing;
+                $first = $messages->first();
+
+                if (!$first || !$first->resolvedListing) continue;
+
+                $listing = $first->resolvedListing;
+                $student = $first->sender_id === auth()->id() ? $first->receiver : $first->sender;
+
+                if (!$student) continue;
+
                 $unread = $messages->where('is_read', false)->count();
-                $lastMessage = $messages->first();
+
+                $lastMessage = $messages->sortByDesc('created_at')->first();
             @endphp
 
-            <a href="/owner/inquiries/{{ $listingId }}"
+            <a href="{{ route('owner.inquiries.show', [
+                    'listingId' => $listing->id,
+                    'userId' => $student->id
+                ]) }}"
                class="listing-card"
-               data-listing="{{ $listingId }}">
+               data-listing="{{ $listing->id }}">
 
                 <div class="listing-title">
-                    📍 {{ $listing->title ?? 'Listing #'.$listingId }}
+                    👤 {{ $student->name ?? 'Unknown User' }}
                 </div>
 
                 <div class="listing-meta">
-                    {{ $messages->count() }} messages
+                    📍 {{ $listing->title ?? 'Listing #'.$listing->id }}
+                </div>
+
+                <div class="listing-meta">
+                    {{ \Illuminate\Support\Str::limit($lastMessage->message ?? '', 60) }}
                 </div>
 
                 @if($unread > 0)
@@ -165,21 +184,21 @@
 
             </a>
 
-        @endforeach
+        @empty
 
-        @if($grouped->isEmpty())
             <div class="empty">
                 <div style="font-size:2rem;">📭</div>
                 <p>No inquiries yet</p>
             </div>
-        @endif
+
+        @endforelse
 
     </div>
 
 </div>
 
 <script>
-function filterListing(id){
+function filterListing(id, event){
 
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     event.target.classList.add('active');

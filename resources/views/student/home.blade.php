@@ -58,7 +58,7 @@
         <span id="listCount" style="font-weight:600;opacity:.6;font-size:.65rem;margin-left:.3rem;text-transform:none;letter-spacing:0;"></span>
       </div>
       <div id="dormList">
-
+        
         @forelse($dormListings as $dorm)
           @php
             $photos = $dorm->images->pluck('path')->toArray();
@@ -94,9 +94,11 @@
                 <div class="carousel-inner" id="ci-{{ $dorm->id }}">
                   @foreach($photos as $photo)
                     <div class="carousel-slide">
-                      <img data-src="{{ asset('storage/' . $photo) }}" src=""
-                           class="lazy-pending" alt="{{ $dorm->street }}"
-                           loading="lazy" onclick="UI.openLb(this.src)">
+                      <img src="{{ asset('storage/dorms/' . $photo) }}"
+                          alt="{{ $dorm->street }}"
+                          loading="lazy"
+                          style="width:100%;height:185px;object-fit:cover;cursor:pointer;border-radius:12px;"
+                          onclick="UI.openLb(this.src)">
                     </div>
                   @endforeach
                 </div>
@@ -112,9 +114,11 @@
               </div>
             @else
               <div class="carousel">
-                <img data-src="{{ $cover }}" src="" class="lazy-pending"
-                     style="width:100%;height:185px;object-fit:cover;cursor:pointer;border-radius:12px;"
-                     alt="{{ $dorm->street }}" loading="lazy" onclick="UI.openLb(this.src)">
+              <img src="{{ $cover }}"
+                  style="width:100%;height:185px;object-fit:cover;cursor:pointer;border-radius:12px;"
+                  alt="{{ $dorm->street }}"
+                  loading="lazy"
+                  onclick="UI.openLb(this.src)">
                 <div class="dist-overlay">📍 {{ $dorm->walk_minutes }}-min walk</div>
               </div>
             @endif
@@ -204,8 +208,8 @@
 
             {{-- CONTACT OWNER --}}
             <button class="btn btn-blue btn-full"
-              onclick="ChatModule.contactOwner({{ $dorm->owner->id ?? 'null' }}, '{{ addslashes($dorm->street) }}', {{ $dorm->id }})">
-              📞 Contact Owner
+                onclick="window.location.href='{{ route('messages.show', [$dorm->id, $dorm->owner->id]) }}'">
+                📞 Contact Owner
             </button>
 
           </div>{{-- /.dorm-card --}}
@@ -1081,7 +1085,7 @@ const Schedule = {
     fetch('/visits', {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':window.csrfToken },
-      body: JSON.stringify({ dorm_id:this._dormId, date:dt, time:this._selectedTime, notes }),
+      body: JSON.stringify({ dorm_listing_id:this._dormId, visit_date:dt, visit_time:this._selectedTime, notes }),
     })
     .then(r => r.json())
     .then(data => {

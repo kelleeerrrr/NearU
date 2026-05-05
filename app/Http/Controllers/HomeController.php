@@ -10,7 +10,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $dormListings = DormListing::with('owner')
-            ->where('status', 'Available')
+            ->where('status', '')
             ->latest()
             ->get();
 

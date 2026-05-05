@@ -8,35 +8,32 @@
 :root{
   --bg:#F0F7F2;
   --card:#fff;
-  --t1:#141F14;
   --t2:#5E6E5E;
   --border:#D6E8DC;
   --green:#2D7D4F;
-  --gold:#F2B705;
-  --blue:#3B82F6;
-  --red:#C8102E;
-  --green-lt:#E8F7EE;
-  --gold-lt:#FFFBEB;
-  --blue-lt:#EFF6FF;
-  --red-lt:#FFF0F2;
 }
 
-body{background:var(--bg);font-family:system-ui;}
+body{
+  background:var(--bg);
+  font-family:system-ui;
+}
 
+/* HEADER */
 .header{
-    display:flex;justify-content:space-between;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     padding:1rem;
     font-weight:800;
 }
 
-.card{
-    background:#fff;
-    margin:.6rem 1rem;
-    padding:1rem;
-    border:1px solid var(--border);
-    border-radius:14px;
+.back{
+    text-decoration:none;
+    color:var(--green);
+    font-weight:600;
 }
 
+/* GRID */
 .grid-2{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -44,13 +41,23 @@ body{background:var(--bg);font-family:system-ui;}
     padding:0 1rem;
 }
 
-.stat{
+/* CARDS */
+.card, .stat{
     background:#fff;
     border:1px solid var(--border);
-    padding:1rem;
     border-radius:14px;
 }
 
+.card{
+    margin:.6rem 1rem;
+    padding:1rem;
+}
+
+.stat{
+    padding:1rem;
+}
+
+/* TEXT */
 .big{
     font-size:1.4rem;
     font-weight:800;
@@ -65,16 +72,21 @@ body{background:var(--bg);font-family:system-ui;}
     padding:1rem 1rem .3rem;
     font-weight:800;
 }
+
+/* PROGRESS */
 .progress{
     height:8px;
     background:#eee;
     border-radius:50px;
     overflow:hidden;
+    margin-top:.5rem;
 }
+
 .bar{
     height:100%;
     background:var(--green);
 }
+
 .small{
     font-size:.8rem;
     color:var(--t2);
@@ -83,9 +95,9 @@ body{background:var(--bg);font-family:system-ui;}
 
 <!-- HEADER -->
 <div class="header">
-    <a href="{{ url()->previous() }}">← Back</a>
+    <a href="{{ route('owner.dashboard') }}" class="back">← Back</a>
     <div>📊 Statistics</div>
-    <div>🔔</div>
+    <div></div>
 </div>
 
 <!-- OVERVIEW -->
@@ -94,13 +106,13 @@ body{background:var(--bg);font-family:system-ui;}
 <div class="grid-2">
 
     <div class="stat">
-        <div class="big">{{ number_format($avgRating ?? 0,1) }}</div>
-        <div class="label">⭐ Avg Rating</div>
+        <div class="big">{{ number_format($avgRating ?? 0, 1) }}</div>
+        <div class="label">⭐ Average Rating</div>
     </div>
 
     <div class="stat">
         <div class="big">{{ $totalMessages ?? 0 }}</div>
-        <div class="label">💬 Total Inquiries</div>
+        <div class="label">💬 Total Messages</div>
     </div>
 
     <div class="stat">
@@ -108,74 +120,89 @@ body{background:var(--bg);font-family:system-ui;}
         <div class="label">📅 Total Visits</div>
     </div>
 
+    <div class="stat">
+        <div class="big">{{ number_format($avgResponseTime ?? 0, 1) }}h</div>
+        <div class="label">⚡ Avg Response Time</div>
+    </div>
+
 </div>
 
-<!-- INQUIRY PERFORMANCE -->
-<div class="section">💬 Inquiry Performance</div>
+<!-- PERFORMANCE -->
+<div class="section">📊 Performance</div>
 
 <div class="grid-2">
 
     <div class="stat">
-        <div class="big">{{ $totalMessages ?? 0 }}</div>
-        <div class="label">📨 Total Received</div>
+        <div class="big">{{ $conversionRate ?? 0 }}%</div>
+        <div class="label">Message → Visit Conversion</div>
     </div>
 
     <div class="stat">
-        <div class="big">{{ $unreadMessages ?? 0 }}</div>
-        <div class="label">🔴 Unread</div>
+        <div class="big">{{ $dropOffRate ?? 0 }}%</div>
+        <div class="label">Drop-off Rate</div>
     </div>
 
 </div>
 
+<!-- RESPONSE RATE -->
 <div class="card">
-    <div class="small">
-        Response Rate
-    </div>
 
-    <div style="font-weight:700;margin:.3rem 0;">
-        {{ round((($totalMessages - ($unreadMessages ?? 0)) / max($totalMessages,1)) * 100) }}%
+    @php
+        $responseRate = ($totalMessages ?? 0) > 0
+            ? round((($totalMessages - ($unreadMessages ?? 0)) / $totalMessages) * 100)
+            : 0;
+    @endphp
+
+    <div class="small">Response Rate</div>
+
+    <div style="font-size:1.2rem;font-weight:800;">
+        {{ $responseRate }}%
     </div>
 
     <div class="progress">
-        <div class="bar" style="width:
-        {{ round((($totalMessages - ($unreadMessages ?? 0)) / max($totalMessages,1)) * 100) }}%">
-        </div>
+        <div class="bar" style="width: {{ $responseRate }}%"></div>
     </div>
+
 </div>
 
 <!-- VISITS -->
-<div class="section">📅 Visit Statistics</div>
+<div class="section">📅 Visit Status</div>
 
 <div class="grid-2">
 
     <div class="stat">
         <div class="big">{{ $totalVisits ?? 0 }}</div>
-        <div class="label">📋 Requested</div>
+        <div class="label">Requested</div>
     </div>
 
     <div class="stat">
         <div class="big">{{ $approvedVisits ?? 0 }}</div>
-        <div class="label">✅ Confirmed</div>
+        <div class="label">Approved</div>
     </div>
 
     <div class="stat">
         <div class="big">{{ $pendingVisits ?? 0 }}</div>
-        <div class="label">⏳ Pending</div>
+        <div class="label">Pending</div>
+    </div>
+
+    <div class="stat">
+        <div class="big">{{ $completedVisits ?? 0 }}</div>
+        <div class="label">Completed</div>
     </div>
 
 </div>
 
-<div class="card">
-    <div class="small">Inquiry → Visit Rate</div>
-    <div style="font-weight:700;margin:.3rem 0;">
-        {{ $totalMessages ? round(($totalVisits / $totalMessages) * 100) : 0 }}%
-    </div>
-</div>
+<!-- LISTINGS -->
+<div class="section">🏠 Listings Overview</div>
 
-<!-- OCCUPANCY -->
-<div class="section">🏠 Listing Occupancy</div>
+@php
+    $occupancy = ($totalListings ?? 0) > 0
+        ? round(($takenListings / $totalListings) * 100)
+        : 0;
+@endphp
 
 <div class="card">
+
     <div class="small">Occupancy Rate</div>
 
     <div style="font-size:1.2rem;font-weight:800;">
@@ -183,25 +210,52 @@ body{background:var(--bg);font-family:system-ui;}
     </div>
 
     <div class="progress">
-        <div class="bar" style="width:
-        {{ $totalListings ? round(($takenListings / $totalListings) * 100) : 0 }}%">
-        </div>
+        <div class="bar" style="width: {{ $occupancy }}%"></div>
     </div>
 
     <div class="small" style="margin-top:.4rem;">
         {{ $activeListings ?? 0 }} Available · {{ $takenListings ?? 0 }} Taken
     </div>
+
 </div>
 
-<!-- REVIEWS -->
-<div class="section">⭐ Ratings & Reviews</div>
+<!-- TOP LISTING -->
+<div class="section">🏆 Top Performing Listing</div>
 
 <div class="card">
-    <div style="font-size:1.6rem;font-weight:800;">
-        {{ number_format($avgRating ?? 0,1) }} ★
+
+    <div style="font-weight:800;">
+        {{ $topListing->street ?? 'No data yet' }}
     </div>
 
-    <div class="small">Reviews coming from listings</div>
+    <div class="small">
+        Score: {{ $topListing->score ?? 0 }}
+    </div>
+
 </div>
+
+<!-- CHART -->
+<div class="section">🔥 Weekly Message Trend</div>
+
+<div class="card">
+    <canvas id="messageChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+new Chart(document.getElementById('messageChart'), {
+    type: 'line',
+    data: {
+        labels: @json($chartLabels ?? []),
+        datasets: [{
+            label: 'Messages',
+            data: @json($chartData ?? []),
+            borderWidth: 2,
+            tension: 0.4
+        }]
+    }
+});
+</script>
 
 @endsection

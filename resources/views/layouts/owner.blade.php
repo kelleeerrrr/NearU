@@ -129,9 +129,19 @@ body{
 <div class="wrap">
 
   <!-- TOP BAR -->
-  <div class="top">
+  <div class="top" style="justify-content:space-between; gap:1rem;">
     <div class="logo">Near<em>U</em> OWNER</div>
-    <div>👤 {{ auth()->user()->name }}</div>
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <a href="{{ route('notifications.owner') }}" style="color:#fff; text-decoration:none; position:relative;">
+        🔔
+        @if(isset($unreadCount) && $unreadCount > 0)
+          <span style="position:absolute; top:-4px; right:-8px; background:red; color:#fff; font-size:0.7rem; padding:2px 6px; border-radius:999px;">
+            {{ $unreadCount }}
+          </span>
+        @endif
+      </a>
+      <div>👤 {{ auth()->user()->name }}</div>
+    </div>
   </div>
 
   @yield('content')

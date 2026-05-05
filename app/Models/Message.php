@@ -11,6 +11,7 @@ class Message extends Model
         'sender_id',
         'receiver_id',
         'message',
+        'dorm_listing_id',
         'listing_id',
         'is_read',
     ];
@@ -20,6 +21,7 @@ class Message extends Model
     | CASTS
     |--------------------------------------------------------------------------
     */
+
 
     protected $casts = [
         'is_read' => 'boolean',
@@ -43,6 +45,16 @@ class Message extends Model
 
     public function listing(): BelongsTo
     {
+        return $this->belongsTo(DormListing::class, 'dorm_listing_id');
+    }
+
+    public function legacyListing(): BelongsTo
+    {
         return $this->belongsTo(DormListing::class, 'listing_id');
+    }
+
+    public function getResolvedListingAttribute()
+    {
+        return $this->listing ?? $this->legacyListing;
     }
 }

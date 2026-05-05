@@ -17,24 +17,43 @@
         <p>Start a conversation by contacting dorm owners!</p>
       </div>
       @else
-        @foreach($conversations as $userId => $messages)
+        @foreach($conversations as $key => $messages)
         @php
-          $otherUser = $messages->first()->sender_id == auth()->id()
-            ? $messages->first()->receiver
-            : $messages->first()->sender;
+          $first = $messages->first();
+          $otherUser = $first->sender_id == auth()->id() ? $first->receiver : $first->sender;
+          $listing = $first->resolvedListing;
           $lastMessage = $messages->last();
+          $unread = $messages->where('is_read', false)->count();
         @endphp
-        <div class="conv-i" onclick="window.location.href='{{ route('messages.show', $otherUser->id) }}'" style="display:flex; align-items:center; padding:1rem; cursor:pointer; border-radius:8px; transition: background-color 0.2s;"
+
+        @if(!$listing)
+            @continue
+        @endif
+        <div class="conv-i" onclick="window.location.href='{{ route('messages.show', [$listing->id, $otherUser->id]) }}'" style="display:flex; align-items:center; padding:1rem; cursor:pointer; border-radius:8px; transition: background-color 0.2s;"
              onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">
           
-          <!-- Avatar: replace with user profile photo if available -->
-          <div class="conv-av" style="width:50px; height:50px; border-radius:50%; background-color: #ccc; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-right:1rem;">
-            {{ substr($otherUser->name, 0, 1) }}
+          <!-- Avatar: listing image -->
+          <div class="conv-av" style="width:50px; height:50px; border-radius:8px; background-color: #ccc; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-right:1rem; overflow:hidden;">
+            @if($listing && $listing->photos)
+              @php $photos = is_array($listing->photos) ? $listing->photos : json_decode($listing->photos, true); @endphp
+              @if(count($photos ?? []))
+                <img src="{{ asset('storage/' . $photos[0]) }}" alt="Listing" style="width:100%; height:100%; object-fit:cover;">
+              @else
+                📍
+              @endif
+            @else
+              📍
+            @endif
           </div>
 
           <div class="conv-info" style="flex:1;">
-            <div class="conv-n" style="font-weight:600;">{{ $otherUser->name }}</div>
-            <div class="conv-p" style="color: #555;">{{ Str::limit($lastMessage->message, 50) }}</div>
+            <div class="conv-n" style="font-weight:600; display:flex; align-items:center; gap:0.5rem;">
+              {{ $listing ? $listing->street : 'Unknown Listing' }}
+              @if($unread > 0)
+                <span style="background:#2D7D4F; color:white; padding:0.2rem 0.5rem; border-radius:10px; font-size:0.7rem; font-weight:600;">{{ $unread }}</span>
+              @endif
+            </div>
+            <div class="conv-p" style="color: #555; font-size:0.9rem;">{{ $otherUser->name }} • {{ Str::limit($lastMessage->message, 40) }}</div>
           </div>
 
           <div style="font-size:.7rem; color:var(--t2); text-align:right;">
