@@ -17,6 +17,11 @@ class HomeController extends Controller
             'session_id' => session()->getId()
         ]);
 
+        $dormListings = DormListing::with('owner')
+            ->where('status', '')
+            ->latest()
+            ->get();
+
         // If user is not authenticated, show welcome screen
         if (!auth()->check()) {
             \Log::info('Showing welcome screen for guest');

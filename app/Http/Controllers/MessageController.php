@@ -2,169 +2,235 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DormListing;
 use App\Models\Message;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-// ✅ ADD THIS (notification helper)
-use App\Models\Notification;
 
 class MessageController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | STUDENT MESSAGING SYSTEM
+    | STUDENT MESSAGES - LISTING-BASED
     |--------------------------------------------------------------------------
     */
 
     public function index()
     {
-        $conversations = Message::where('sender_id', Auth::id())
-            ->orWhere('receiver_id', Auth::id())
-            ->with(['sender', 'receiver'])
+        $conversations = Message::where(function ($q) {
+                $q->where('sender_id', Auth::id())
+                  ->orWhere('receiver_id', Auth::id());
+            })
+            ->with(['sender', 'receiver', 'listing', 'legacyListing'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->groupBy(function ($message) {
-                return $message->sender_id == Auth::id()
-                    ? $message->receiver_id
-                    : $message->sender_id;
+                $otherUserId = $message->sender_id == Auth::id() ? $message->receiver_id : $message->sender_id;
+                return ($message->dorm_listing_id ?? $message->listing_id) . '_' . $otherUserId;
             });
 
         return view('messages.index', compact('conversations'));
     }
 
-    public function show($userId)
+    public function show($listingId, $userId)
     {
+        $listing = DormListing::findOrFail($listingId);
         $otherUser = User::findOrFail($userId);
 
-        $messages = Message::where(function ($query) use ($userId) {
-                $query->where('sender_id', Auth::id())
-                      ->where('receiver_id', $userId);
+        $messages = Message::where(function ($q) use ($listingId) {
+                $q->where('dorm_listing_id', $listingId)
+                  ->orWhere('listing_id', $listingId);
             })
-            ->orWhere(function ($query) use ($userId) {
-                $query->where('sender_id', $userId)
-                      ->where('receiver_id', Auth::id());
+            ->where(function ($q) use ($userId) {
+                $q->where(function ($sub) use ($userId) {
+                    $sub->where('sender_id', Auth::id())
+                        ->where('receiver_id', $userId);
+                })->orWhere(function ($sub) use ($userId) {
+                    $sub->where('sender_id', $userId)
+                        ->where('receiver_id', Auth::id());
+                });
             })
+            ->with(['sender', 'receiver', 'listing', 'legacyListing'])
             ->orderBy('created_at', 'asc')
             ->get();
 
-        Message::where('sender_id', $userId)
+        Message::where(function ($q) use ($listingId) {
+                $q->where('dorm_listing_id', $listingId)
+                  ->orWhere('listing_id', $listingId);
+            })
+            ->where('sender_id', $userId)
             ->where('receiver_id', Auth::id())
             ->update(['is_read' => true]);
 
-        return view('messages.show', compact('messages', 'otherUser'));
+        return view('messages.show', compact('messages', 'otherUser', 'listing'));
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SEND MESSAGE (🔥 UPDATED WITH NOTIFICATION)
-    |--------------------------------------------------------------------------
-    */
 
     public function send(Request $request, $userId)
     {
         $request->validate([
             'message' => 'required|string|max:1000',
+            'listing_id' => 'required|exists:dorm_listings,id',
         ]);
 
-        $message = Message::create([
+        $listing = DormListing::findOrFail($request->listing_id);
+
+        // ✅ ALWAYS use listing owner as receiver
+        $receiverId = $listing->owner_id;
+
+        // ❗ Safety check (prevents your exact crash)
+        if (!User::where('id', $receiverId)->exists()) {
+            return back()->with('error', 'Listing owner does not exist.');
+        }
+
+        Message::create([
             'sender_id' => Auth::id(),
-            'receiver_id' => $userId,
+            'receiver_id' => $receiverId,
+            'dorm_listing_id' => $listing->id,
+            'listing_id' => $listing->id,
             'message' => $request->message,
-            'listing_id' => $request->listing_id ?? null,
+            'is_read' => false,
         ]);
 
-        // 🔔 AUTO NOTIFICATION (NEW)
         Notification::create([
-            'user_id' => $userId,
+            'user_id' => $receiverId,
+            'dorm_listing_id' => $listing->id,
             'title' => 'New Message',
-            'message' => Auth::user()->name . ' sent you a message.',
+            'message' => Auth::user()->name . ' sent you a message about ' . $listing->street,
             'type' => 'message',
             'is_read' => false,
         ]);
 
-        return back();
+        return back()->with('success', 'Message sent!');
     }
 
     /*
     |--------------------------------------------------------------------------
-    | OWNER INQUIRIES
+    | OWNER INQUIRIES - LISTING-BASED
     |--------------------------------------------------------------------------
     */
 
     public function ownerInquiries()
     {
+        if (Auth::user()->verification_status !== 'approved') {
+            return redirect()->route('owner.dashboard')
+                ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
+        }
+
         $ownerId = Auth::id();
 
-        $messages = Message::where('receiver_id', $ownerId)
-            ->with(['sender', 'listing'])
+        $grouped = Message::whereHas('listing', function ($query) use ($ownerId) {
+                $query->where('owner_id', $ownerId);
+            })
+            ->where(function ($q) use ($ownerId) {
+                $q->where('receiver_id', $ownerId)
+                  ->orWhere('sender_id', $ownerId);
+            })
+            ->with(['sender', 'listing', 'legacyListing'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->groupBy(function ($message) use ($ownerId) {
+                $otherUserId = $message->sender_id === $ownerId ? $message->receiver_id : $message->sender_id;
+                return ($message->dorm_listing_id ?? $message->listing_id) . '_' . $otherUserId;
+            });
 
-        $grouped = $messages->groupBy('listing_id');
-
-        return view('owner.inquiries.index', [
-            'messages' => $messages,
-            'grouped' => $grouped
-        ]);
+        return view('owner.inquiries.index', compact('grouped'));
     }
 
     public function ownerConversation($listingId, $userId)
     {
-        $ownerId = Auth::id();
+        if (Auth::user()->verification_status !== 'approved') {
+            return redirect()->route('owner.dashboard')
+                ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
+        }
 
-        $otherUser = User::findOrFail($userId);
+        // ✅ LISTING-BASED: Show conversation for specific listing + user
+        $listing = \App\Models\DormListing::where('owner_id', Auth::id())
+            ->findOrFail($listingId);
+        $student = User::findOrFail($userId);
 
-        $messages = Message::where('listing_id', $listingId)
-            ->where(function ($query) use ($userId, $ownerId) {
-                $query->where(function ($q) use ($userId, $ownerId) {
-                    $q->where('sender_id', $ownerId)
-                      ->where('receiver_id', $userId);
-                })
-                ->orWhere(function ($q) use ($userId, $ownerId) {
-                    $q->where('sender_id', $userId)
-                      ->where('receiver_id', $ownerId);
+        $messages = Message::where(function ($q) use ($listingId) {
+                $q->where('dorm_listing_id', $listingId)
+                  ->orWhere('listing_id', $listingId);
+            })
+            ->where(function ($q) use ($userId) {
+                $q->where(function ($sub) use ($userId) {
+                    $sub->where('sender_id', Auth::id())
+                        ->where('receiver_id', $userId);
+                })->orWhere(function ($sub) use ($userId) {
+                    $sub->where('sender_id', $userId)
+                        ->where('receiver_id', Auth::id());
                 });
             })
+            ->with(['sender', 'receiver', 'listing', 'legacyListing'])
             ->orderBy('created_at', 'asc')
             ->get();
 
-        Message::where('sender_id', $userId)
-            ->where('receiver_id', $ownerId)
+        Message::where(function ($q) use ($listingId) {
+                $q->where('dorm_listing_id', $listingId)
+                  ->orWhere('listing_id', $listingId);
+            })
+            ->where('sender_id', $userId)
+            ->where('receiver_id', Auth::id())
             ->update(['is_read' => true]);
 
-        return view('owner.inquiries.show', compact('messages', 'otherUser', 'listingId'));
+        return view('owner.inquiries.show', compact('messages', 'student', 'listing'));
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | OWNER REPLY (🔥 UPDATED WITH NOTIFICATION)
-    |--------------------------------------------------------------------------
-    */
 
     public function ownerReply(Request $request, $listingId, $userId)
     {
+        if (Auth::user()->verification_status !== 'approved') {
+            return redirect()->route('owner.dashboard')
+                ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
+        }
+
         $request->validate([
             'message' => 'required|string|max:1000',
         ]);
 
+        // Verify ownership
+        $listing = \App\Models\DormListing::where('owner_id', Auth::id())
+            ->findOrFail($listingId);
+
         Message::create([
             'sender_id' => Auth::id(),
             'receiver_id' => $userId,
+            'dorm_listing_id' => $listingId,
             'listing_id' => $listingId,
             'message' => $request->message,
+            'is_read' => false,
         ]);
 
-        // 🔔 AUTO NOTIFICATION (NEW)
+        // ✅ ENHANCED NOTIFICATIONS: Include listing context
         Notification::create([
             'user_id' => $userId,
-            'title' => 'Owner Reply',
-            'message' => 'The owner replied to your inquiry.',
+            'dorm_listing_id' => $listingId,
+            'title' => 'New Reply',
+            'message' => $listing->street . ': ' . Auth::user()->name . ' replied to your inquiry',
             'type' => 'message',
             'is_read' => false,
         ]);
 
-        return back();
+        return back()->with('success', 'Reply sent!');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE MESSAGE
+    |--------------------------------------------------------------------------
+    */
+
+    public function destroy($id)
+    {
+        $message = Message::findOrFail($id);
+
+        if ($message->sender_id !== Auth::id() && $message->receiver_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $message->delete();
+
+        return back()->with('success', 'Message deleted.');
     }
 }

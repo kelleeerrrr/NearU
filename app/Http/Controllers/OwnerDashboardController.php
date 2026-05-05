@@ -12,11 +12,12 @@ class OwnerDashboardController extends Controller
 {
     public function index()
     {
-        $owner = Auth::user();
+        // ✅ Use fresh database data instead of stale session cache
+        $owner = \App\Models\User::find(Auth::id());
 
         // 🏠 Listings
         $listings = DormListing::where('owner_id', $owner->id)->get();
-        $activeListings = $listings->where('status', 'Available')->count();
+        $activeListings = $listings->where('status', 'available')->count();
 
         // ⭐ Rating
         $avgRating = Review::whereIn('dorm_listing_id', $listings->pluck('id'))
@@ -31,7 +32,10 @@ class OwnerDashboardController extends Controller
             ->count();
 
         // 📅 Visits (FIXED LOGIC)
-        $pendingVisits = VisitSchedule::whereIn('dorm_listing_id', $listings->pluck('id'))
+        $listingIds = DormListing::where('owner_id', $owner->id)
+            ->pluck('id');
+
+        $pendingVisits = VisitSchedule::whereIn('dorm_listing_id', $listingIds)
             ->where('status', 'pending')
             ->count();
 
