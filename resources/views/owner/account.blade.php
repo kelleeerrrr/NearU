@@ -164,12 +164,10 @@ body.dark .back-btn{
     <div class="avatar">
       {{ strtoupper(substr($user->name, 0, 1)) }}
     </div>
-
-    <div>
+    <div style="margin-bottom: 1rem;">
       <h2>{{ $user->name }}</h2>
       <p>{{ $user->email }}</p>
       <p>{{ $user->phone ?? 'No phone number' }}</p>
-
       <span class="badge">🏠 Owner Account</span>
     </div>
   </div>
@@ -177,48 +175,20 @@ body.dark .back-btn{
   {{-- WARNING --}}
   @if($status !== 'approved')
     <div class="warn-box">
-      ⚠️ Your account is not fully verified yet.
-      Listing features are locked until verification is complete.
+      @if($status === 'not_verified')
+        ⚠️ Your account is not fully verified yet.
+        Listing features are locked until verification is complete.
+      @elseif($status === 'under_review')
+        ⏳ Your account is under review.
+        Listing features are locked until verification is complete.
+      @endif
     </div>
   @endif
-
-  {{-- STATUS --}}
-  <div class="section">
-    <div class="section-title">🔐 Account Verification</div>
-
-    <div style="padding:.8rem;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);">
-
-      <div style="font-weight:800;">
-        @if($status === 'approved')
-          ✅ Verified Owner
-        @elseif($status === 'under_review')
-          ⏳ Under Review
-        @elseif($status === 'rejected')
-          ❌ Rejected
-        @else
-          ⛔ Not Verified
-        @endif
-      </div>
-
-      <small style="font-size:.75rem;color:var(--t2);">
-        @if($status === 'approved')
-          Your account is fully active.
-        @elseif($status === 'under_review')
-          Your documents are being reviewed.
-        @elseif($status === 'rejected')
-          Your application was rejected.
-        @else
-          Complete verification to unlock all features.
-        @endif
-      </small>
-
-    </div>
-  </div>
 
   {{-- SECURITY --}}
   <div class="section">
     <div class="section-title">🔒 Security</div>
-
+    
     <div class="security">
       <input type="password" class="input" placeholder="New Password">
       <input type="password" class="input" placeholder="Confirm Password">

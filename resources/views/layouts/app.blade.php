@@ -89,6 +89,11 @@
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
       color: var(--t1);
+      position: relative;
+    }
+
+    
+    html {
       overflow-x: hidden;
       transition: background .3s, color .3s;
     }
@@ -114,7 +119,7 @@
 
     /* ── TOP BAR ── */
     .top-bar {
-      background: var(--green);
+      background: linear-gradient(135deg,#0f2d0f,#2D7D4F);
       padding: .9rem 1.4rem;
       display: flex;
       justify-content: space-between;
@@ -122,7 +127,7 @@
       color: #fff;
       position: sticky;
       top: 0;
-      z-index: 60;
+      z-index: 1500;
       box-shadow: 0 2px 12px rgba(45, 125, 79, .25);
     }
 
@@ -317,15 +322,21 @@
       transform: translateX(-50%);
       width: calc(100% - 40px);
       max-width: 440px;
-      background: rgba(242, 183, 5, 0.85);
+      background: rgba(255, 251, 235, 0.9);
       backdrop-filter: blur(10px);
       border-radius: 25px;
       display: flex;
       justify-content: space-around;
       padding: 8px 16px;
-      z-index: 100;
+      z-index: 1500;
       box-shadow: 0 4px 20px rgba(242, 183, 5, 0.25);
-      border: 1px solid rgba(242, 183, 5, 0.3);
+      border: 2px solid #F2B705;
+    }
+
+    body.dark .bot-nav {
+      background: rgba(45, 35, 20, 0.9);
+      border: 2px solid rgba(242, 183, 5, 0.5);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .nav-i {

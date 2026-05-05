@@ -116,13 +116,13 @@
 
             @php
                 $first = $messages->first();
-                $listing = $first?->resolvedListing;
+                $listing = $first?->listing ?? $first?->legacyListing;
                 $unread = $messages->where('is_read', false)->count();
             @endphp
 
             @if($listing)
                 <div class="chip" onclick="filterListing('{{ $listing->id }}', event)">
-                    {{ $listing->title ?? 'Listing '.$listing->id }}
+                    {{ $listing->street ?? 'Listing '.$listing->id }}
                     @if($unread > 0)
                         ({{ $unread }})
                     @endif
@@ -141,15 +141,13 @@
             @php
                 $first = $messages->first();
 
-                if (!$first || !$first->resolvedListing) continue;
+                $listing = $first?->listing ?? $first?->legacyListing;
+                if (!$listing) continue;
 
-                $listing = $first->resolvedListing;
                 $student = $first->sender_id === auth()->id() ? $first->receiver : $first->sender;
-
                 if (!$student) continue;
 
                 $unread = $messages->where('is_read', false)->count();
-
                 $lastMessage = $messages->sortByDesc('created_at')->first();
             @endphp
 
@@ -165,7 +163,7 @@
                 </div>
 
                 <div class="listing-meta">
-                    📍 {{ $listing->title ?? 'Listing #'.$listing->id }}
+                    📍 {{ $listing->street ?? 'Listing #'.$listing->id }}
                 </div>
 
                 <div class="listing-meta">

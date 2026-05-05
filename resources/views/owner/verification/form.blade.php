@@ -122,8 +122,6 @@
 
 <div id="toast"></div>
 
-<div class="wrap">
-
   <!-- TOP -->
   <div class="top">
     <button class="back" onclick="history.back()">← Back</button>

@@ -37,7 +37,7 @@ body.dark {
 }
 
 /* PAGE */
-.page{padding:1rem 1.2rem; max-width: 480px; margin: 0 auto;}
+.page{padding:1rem 1.2rem; max-width: 480px;}
 
 /* PROFILE */
 .profile-card{
@@ -250,5 +250,44 @@ body.dark {
 @push('scripts')
 <script>
 // Use global dark mode function from app layout
+// Comprehensive fix for floating footer glitch on profile page
+document.addEventListener('DOMContentLoaded', function() {
+  // Ensure floating footer is properly positioned
+  const botNav = document.querySelector('.bot-nav');
+  if (botNav) {
+    // Force proper positioning
+    botNav.style.position = 'fixed';
+    botNav.style.bottom = '20px';
+    botNav.style.left = '50%';
+    botNav.style.transform = 'translateX(-50%)';
+    botNav.style.zIndex = '1500';
+    
+    // Prevent conflicts with screen animations
+    const screen = document.querySelector('.screen');
+    if (screen) {
+      screen.style.overflow = 'visible';
+    }
+    
+    // Monitor for any DOM changes that might affect positioning
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (botNav && botNav.style.position !== 'fixed') {
+          botNav.style.position = 'fixed';
+          botNav.style.bottom = '20px';
+          botNav.style.left = '50%';
+          botNav.style.transform = 'translateX(-50%)';
+        }
+      });
+    });
+    
+    if (document.body) {
+      observer.observe(document.body, {
+        attributes: true,
+        childList: true,
+        subtree: true
+      });
+    }
+  }
+});
 </script>
 @endpush

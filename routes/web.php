@@ -214,15 +214,15 @@ Route::middleware('auth')->group(function () {
         $user = auth()->user();
 
         // delete old photo if exists
-        if ($user->photo) {
-            Storage::disk('public')->delete($user->photo);
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
         }
 
         // store new photo
-        $path = $request->file('photo')->store('profile_photos', 'public');
+        $path = $request->file('photo')->store('profile-photos', 'public');
 
         $user->update([
-            'photo' => $path,
+            'profile_photo_path' => $path,
         ]);
 
         return response()->json([

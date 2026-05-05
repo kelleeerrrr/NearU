@@ -311,7 +311,7 @@ document.getElementById('photoInput')?.addEventListener('change', function(e){
   if(!file) return;
 
   const formData = new FormData();
-  formData.append('profile_photo', file);
+  formData.append('photo', file);
   formData.append('_token', '{{ csrf_token() }}');
 
   document.getElementById('uploadStatus').innerText = "Uploading...";
@@ -329,16 +329,37 @@ document.getElementById('photoInput')?.addEventListener('change', function(e){
     method: "POST",
     body: formData
   })
-  .then(() => {
-    document.getElementById('uploadStatus').innerText = "✅ Photo updated successfully!";
-    setTimeout(() => {
-      document.getElementById('uploadStatus').innerText = "";
-    }, 3000);
+  .then(response => {
+    console.log('Response status:', response.status);
+    if (response.ok) {
+      // Try to parse JSON, but if it fails, assume success since photo was uploaded
+      return response.json().catch(() => ({ success: true }));
+    } else if (response.status === 422) {
+      // Validation error
+      return response.json().then(data => {
+        throw new Error(data.message || 'Validation failed');
+      });
+    } else {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
   })
-  .catch(() => {
-    document.getElementById('uploadStatus').innerText = "❌ Upload failed.";
+  .then(data => {
+    console.log('Response data:', data);
+    if (data.success) {
+      document.getElementById('uploadStatus').innerText = "✅ Photo updated successfully!";
+      setTimeout(() => {
+        document.getElementById('uploadStatus').innerText = "";
+      }, 3000);
+    } else {
+      document.getElementById('uploadStatus').innerText = "❌ Upload failed.";
+    }
+  })
+  .catch(error => {
+    console.error('Upload error:', error);
+    document.getElementById('uploadStatus').innerText = "❌ " + error.message;
+  })
   });
-});
+
 
 // PASSWORD VISIBILITY TOGGLE
 function togglePassword(fieldId) {

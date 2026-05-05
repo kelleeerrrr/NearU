@@ -113,10 +113,10 @@ class MessageController extends Controller
 
     public function ownerInquiries()
     {
-        if (Auth::user()->verification_status !== 'approved') {
-            return redirect()->route('owner.dashboard')
-                ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
-        }
+        // if (Auth::user()->verification_status !== 'approved') {
+        //     return redirect()->route('owner.dashboard')
+        //         ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
+        // }
 
         $ownerId = Auth::id();
 
@@ -140,10 +140,10 @@ class MessageController extends Controller
 
     public function ownerConversation($listingId, $userId)
     {
-        if (Auth::user()->verification_status !== 'approved') {
-            return redirect()->route('owner.dashboard')
-                ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
-        }
+        // if (Auth::user()->verification_status !== 'approved') {
+        //     return redirect()->route('owner.dashboard')
+        //         ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
+        // }
 
         // ✅ LISTING-BASED: Show conversation for specific listing + user
         $listing = \App\Models\DormListing::where('owner_id', Auth::id())
@@ -180,10 +180,10 @@ class MessageController extends Controller
 
     public function ownerReply(Request $request, $listingId, $userId)
     {
-        if (Auth::user()->verification_status !== 'approved') {
-            return redirect()->route('owner.dashboard')
-                ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
-        }
+        // if (Auth::user()->verification_status !== 'approved') {
+        //     return redirect()->route('owner.dashboard')
+        //         ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
+        // }
 
         $request->validate([
             'message' => 'required|string|max:1000',
