@@ -16,7 +16,7 @@
           @if($dorm->photos)
             @foreach($dorm->photos as $photo)
             <div class="carousel-slide">
-              <img src="{{ asset('storage/dorms/' . $photo) }}" alt="Dorm image">
+              <img src="{{ asset('storage/' . $photo) }}" alt="Dorm image">
             </div>
             @endforeach
           @else
