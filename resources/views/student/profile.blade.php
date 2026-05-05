@@ -36,6 +36,19 @@ body.dark {
   border:none;
 }
 
+.green-btn{
+  background:transparent;
+  color:var(--green);
+  border:1.5px solid var(--green);
+  transition:all 0.2s ease;
+}
+
+.green-btn:hover{
+  background:var(--green);
+  color:#fff;
+  transform:translateY(-1px);
+}
+
 /* PAGE */
 .page{padding:1rem 1.2rem; max-width: 480px;}
 
@@ -132,13 +145,19 @@ body.dark {
 }
 
 .save-btn{
-  background:var(--blue);
+  background:var(--green);
   color:#fff;
   padding:.7rem;
   border:none;
   border-radius:12px;
   font-weight:800;
   cursor:pointer;
+  transition:all 0.2s ease;
+}
+
+.save-btn:hover{
+  background:var(--green-dk);
+  transform:translateY(-1px);
 }
 
 /* PHOTO UPLOAD */
@@ -173,7 +192,7 @@ body.dark {
       <div class="top-actions">
 
         {{-- DARK MODE --}}
-        <button class="icon-btn" onclick="toggleDark()">
+        <button class="icon-btn green-btn" onclick="toggleDark()">
           🌙 Dark Mode
         </button>
 
@@ -208,7 +227,7 @@ body.dark {
 
   {{-- EDIT PROFILE BUTTON --}}
   <div class="section">
-    <button class="icon-btn" style="width: 100%; justify-content: center;" onclick="window.location.href='/profile/edit'">
+    <button class="icon-btn green-btn" style="width: 100%; justify-content: center;" onclick="window.location.href='/profile/edit'">
       ✏️ Edit Profile
     </button>
   </div>
