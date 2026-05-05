@@ -30,8 +30,8 @@
         font-size:10px;
         padding:2px 5px;
         border-radius:50%;
-        display:none;
-      ">0</span>
+        display:{{ $unreadCount > 0 ? 'block' : 'none' }};
+      ">{{ $unreadCount }}</span>
 
     </button>
 

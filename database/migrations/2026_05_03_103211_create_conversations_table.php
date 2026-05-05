@@ -9,12 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('messages', function (Blueprint $table) {
-
-            $table->foreignId('conversation_id')
-                ->nullable()
-                ->after('id')
-                ->constrained('conversations')
-                ->onDelete('cascade');
+        Schema::create('conversations', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+            $table->foreignId('conversation_id')->nullable();
         });
     }
 

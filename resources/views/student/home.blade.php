@@ -5,10 +5,8 @@
 @section('content')
 <div class="wrap">
 
-  {{-- ── TOP BAR (notification removed, profile is in nav bar) ── --}}
-  <div class="top-bar">
-    <div class="tb-logo">Near<em>U</em></div>
-  </div>
+  {{-- ── NAVIGATION BAR ── --}}
+  @include('partials.navbar')
 
   {{-- ── HOME SCREEN ── --}}
   <div id="home" class="screen active">

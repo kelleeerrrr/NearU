@@ -17,20 +17,34 @@ class DormController extends Controller
     | VISIT SCHEDULING
     |----------------------------------------
     */
-    public function scheduleVisit(Request $request)
+    public function scheduleVisit(Request $request, $id)
     {
+        if (Auth::user()->user_type !== 'student') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only students can schedule visits.'
+            ], 403);
+        }
+
         $request->validate([
-            'dorm_id' => 'required|exists:dorm_listings,id',
-            'date'    => 'required|date|after:today',
+            'date'    => 'required|date|after_or_equal:today',
             'time'    => 'required',
             'notes'   => 'nullable|string|max:500',
         ]);
 
-        $dorm = DormListing::with('owner')->findOrFail($request->dorm_id);
+        $dorm = DormListing::with('owner')->findOrFail($id);
+
+        if ($dorm->owner_id === Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot schedule a visit to your own listing.'
+            ], 403);
+        }
 
         $exists = VisitSchedule::where('user_id', Auth::id())
             ->where('dorm_listing_id', $dorm->id)
             ->where('visit_date', $request->date)
+            ->whereIn('status', ['Pending', 'Confirmed'])
             ->first();
 
         if ($exists) {
@@ -46,7 +60,7 @@ class DormController extends Controller
             'visit_date' => $request->date,
             'visit_time' => $request->time,
             'notes' => $request->notes,
-            'status' => 'pending',
+            'status' => 'Pending',
         ]);
 
         if ($dorm->owner) {
@@ -58,6 +72,12 @@ class DormController extends Controller
             'message' => 'Visit request sent to owner',
             'visit' => $visit
         ]);
+    }
+    public function show($id)
+    {
+        $listing = DormListing::with(['images', 'reviews.user'])->findOrFail($id);
+
+        return view('dorms.show', compact('listing'));
     }
 
     public function toggleSave(Request $request, $id)
@@ -170,64 +190,56 @@ class DormController extends Controller
             'street' => 'required|string|max:255',
             'price' => 'required|numeric',
             'type' => 'required|string',
-
-            'gender_policy' => 'nullable|string',
-            'walk_minutes' => 'nullable|integer',
-            'bathroom' => 'nullable|string',
-
-            'furnishings' => 'nullable|string',
-            'appliances' => 'nullable|string',
-            'bills_included' => 'nullable|string',
-            'curfew' => 'nullable|string',
-
-            'wifi' => 'nullable',
-            'pets' => 'nullable',
-
-            'nearby_landmarks' => 'nullable|string',
-
-            'latitude' => 'nullable',
-            'longitude' => 'nullable',
-
-            'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
+
+        // FIX: convert arrays properly
+        $furnishings = json_encode($request->furnishings ?? []);
+        $appliances = json_encode($request->appliances ?? []);
+        $bills = json_encode($request->bills ?? []);
+
+        // FIX: walk minutes
+        $walkMinutes = (int) $request->walk_minutes;
+
+        // FIX: curfew constraint
+        $curfew = $request->curfew;
+        if (is_numeric($curfew)) {
+            $curfew .= 'PM';
+        }
 
         $dorm = DormListing::create([
             'owner_id' => Auth::id(),
-
             'street' => $request->street,
             'price' => $request->price,
             'type' => $request->type,
 
             'gender_policy' => $request->gender_policy,
-            'walk_minutes' => $request->walk_minutes,
+            'walk_minutes' => $walkMinutes,
             'bathroom' => $request->bathroom,
 
-            'furnishings' => $request->furnishings,
-            'appliances' => $request->appliances,
-            'bills_included' => $request->bills_included,
-            'curfew' => $request->curfew,
+            'furnishings' => $furnishings,
+            'appliances' => $appliances,
+            'bills_included' => $bills,
+
+            'curfew' => $curfew,
 
             'wifi' => $request->has('wifi') ? 1 : 0,
             'pets' => $request->has('pets') ? 1 : 0,
 
             'nearby_landmarks' => $request->nearby_landmarks,
-
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
 
-            // IMPORTANT FIX
             'status' => 'available',
         ]);
 
         if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $index => $file) {
-
+            foreach ($request->file('photos') as $i => $file) {
                 $path = $file->store('dorms', 'public');
 
                 DormListingImage::create([
                     'dorm_listing_id' => $dorm->id,
                     'path' => $path,
-                    'is_cover' => $index === 0,
+                    'is_cover' => $i === 0,
                 ]);
             }
         }

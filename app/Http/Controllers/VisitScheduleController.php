@@ -35,14 +35,41 @@ class VisitScheduleController extends Controller
 
     public function store(Request $request)
     {
+        if (Auth::user()->user_type !== 'student') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only students can schedule visits.'
+            ], 403);
+        }
+
         $request->validate([
             'dorm_listing_id' => 'required|exists:dorm_listings,id',
-            'visit_date'      => 'required|date',
+            'visit_date'      => 'required|date|after_or_equal:today',
             'visit_time'      => 'required',
-            'notes'           => 'nullable|string',
+            'notes'           => 'nullable|string|max:500',
         ]);
 
         $listing = \App\Models\DormListing::findOrFail($request->dorm_listing_id);
+
+        if ($listing->owner_id === Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot schedule a visit for your own listing.'
+            ], 403);
+        }
+
+        $existing = VisitSchedule::where('user_id', Auth::id())
+            ->where('dorm_listing_id', $listing->id)
+            ->where('visit_date', $request->visit_date)
+            ->whereIn('status', ['Pending', 'Confirmed'])
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You already scheduled a visit on this date.'
+            ]);
+        }
 
         VisitSchedule::create([
             'user_id'         => Auth::id(),
@@ -78,35 +105,68 @@ class VisitScheduleController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:Pending,Confirmed,Completed,Cancelled'
+            'status' => 'required|in:Pending,Confirmed,Approved,Completed,Cancelled'
         ]);
+
+        $status = $request->status === 'Approved' ? 'Confirmed' : $request->status;
 
         $visit = VisitSchedule::with('dormListing')
             ->whereHas('dormListing', fn ($q) => $q->where('owner_id', Auth::id()))
             ->findOrFail($id);
 
-        $oldStatus = $visit->status;
-        $visit->update(['status' => $request->status]);
+        if (in_array($visit->status, ['Completed', 'Cancelled'])) {
+            return back()->with('error', 'This visit cannot be updated.');
+        }
+
+        $visit->update([
+            'status' => $status,
+            'cancelled_at' => $status === 'Cancelled' ? now() : null,
+        ]);
 
         // ✅ NOTIFICATIONS: Notify student of status change
         $statusMessages = [
-            'Confirmed' => 'confirmed your visit request',
+            'Confirmed' => 'approved your visit request',
             'Completed' => 'marked your visit as completed',
             'Cancelled' => 'cancelled your visit'
         ];
 
-        if (isset($statusMessages[$request->status])) {
+        if (isset($statusMessages[$status])) {
             \App\Models\Notification::create([
                 'user_id' => $visit->user_id,
                 'dorm_listing_id' => $visit->dorm_listing_id,
-                'title' => 'Visit ' . ucfirst($request->status),
-                'message' => $visit->dormListing->street . ': ' . Auth::user()->name . ' ' . $statusMessages[$request->status],
-                'type' => 'visit_' . strtolower($request->status),
+                'title' => 'Visit ' . ucfirst($status),
+                'message' => $visit->dormListing->street . ': ' . Auth::user()->name . ' ' . $statusMessages[$status],
+                'type' => 'visit_' . strtolower($status),
                 'is_read' => false,
             ]);
         }
 
         return back()->with('success', 'Visit updated successfully.');
+    }
+
+    public function cancel($id)
+    {
+        $visit = VisitSchedule::with('dormListing')
+            ->where('id', $id)
+            ->where('user_id', Auth::id())
+            ->whereIn('status', ['Pending', 'Confirmed'])
+            ->firstOrFail();
+
+        $visit->update([
+            'status' => 'Cancelled',
+            'cancelled_at' => now(),
+        ]);
+
+        \App\Models\Notification::create([
+            'user_id' => $visit->dormListing->owner_id,
+            'dorm_listing_id' => $visit->dorm_listing_id,
+            'title' => 'Visit Cancelled',
+            'message' => Auth::user()->name . ' cancelled the visit request for ' . $visit->dormListing->street,
+            'type' => 'visit_cancelled',
+            'is_read' => false,
+        ]);
+
+        return back()->with('success', 'Visit cancelled successfully.');
     }
 
     public function destroy($id)
