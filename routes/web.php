@@ -117,6 +117,12 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/student/dorms/compare', [DormController::class, 'compare'])
     ->name('dorms.compare');
+    
+    Route::get('/dorms/{id}', [DormController::class, 'show'])->name('dorms.show');
+
+    // Owner profile page for students
+    Route::get('/owners/{id}', [App\Http\Controllers\OwnerController::class, 'show'])
+        ->name('owners.show');
 /*
 |--------------------------------------------------------------------------
 | LOGOUT
@@ -161,14 +167,23 @@ Route::middleware('auth')->group(function () {
         Route::post('/visits', [VisitScheduleController::class, 'store'])
             ->name('visits.store');
 
+        Route::post('/visits/{id}/cancel', [VisitScheduleController::class, 'cancel'])
+            ->name('visits.cancel');
+
+        Route::post('/visits/{id}/status', [VisitScheduleController::class, 'updateStatus'])
+            ->name('visits.status.update');
+
         Route::post('/owner/visits/{id}/status', [VisitScheduleController::class, 'updateStatus'])
-        ->name('owner.visits.status.update');
+            ->name('owner.visits.status.update');
 
 
     });
 
     Route::get('/student/home', [DormController::class, 'indexStudent'])
         ->name('student.home');
+
+    Route::post('/dorms/{id}/schedule-visit', [DormController::class, 'scheduleVisit'])
+        ->name('dorms.schedule.visit');
 
     Route::get('/saved', function () {
 

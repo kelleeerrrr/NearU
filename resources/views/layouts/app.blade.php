@@ -602,6 +602,18 @@
     }
     input:checked + .sl { background: var(--green); }
     input:checked + .sl::before { transform: translateX(22px); }
+
+    /* ── GRADIENT BACKGROUND ── */
+    body {
+      background: linear-gradient(135deg, #fefefe 0%, #fff9e6 50%, #fefefe 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    /* Dark mode override */
+    .dark body {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+    }
   </style>
 </head>
 

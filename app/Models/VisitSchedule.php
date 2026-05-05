@@ -22,6 +22,7 @@ class VisitSchedule extends Model
         'visit_time',
         'notes',
         'status',
+        'cancelled_at',
     ];
 
     /*
@@ -32,6 +33,7 @@ class VisitSchedule extends Model
 
     protected $casts = [
         'visit_date' => 'date',
+        'cancelled_at' => 'datetime',
         // visit_time is TIME in DB, so keep it as string to avoid issues
         'visit_time' => 'string',
     ];

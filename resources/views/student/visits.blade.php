@@ -77,8 +77,12 @@
                   📝 {{ $visit->notes }}
                 </div>
                 @endif
+                @php
+                  $statusLabel = $visit->status === 'Confirmed' ? 'Approved' : ucfirst($visit->status);
+                  $statusColor = $visit->status === 'Pending' ? '#F59E0B' : ($visit->status === 'Confirmed' ? '#2563EB' : ($visit->status === 'Completed' ? '#16A34A' : '#B91C1C'));
+                @endphp
                 <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--t2);">
-                  Status: <strong style="color: {{ $visit->status === 'Confirmed' ? '#2D7D4F' : ($visit->status === 'Completed' ? '#3B82F6' : '#F59E0B') }};">{{ ucfirst($visit->status) }}</strong>
+                  Status: <strong style="color: {{ $statusColor }};">{{ $statusLabel }}</strong>
                 </div>
               </div>
 
@@ -86,10 +90,11 @@
                 <a href="/dorms/{{ $dorm->id }}" class="btn btn-out" style="width: 100%; padding: 0.68rem;">View Property →</a>
               </div>
 
-              @if(!$isPast && $visit->status !== 'Completed')
-                <div style="text-align: center; padding-top: 0.5rem; border-top: 1px solid var(--border);">
-                  <button onclick="cancelVisit({{ $visit->id }})" style="color: var(--red); font-size: 0.85rem; font-weight: 600; background: none; border: none; cursor: pointer;">Cancel Visit</button>
-                </div>
+              @if(in_array($visit->status, ['Pending', 'Confirmed']))
+                <form method="POST" action="{{ route('visits.cancel', $visit->id) }}" onsubmit="return confirm('Cancel this visit?');" style="margin-top: 0.8rem;">
+                  @csrf
+                  <button type="submit" class="btn btn-red" style="width: 100%;">Cancel Visit</button>
+                </form>
               @endif
             </div>
           @endforeach

@@ -37,8 +37,12 @@
 
     <div style="margin-top:.5rem;">
         Status:
-        <strong style="color: {{ $visit->status === 'Confirmed' ? '#2D7D4F' : ($visit->status === 'Completed' ? '#3B82F6' : '#F59E0B') }};">
-            {{ ucfirst($visit->status) }}
+        @php
+            $statusLabel = $visit->status === 'Confirmed' ? 'Approved' : ucfirst($visit->status);
+            $statusColor = $visit->status === 'Pending' ? '#F59E0B' : ($visit->status === 'Confirmed' ? '#2563EB' : ($visit->status === 'Completed' ? '#16A34A' : '#B91C1C'));
+        @endphp
+        <strong style="color: {{ $statusColor }};">
+            {{ $statusLabel }}
         </strong>
     </div>
 
@@ -46,27 +50,33 @@
     <div style="margin-top:.8rem;display:flex;gap:.5rem;flex-wrap:wrap;">
 
         @if($visit->status === 'Pending')
-            <form method="POST" action="{{ route('owner.visits.status.update', $visit->id) }}">
+            <form method="POST" action="{{ route('visits.status.update', $visit->id) }}">
                 @csrf
                 <input type="hidden" name="status" value="Confirmed">
-                <button style="padding:.4rem .7rem;background:#2D7D4F;color:#fff;border:none;border-radius:8px;">
-                    ✅ Confirm
+                <button style="padding:.4rem .7rem;background:#2563EB;color:#fff;border:none;border-radius:8px;">
+                    ✅ Approve
+                </button>
+            </form>
+
+            <form method="POST" action="{{ route('visits.status.update', $visit->id) }}">
+                @csrf
+                <input type="hidden" name="status" value="Cancelled">
+                <button style="padding:.4rem .7rem;background:#C8102E;color:#fff;border:none;border-radius:8px;">
+                    ❌ Reject
                 </button>
             </form>
         @endif
 
         @if($visit->status === 'Confirmed')
-            <form method="POST" action="{{ route('owner.visits.status.update', $visit->id) }}">
+            <form method="POST" action="{{ route('visits.status.update', $visit->id) }}">
                 @csrf
                 <input type="hidden" name="status" value="Completed">
-                <button style="padding:.4rem .7rem;background:#3B82F6;color:#fff;border:none;border-radius:8px;">
-                    📩 Mark Done
+                <button style="padding:.4rem .7rem;background:#16A34A;color:#fff;border:none;border-radius:8px;">
+                    📩 Mark Completed
                 </button>
             </form>
-        @endif
 
-        @if($visit->status !== 'Completed')
-            <form method="POST" action="{{ route('owner.visits.status.update', $visit->id) }}">
+            <form method="POST" action="{{ route('visits.status.update', $visit->id) }}">
                 @csrf
                 <input type="hidden" name="status" value="Cancelled">
                 <button style="padding:.4rem .7rem;background:#C8102E;color:#fff;border:none;border-radius:8px;">
