@@ -9,7 +9,7 @@
 .header {
     font-weight: 800;
     margin-bottom: 1rem;
-    background: #fff;
+    background: #fffcee;
     border-radius: 12px;
     padding: 1rem;
     border: 1px solid #ddd;
@@ -144,6 +144,12 @@ button {
 
 <div class="page">
 
+    <div style="text-align: left; margin-bottom: 10px; color: #666; font-size: 12px;">
+        <a href="{{ route('owner.inquiries.index') }}" class="back-btn" style="background: #2D7D4F; color: white; padding: 8px 10px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600;">
+            ← Back
+        </a>
+    </div>
+
     <div class="header">
         <div class="header-info">
             <div class="header-avatar">👤</div>
@@ -170,11 +176,10 @@ button {
                 </div>
             </div>
         @empty
-            <div style="text-align: center; padding: 2rem; color: #666;">
-                No messages yet. Start the conversation!
+            <div style="text-align: center; margin-bottom: 10px; color: #666; font-size: 12px;">
+                No messages yet.
             </div>
         @endforelse
-
     </div>
 
     <form method="POST" class="form"

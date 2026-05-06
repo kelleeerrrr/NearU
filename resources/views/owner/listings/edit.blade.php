@@ -36,7 +36,7 @@ body {
   text-decoration: none;
   font-weight: 600;
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #dddddd;
   border-radius: 6px;
   transition: all 0.2s;
 }

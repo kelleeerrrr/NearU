@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="auth-wrap">
-  <div class="auth-box">
+  <div class="auth-box" style="max-width: 400px; margin: 0 auto; height: 500px; overflow-y: auto;">
 
     {{-- Logo --}}
     <div class="auth-logo">
