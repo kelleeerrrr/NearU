@@ -51,11 +51,11 @@
         </div>
         <div class="ig">
           <label>Phone</label>
-          <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="09XX XXX XXXX">
+          <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="09XX XXX XXXX" pattern="[0-9]{11}" maxlength="11" oninput="if(this.value.length >= 11) this.value = this.value.slice(0, 11)" required>
         </div>
         <div class="ig">
           <label>Password</label>
-          <input type="password" name="password" placeholder="••••••••" required>
+          <input type="password" name="password" placeholder="••••••" required>
         </div>
         <div class="ig">
           <label>Confirm Password</label>
@@ -93,10 +93,68 @@ function selectUserType(type) {
   console.log('User type input set to:', userTypeInput.value);
 }
 
+function validateForm() {
+  var form = document.querySelector('form[action*="register"]');
+  var email = document.querySelector('input[name="email"]').value;
+  var phone = document.querySelector('input[name="phone"]').value;
+  var password = document.querySelector('input[name="password"]').value;
+  var passwordConfirmation = document.querySelector('input[name="password_confirmation"]').value;
+  var name = document.querySelector('input[name="name"]').value;
+  
+  // Email validation (must contain @)
+  if (!email.includes('@')) {
+    alert('Please enter a valid email address with @ symbol');
+    return false;
+  }
+  
+  // Phone validation (11 digits only)
+  if (!/^[0-9]{11}$/.test(phone)) {
+    alert('Phone number must be exactly 11 digits');
+    return false;
+  }
+  
+  // Password validation (optional - no constraints)
+  if (password.length < 1) {
+    alert('Password is required');
+    return false;
+  }
+  
+  // Password confirmation
+  if (password !== passwordConfirmation) {
+    alert('Passwords do not match');
+    return false;
+  }
+  
+  // Name validation (required)
+  if (name.trim() === '') {
+    alert('Name field is required');
+    return false;
+  }
+  
+  // All fields required
+  if (!email || !phone || !password || !passwordConfirmation || !name) {
+    alert('All fields are required');
+    return false;
+  }
+  
+  return true;
+}
+
 // Initialize selection on page load
 document.addEventListener('DOMContentLoaded', function() {
   var initialType = document.getElementById('userTypeInput').value || 'student';
   console.log('Initial user type:', initialType);
+  
+  // Add form validation to submit button
+  var form = document.querySelector('form[action*="register"]');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      if (!validateForm()) {
+        e.preventDefault();
+      }
+    });
+  }
+  
   selectUserType(initialType);
 });
 

@@ -9,7 +9,7 @@
     {{-- Logo --}}
     <div class="auth-logo">
       <h1>Near<em>U</em></h1>
-      <p>Welcome back! 👋</p>
+      <p>NearU makes your dorm finding easier and greater! 🏠</p>
     </div>
 
     {{-- Validation Errors --}}
@@ -71,13 +71,6 @@
     {{-- Sign up link --}}
     <div class="auth-link">
       No account? <a href="{{ route('register') }}">Sign up</a>
-    </div>
-
-    {{-- Demo tip --}}
-    <div class="auth-demo-tip">
-      💡 <strong>Demo tip:</strong> Use any email with "owner"
-      (e.g. <em>owner@example.com</em>) to access the
-      <strong>Owner Dashboard</strong>. Any other email opens the student view.
     </div>
 
   </div>
