@@ -111,7 +111,7 @@
       position: relative;
       padding-top: 70px;
       padding-bottom: 20px;
-      overflow: hidden;
+      overflow-y: auto;
 
       box-shadow: 0 0 1px rgba(0,0,0,0.05),
                 0 10px 40px rgba(0,0,0,0.15);
