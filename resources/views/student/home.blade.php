@@ -388,7 +388,7 @@
 
   /* CARD */
   .dorm-card { 
-    background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
+    background:linear-gradient(135deg, rgba(45,125,79,0.8) 0%, rgba(45,125,79,0.8) 66%, rgba(242,183,5,0.3) 100%); 
     border-radius:20px; 
     padding:1.5rem; 
     margin-bottom:1.5rem; 
@@ -549,7 +549,7 @@
     color:#fff;
     transform:translateX(2px);
   }
-  .inc-box  { background:linear-gradient(135deg, #fff 0%, #fef3d2 100%); border-radius:16px; padding:1rem 1.2rem; margin-bottom:1rem; border:1.5px solid #F2B705; box-shadow:0 1px 4px rgba(242,183,5,0.15); }
+  .inc-box  { background:linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(254,243,210,0.05) 100%); border-radius:16px; padding:1rem 1.2rem; margin-bottom:1rem; border:1.5px solid #F2B705; box-shadow:0 1px 4px rgba(242,183,5,0.15); }
   .inc-ttl  { font-weight:800; font-size:.68rem; color:#F2B705; text-transform:uppercase; letter-spacing:.8px; margin-bottom:.42rem; }
   .inc-grid { display:grid; grid-template-columns:1fr 1fr; gap:.28rem; }
   .inc-i    { font-size:.76rem; color:#374151; display:flex; align-items:center; gap:.24rem; background:rgba(255,255,255,0.7); padding:.2rem .4rem; border-radius:12px; border:1.5px solid rgba(242,183,5,0.3); box-shadow:0 1px 2px rgba(242,183,5,0.1); }
@@ -589,18 +589,149 @@
   #lb-cls { position:absolute; top:18px; right:18px; font-size:1.8rem; color:#fff; cursor:pointer; background:rgba(255,255,255,.12); border:none; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
 
   /* MODALS */
-  .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:10000; align-items:flex-end; justify-content:center; }
+  .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:10000; align-items:flex-end; justify-content:center; backdrop-filter:blur(8px); }
   .modal.active { display:flex; }
-  .msheet { background:var(--card); width:100%; max-width:480px; border-radius:24px 24px 0 0; padding:1.4rem 1.3rem; max-height:92vh; overflow-y:auto; animation:sUp .28s cubic-bezier(.4,0,.2,1); }
-  @keyframes sUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-  .mhandle { width:38px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 1.1rem; }
-  .m-ttl { font-family:'Syne',sans-serif; font-size:1.14rem; font-weight:800; margin-bottom:.24rem; color:var(--t1); }
-  .m-sub { font-size:.8rem; color:var(--t2); margin-bottom:1rem; }
-  .opt-i { padding:.84rem .95rem; border:1.5px solid var(--border); border-radius:12px; margin-bottom:.52rem; cursor:pointer; transition:all .2s; color:var(--t1); font-size:.87rem; font-weight:600; display:flex; align-items:center; gap:.6rem; }
-  .opt-i:hover,.opt-i.sel { background:var(--green); color:#fff; border-color:var(--green); }
-  .opt-i.multi.sel { background:var(--green-lt); color:var(--green); border-color:var(--green); }
-  .apply-btn { width:100%; padding:.92rem; background:var(--gold); color:#1F2933; border:none; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.92rem; font-weight:800; cursor:pointer; margin-top:.7rem; transition:all .2s; box-shadow:0 3px 12px rgba(242,183,5,.35); }
-  .apply-btn:hover { background:var(--gold-dk); }
+  .msheet { 
+    background:linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); 
+    width:100%; 
+    max-width:380px; 
+    border-radius:24px 24px 0 0; 
+    padding:1.2rem 1rem; 
+    max-height:85vh; 
+    overflow-y:auto; 
+    animation:sUp .3s cubic-bezier(.4,0,.2,1); 
+    box-shadow:0 -2px 16px rgba(0,0,0,0.08), 0 6px 24px rgba(45,125,79,0.12);
+    border:1px solid rgba(45,125,79,0.08);
+  }
+  @keyframes sUp { 
+    from{transform:translateY(100%); opacity:0} 
+    to{transform:translateY(0); opacity:1} 
+  }
+  .mhandle { 
+    width:42px; 
+    height:5px; 
+    background:linear-gradient(90deg, var(--green), var(--gold)); 
+    border-radius:3px; 
+    margin:0 auto 1.3rem; 
+    box-shadow:0 2px 4px rgba(0,0,0,0.1);
+  }
+  .m-ttl { 
+    font-family:'Syne',sans-serif; 
+    font-size:1.1rem; 
+    font-weight:800; 
+    margin-bottom:.25rem; 
+    color:var(--t1); 
+    text-align:center;
+  }
+  .m-sub { 
+    font-size:.78rem; 
+    color:var(--t2); 
+    margin-bottom:1rem; 
+    text-align:center;
+    padding:.6rem;
+    background:rgba(45,125,79,0.05);
+    border-radius:12px;
+    border:1px solid rgba(45,125,79,0.1);
+  }
+  .opt-i { 
+    padding:.75rem .9rem; 
+    border:2px solid var(--border); 
+    border-radius:14px; 
+    margin-bottom:.5rem; 
+    cursor:pointer; 
+    transition:all .25s cubic-bezier(.4,0,.2,1); 
+    color:var(--t1); 
+    font-size:.82rem; 
+    font-weight:600; 
+    display:flex; 
+    align-items:center; 
+    gap:.6rem;
+    background:linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow:0 2px 6px rgba(0,0,0,0.06);
+    position:relative;
+    overflow:hidden;
+  }
+  
+  .opt-i::before {
+    content:'';
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg, transparent, rgba(45,125,79,0.1), transparent);
+    transition:left 0.6s;
+  }
+  
+  .opt-i:hover { 
+    background:linear-gradient(135deg, rgba(45,125,79,0.05) 0%, rgba(45,125,79,0.02) 100%); 
+    color:var(--green); 
+    border-color:var(--green); 
+    transform:translateY(-2px) scale(1.02);
+    box-shadow:0 6px 20px rgba(45,125,79,0.15);
+  }
+  
+  .opt-i:hover::before {
+    left:100%;
+  }
+  
+  .opt-i.sel { 
+    background:linear-gradient(135deg, var(--green) 0%, #1f5c38 100%); 
+    color:#fff; 
+    border-color:var(--green); 
+    transform:scale(1.02);
+    box-shadow:0 4px 16px rgba(45,125,79,0.25);
+  }
+  
+  .opt-i.sel::before {
+    display:none;
+  }
+  
+  .opt-i.multi.sel { 
+    background:linear-gradient(135deg, var(--green-lt) 0%, #d1fae5 100%); 
+    color:var(--green); 
+    border-color:var(--green); 
+    box-shadow:0 2px 12px rgba(45,125,79,0.2);
+  }
+  
+  .apply-btn { 
+    width:100%; 
+    padding:.85rem; 
+    background:linear-gradient(135deg, var(--gold) 0%, #f59e0b 100%); 
+    color:#1F2933; 
+    border:none; 
+    border-radius:50px; 
+    font-family:'DM Sans',sans-serif; 
+    font-size:.9rem; 
+    font-weight:800; 
+    cursor:pointer; 
+    margin-top:.8rem; 
+    transition:all .3s cubic-bezier(.4,0,.2,1); 
+    box-shadow:0 3px 12px rgba(242,183,5,.35); 
+    position:relative;
+    overflow:hidden;
+  }
+  
+  .apply-btn::before {
+    content:'';
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition:left 0.6s;
+  }
+  
+  .apply-btn:hover { 
+    background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
+    transform:translateY(-2px);
+    box-shadow:0 6px 24px rgba(242,183,5,.4);
+  }
+  
+  .apply-btn:hover::before {
+    left:100%;
+  }
 
   /* SCHEDULE */
   .fg { margin-bottom:.95rem; }
@@ -823,15 +954,15 @@ const Filters = {
   _state: { price:null, type:null, distance:null, gender:null, avail:true, adv:[] },
 
   _config: {
-    price:    { title:'💰 Filter by Price',  sub:'Select one', single:true,
+    price:    { title:'💰 Filter by Price', sub:'Choose price range', single:true,
                 opts:[['0-3000','Under ₱3,000'],['3001-4000','₱3,000–₱4,000'],['4001-5000','₱4,000–₱5,000'],['5001-999999','₱5,000+']] },
-    type:     { title:'🏠 Filter by Type',   sub:'Select one', single:true,
+    type:     { title:'🏠 Filter by Type',   sub:'Choose accommodation', single:true,
                 opts:[['bedspace','🛌 Bedspace'],['room','🛏️ Room'],['unit','🏠 Unit']] },
-    distance: { title:'🚶 Walking Distance', sub:'Select one', single:true,
+    distance: { title:'🚶 Walking Distance', sub:'Choose distance', single:true,
                 opts:[['5','5 min or less'],['7','7 min or less'],['10','10 min or less'],['15','15 min or less']] },
-    gender:   { title:'👥 Gender Policy',    sub:'Select one', single:true,
+    gender:   { title:'👥 Gender Policy',    sub:'Choose preference', single:true,
                 opts:[['male','👨 Male Only'],['female','👩 Female Only'],['any','👥 Any']] },
-    advanced: { title:'⚙️ More Filters',     sub:'Multi-select', single:false,
+    advanced: { title:'⚙️ More Filters',     sub:'Select multiple', single:false,
                 opts:[['pets','🐾 Pets Allowed'],['no-curfew','🌙 No Curfew'],['wifi','📶 WiFi Included']] },
   },
 

@@ -42,6 +42,12 @@ class NotificationController extends Controller
         }
 
         $notification->update(['is_read' => true]);
+        
+        // Return JSON response for AJAX requests
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+        
         return back();
     }
 

@@ -4,15 +4,28 @@
 
 @push('styles')
 <style>
-.carousel { position: relative; overflow: hidden; border-radius: 14px; background: #f8f9f7; }
-.carousel-inner { display: flex; transition: transform .35s ease; width: 100%; }
+.carousel { position: relative; overflow: hidden; border-radius: 18px; background: linear-gradient(135deg, #f8f9f7, #e8f5e8); box-shadow: 0 8px 32px rgba(45,125,79,0.12); }
+.carousel-inner { display: flex; transition: transform .4s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; }
 .carousel-slide { min-width: 100%; flex-shrink: 0; position: relative; }
-.carousel-slide img { width: 100%; height: 320px; object-fit: cover; display: block; }
-.carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.92); border: none; box-shadow: 0 3px 12px rgba(0,0,0,.16); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #1a2e22; z-index: 2; }
-.carousel-arrow.prev { left: 12px; }
-.carousel-arrow.next { right: 12px; }
-.carousel-arrow:hover { transform: translateY(-50%) scale(1.05); }
-.carousel-indicator { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,.58); color: #fff; padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+.carousel-slide img { width: 100%; height: 280px; object-fit: cover; display: block; }
+.carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.95); border: none; box-shadow: 0 4px 20px rgba(0,0,0,.2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #2D7D4F; z-index: 2; transition: all 0.3s ease; }
+.carousel-arrow.prev { left: 16px; }
+.carousel-arrow.next { right: 16px; }
+.carousel-arrow:hover { transform: translateY(-50%) scale(1.1); background: #fff; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+.carousel-indicator { position: absolute; bottom: 16px; right: 16px; background: rgba(45,125,79,0.9); color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; backdrop-filter: blur(10px); }
+
+.listing-header { background: linear-gradient(135deg, #2D7D4F, #4a9d6a); color: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 6px 24px rgba(45,125,79,0.2); }
+.listing-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+.listing-subtitle { opacity: 0.9; font-size: 0.95rem; }
+
+.price-type-row { background: white; padding: 1.2rem; border-radius: 14px; margin-bottom: 1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+.enhanced-price { font-size: 1.8rem; font-weight: 800; color: #2D7D4F; }
+.enhanced-price small { font-size: 0.9rem; opacity: 0.8; }
+
+.metas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+.mpill { padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; transition: all 0.2s ease; }
+.mpill:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.mpill.ok { background: linear-gradient(135deg, #2D7D4F, #4a9d6a); color: white; border: none; }
 </style>
 @endpush
 
@@ -22,33 +35,29 @@
 
   <div class="screen active">
     <div class="cs">
-      <h2>{{ $listing->street }}</h2>
+      <!-- Back Button -->
+      <div style="margin-bottom: 1rem;">
+        <button class="icon-btn back-btn" onclick="history.back()" style="background: var(--green); color: white; border: none; padding: 0.6rem 1rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
+          ← Back
+        </button>
+      </div>
+
+      <!-- Listing Header -->
+      <div class="listing-header">
+        <h1 class="listing-title">{{ $listing->street }}</h1>
+        <div class="listing-subtitle">{{ $listing->type }} • {{ $listing->gender_policy }} • {{ $listing->walk_minutes }} min walk to campus</div>
+      </div>
 
       @php
-        // Get photos from the images relationship (this is the correct way)
-        $images = $listing->images;
+        $images = $listing->images ?? collect([]);
         
         // Create gallery using direct file serving route
         $gallery = $images->map(function($image) {
             $filename = basename($image->path);
             return url('/photos/' . $filename);
         })->values()->all();
-        
-        // Debug: Show raw data for troubleshooting
-        $rawImages = $listing->images->toArray();
-        
-        // Debug: Log gallery paths
-        // Uncomment the line below for debugging
-        @php logger()->info('Gallery paths for listing ' . $listing->id . ': ' . json_encode($gallery)); @endphp
-        
-        <!-- Temporary debug to see URLs -->
-        <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
-          <strong>Generated URLs:</strong><br>
-          @foreach($gallery as $url)
-            {{ $url }}<br>
-          @endforeach
-        </div>
-        
+      @endphp
+
       <!-- Image Carousel -->
       <div class="carousel" style="margin-bottom: 1rem;">
         <div class="carousel-inner" id="listing-carousel-inner">
@@ -72,8 +81,8 @@
       </div>
 
       <!-- Price and Type -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <div class="card-price" style="margin: 0;">₱{{ number_format($listing->price, 0) }}<small>/month</small></div>
+      <div class="price-type-row">
+        <div class="enhanced-price">₱{{ number_format($listing->price, 0) }}<small>/month</small></div>
         <div class="type-badge {{ $listing->type }}">{{ $listing->type }}</div>
       </div>
 
@@ -148,6 +157,9 @@
 
   @include('partials.footer')
 </div>
+
+<!-- Add bottom spacing for floating nav bar -->
+<div style="height: 6rem;"></div>
 @endsection
 
 @push('scripts')
@@ -218,5 +230,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-
-@endsection

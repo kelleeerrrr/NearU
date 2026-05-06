@@ -200,6 +200,44 @@
   margin-left: 8px;
   opacity: 0.8;
 }
+
+.unread-inquiry {
+  border-left: 4px solid #2D7D4F;
+  background: linear-gradient(to right, rgba(45,125,79,0.05), transparent);
+}
+
+.unread-indicator {
+  color: #2D7D4F;
+  font-size: 8px;
+  margin-left: 8px;
+  animation: pulse 2s infinite;
+}
+
+.unread-badge {
+  background: #2D7D4F;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+.unread-preview {
+  font-weight: 600;
+  color: #141F14;
+}
+
+.read-preview {
+  font-weight: 400;
+  color: #5E6E5E;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 </style>
 @endpush
 
@@ -216,8 +254,16 @@
     <!-- FILTER CHIPS -->
     <div class="chip-bar">
 
-        <div class="chip active" onclick="filterListing('all', event)">
+        <div class="chip active" onclick="filterInquiries('all', event)">
             All
+        </div>
+
+        <div class="chip" onclick="filterInquiries('unread', event)">
+            Unread
+        </div>
+
+        <div class="chip" onclick="filterInquiries('read', event)">
+            Read
         </div>
 
         @foreach($grouped as $key => $messages)
@@ -260,29 +306,43 @@
                 $ownerLastMessage = $ownerReplied ? $lastMessage->message : null;
             @endphp
 
+            @php
+            $hasUnread = $messages->where('is_read', false)->where('receiver_id', auth()->id())->count() > 0;
+        @endphp
             <a href="{{ route('owner.inquiries.show', [
                     'listingId' => $listing->id,
                     'userId' => $student->id
                 ]) }}"
-               class="listing-card"
-               data-listing="{{ $listing->id }}">
+               class="listing-card {{ $hasUnread ? 'unread-inquiry' : '' }}"
+               data-listing="{{ $listing->id }}"
+               data-read-status="{{ $hasUnread ? 'unread' : 'read' }}">
 
                 <div class="inquiry-header">
                     <div class="student-info">
                         <div class="listing-title {{ $ownerReplied ? '' : 'bold-text' }}">
                             👤 {{ $student->name ?? 'Unknown User' }}
+                            @if($hasUnread)
+                                <span class="unread-indicator">●</span>
+                            @endif
                         </div>
                         <div class="listing-meta">
                             📍 {{ $listing->street ?? 'Listing #'.$listing->id }}
                         </div>
                     </div>
+                    @if($hasUnread)
+                        <div class="unread-badge">
+                            {{ $messages->where('is_read', false)->where('receiver_id', auth()->id())->count() }}
+                        </div>
+                    @endif
                 </div>
 
                 <div class="listing-message {{ $ownerReplied ? '' : 'bold-text' }}">
                     @if($ownerReplied)
-                        <span class="you-indicator">You: {{ \Illuminate\Support\Str::limit($ownerLastMessage, 30) }}</span>
+                        <span class="you-indicator">You: {{ \Illuminate\Support\Str::limit($ownerLastMessage, 40) }}</span>
                     @else
-                        {{ \Illuminate\Support\Str::limit($lastMessage->message ?? '', 60) }}
+                        <span class="{{ $hasUnread ? 'unread-preview' : 'read-preview' }}">
+                            {{ \Illuminate\Support\Str::limit($lastMessage->message ?? '', 70) }}
+                        </span>
                     @endif
                 </div>
 
@@ -318,19 +378,38 @@
 </div>
 
 <script>
-function filterListing(id, event){
+function filterInquiries(status, event) {
+    // Update active chip
+    document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
+    event.target.classList.add('active');
 
+    // Filter inquiries by read status
+    document.querySelectorAll('.listing-card').forEach(card => {
+        const readStatus = card.dataset.readStatus;
+        
+        if (status === 'all') {
+            card.style.display = 'block';
+        } else if (status === 'unread' && readStatus === 'unread') {
+            card.style.display = 'block';
+        } else if (status === 'read' && readStatus === 'read') {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function filterListing(id, event){
+    // Update active chip
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     event.target.classList.add('active');
 
     document.querySelectorAll('.listing-card').forEach(card => {
-
         if(id === 'all'){
             card.style.display = 'block';
         } else {
             card.style.display = (card.dataset.listing == id) ? 'block' : 'none';
         }
-
     });
 }
 </script>

@@ -12,13 +12,11 @@
 
         {{-- INFO --}}
         <div class="map-info-card">
-            <strong>🚀 Live Navigation Mode</strong><br>
-            <small id="statusText">Detecting location...</small>
+            <strong>🏫 Batangas State University Alangilan Campus</strong><br>
+            <small id="statusText">Showing dorms near campus</small>
         </div>
 
-        {{-- NEAR ME --}}
-        <button class="near-btn" onclick="locateMe()">📍 Near Me</button>
-
+        
         {{-- MAP --}}
         <div id="map"></div>
 
@@ -80,18 +78,6 @@
     box-shadow:0 6px 18px rgba(0,0,0,.1);
 }
 
-/* NEAR */
-.near-btn{
-    position:absolute;
-    bottom:140px;
-    right:15px;
-    z-index:1000;
-    background:#2563eb;
-    color:#fff;
-    border:none;
-    padding:10px 14px;
-    border-radius:50px;
-}
 
 /* POPUP */
 .preview{
@@ -148,18 +134,37 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    // 🟡 GOLDEN COUNTRY HOMES CENTER
-    const CENTER = { lat: 13.7816, lng: 121.0659 };
+    // 🏫 BATANGAS STATE UNIVERSITY ALANGILAN CAMPUS
+    const CENTER = { lat: 13.7841, lng: 121.0742 };
 
     const map = L.map('map', {
         zoomControl: false
-    }).setView([CENTER.lat, CENTER.lng], 17);
+    }).setView([CENTER.lat, CENTER.lng], 13);
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
     }).addTo(map);
+
+    // 🏫 CAMPUS BOUNDARY
+    const campusBoundary = L.circle([CENTER.lat, CENTER.lng], {
+        color: '#2D7D4F',
+        fillColor: '#2D7D4F',
+        fillOpacity: 0.15,
+        radius: 2000,
+        weight: 3
+    }).addTo(map);
+    
+    // Zoom to campus
+    setTimeout(() => {
+        map.setView([CENTER.lat, CENTER.lng], 16);
+    }, 1000);
+    
+    // Ensure campus boundary is visible
+    setTimeout(() => {
+        map.fitBounds(campusBoundary.getBounds());
+    }, 1000);
 
     let userLatLng = null;
     let routeLine = null;
@@ -199,24 +204,70 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         @endforeach
     ];
-
-    // 📍 MARKERS
+    
+    // 🧾 POPUP FUNCTIONS
+    window.showPreview = function(d){
+        document.getElementById('pStreet').innerText = d.street;
+        document.getElementById('pPrice').innerText = "₱" + d.price + "/mo";
+        document.getElementById('pType').innerText = d.type;
+        document.getElementById('pImage').src = d.image;
+        
+        document.getElementById('msgBtn').href =
+            "/messages/create?dorm_id=" + d.id;
+        
+        document.getElementById('dirBtn').href =
+            `https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}`;
+        
+        document.getElementById('dormPreview').classList.remove('hidden');
+    }
+    
+    window.closePreview = () =>
+        document.getElementById('dormPreview').classList.add('hidden');
+    
+    // 🧭 ROUTE + LIVE NAV STYLE
+    function drawRoute(lat,lng){
+        if(!userLatLng) return;
+        
+        const url =
+            `https://router.project-osrm.org/route/v1/walking/${userLatLng[1]},${userLatLng[0]};${lng},${lat}?overview=full&geometries=geojson`;
+        
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                
+                const coords = data.routes[0].geometry.coordinates;
+                const latlngs = coords.map(c => [c[1], c[0]]);
+                
+                if(routeLine) map.removeLayer(routeLine);
+                
+                routeLine = L.polyline(latlngs,{
+                    color:"#2563eb",
+                    weight:5
+                }).addTo(map);
+                
+                // � fake step UI (can upgrade later to real steps API)
+                document.getElementById('navPanel').classList.remove('hidden');
+                document.getElementById('steps').innerHTML = `
+                    <b>Step 1:</b> Head towards destination<br>
+                    <b>Step 2:</b> Walk straight ~${Math.round(data.routes[0].distance)}m<br>
+                    <b>Step 3:</b> Arrive at location
+                `;
+            });
+    }
+    
+    // �📍 MARKERS
     dorms.forEach(d => {
-
-        if(!d.lat || !d.lng) return;
-
         // type color
         let icon = greenIcon;
         if(d.type === 'Unit') icon = blueIcon;
-
+        
         const marker = L.marker([d.lat, d.lng], {icon}).addTo(map);
-
         marker.on('click', () => {
             showPreview(d);
             drawRoute(d.lat, d.lng);
         });
     });
-
+    
     // 🔴 USER LOCATION
     if(navigator.geolocation){
 
@@ -285,12 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.closePreview = () =>
         document.getElementById('dormPreview').classList.add('hidden');
 
-    // 📍 CENTER USER
-    window.locateMe = function(){
-        if(!userLatLng) return;
-        map.flyTo(userLatLng, 18);
-    }
-
+    
 });
 </script>
 
