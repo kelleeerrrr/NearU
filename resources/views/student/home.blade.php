@@ -360,7 +360,7 @@
   .hero-badge { display:inline-flex; align-items:center; gap:.22rem; background:rgba(255,255,255,.12); padding:.22rem .65rem; border-radius:20px; font-size:.74rem; font-weight:700; border:1px solid rgba(255,255,255,.2); }
 
   /* SEARCH */
-  .search-wrap { margin:-10px 1.2rem .75rem; position:relative; z-index:3; }
+  .search-wrap { margin:0 1.2rem .75rem; position:relative; z-index:3; }
   .search-wrap input { width:100%; padding:.9rem 1.2rem .9rem 2.9rem; border:2px solid var(--border); border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none; background:var(--card); color:var(--t1); box-shadow:var(--sh); transition:border var(--transition),box-shadow var(--transition); }
   .search-wrap input:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(45,125,79,.1),var(--sh); }
   .si { position:absolute; left:1rem; top:50%; transform:translateY(-50%); font-size:.95rem; pointer-events:none; }

@@ -92,6 +92,8 @@
       display: flex;
       justify-content: center;
       background: #e5e7eb;
+      margin: 0;
+      padding: 0;
     }
 
     
@@ -109,12 +111,27 @@
       background: var(--surface);
       min-height: 100vh;
       position: relative;
-      padding-top: 70px;
+      padding-top: 60px;
       padding-bottom: 20px;
       overflow-y: auto;
 
       box-shadow: 0 0 1px rgba(0,0,0,0.05),
                 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .wrap {
+        max-width: 100%;
+        width: 100%;
+        border-radius: 0;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .wrap {
+        box-shadow: none;
+      }
     }
 
     /* ── SCREEN TRANSITIONS ── */
@@ -142,6 +159,20 @@
       max-width: 430px;
       z-index: 2000;
       box-shadow: 0 2px 12px rgba(45, 125, 79, .25);
+    }
+
+    /* Top bar responsive */
+    @media (max-width: 480px) {
+      .top-bar {
+        max-width: 100%;
+        padding: .9rem 1rem;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .top-bar {
+        padding: .8rem .8rem;
+      }
     }
 
     .tb-logo {
