@@ -50,6 +50,36 @@
     font-weight: 500;
 }
 
+.listing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 8px;
+    position: relative;
+    height: 50px;
+}
+
+.listing-cover-small {
+    width: 160px;
+    height: 110px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid #40dc1021;
+    position: absolute;
+    right: -250px;
+    transform: translateY(-50%);
+    top: 0.05%;
+}
+
+.profile-indicator {
+    color: #666;
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 4px;
+    opacity: 0.8;
+}
+
 .chat {
     display: flex;
     flex-direction: column;
@@ -120,7 +150,12 @@ button {
             <div class="header-details">
                 <h3>{{ $student->name }}</h3>
                 <p>Student Inquiry</p>
-                <p class="listing-info">📍 {{ $listing->street }}</p>
+                <div class="listing-header">
+                    <p class="listing-info">📍 {{ $listing->street }}</p>
+                    @if($listing->coverImage)
+                        <img src="{{ asset('storage/' . $listing->coverImage->path) }}" alt="Listing Cover" class="listing-cover-small">
+                    @endif
+                </div>
             </div>
         </div>
     </div>

@@ -74,10 +74,12 @@ Route::middleware('guest')->group(function () {
 
             $user = Auth::user();
 
-            // ✅ ALL OWNERS CAN LOGIN - NO VERIFICATION RESTRICTIONS
-            return $user->user_type === 'owner'
-                ? redirect()->route('owner.dashboard')
-                : redirect()->route('student.home');
+            // ✅ REDIRECT BASED ON USER TYPE
+            return $user->user_type === 'admin'
+                ? redirect()->route('admin.owner-verifications.index')
+                : ($user->user_type === 'owner'
+                    ? redirect()->route('owner.dashboard')
+                    : redirect()->route('student.home'));
         }
 
         return back()->withErrors(['email' => 'Invalid credentials']);

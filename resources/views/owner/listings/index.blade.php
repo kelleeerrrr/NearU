@@ -31,6 +31,53 @@
   cursor:pointer;
 }
 
+.create-btn:disabled{
+  background:#ccc !important;
+  color:#666 !important;
+  cursor:not-allowed;
+}
+
+/* VERIFICATION BANNER */
+.verification-banner {
+  background: linear-gradient(135deg, #FFF3CD, #FFE089);
+  border: 2px solid #F2B705;
+  border-radius: 12px;
+  padding: 15px;
+  margin: 0 1.2rem 1rem;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(242,183,5,0.2);
+}
+
+.verification-banner h4 {
+  color: #856404;
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.verification-banner p {
+  color: #856404;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.verification-link {
+  background: linear-gradient(135deg, #2D7D4F, #1e5a3a);
+  color: white;
+  text-decoration: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.verification-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45,125,79,0.4);
+}
+
 /* FILTER */
 .filter-bar{
   display:flex;
@@ -130,16 +177,23 @@
 
 @php
     $statusFilter = request('status');
+    $verificationStatus = auth()->user()->verification_status ?? 'not_verified';
 @endphp
 
 {{-- HEADER --}}
 <div class="header-actions">
   <div class="page-title">🏠 My Listings</div>
 
-  <button class="create-btn"
-          onclick="location.href='{{ route('owner.listings.create') }}'">
-    + Create Listing
-  </button>
+  @if($verificationStatus === 'approved')
+    <button class="create-btn"
+            onclick="location.href='{{ route('owner.listings.create') }}'">
+      + Create Listing
+    </button>
+  @else
+    <button class="create-btn" disabled>
+      + Create Listing (Verify First)
+    </button>
+  @endif
 </div>
 
 <!-- Success Notification -->
@@ -241,9 +295,19 @@
 </div>
 
 @empty
-<div style="padding:1rem;color:#666;">
-    No listings found.
-</div>
+@if($verificationStatus === 'not_verified' || $verificationStatus === 'under_review')
+    <div class="verification-banner">
+      <h4>🔐 Verification Required</h4>
+      <p>You need to complete verification to create and view your listings.</p>
+      <a href="{{ route('owner.verification.form') }}" class="verification-link">
+        Complete Verification
+      </a>
+    </div>
+@else
+    <div style="padding:1rem;color:#666;">
+        No listings found.
+    </div>
+@endif
 @endforelse
 
 @endsection

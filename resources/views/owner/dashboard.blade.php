@@ -136,6 +136,50 @@
   pointer-events:none;
 }
 
+/* VERIFICATION BANNER */
+.verification-banner {
+  background: linear-gradient(135deg, #FFF3CD, #FFE089);
+  border: 2px solid #F2B705;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(242,183,5,0.2);
+}
+
+.verification-banner h3 {
+  color: #856404;
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.verification-banner p {
+  color: #856404;
+  font-size: 14px;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.verification-btn {
+  background: linear-gradient(135deg, #2D7D4F, #1e5a3a);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.verification-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45,125,79,0.4);
+}
+
 </style>
 @endpush
 
@@ -162,6 +206,18 @@ $status = $owner->verification_status ?? 'not_verified';
 </div>
 
 <div class="main-content">
+
+<!-- VERIFICATION BANNER -->
+@if($status !== 'approved')
+<div class="verification-banner">
+  <h3>🔐 Complete Verification to Access Features</h3>
+  <p>Your account needs to be verified to unlock all features including creating listings, managing inquiries, and viewing statistics.</p>
+  <a href="{{ route('owner.verification.form') }}" class="verification-btn">
+    Complete Verification Now
+  </a>
+</div>
+@endif
+
 <!-- STATS -->
 <div class="dash-stats">
 
