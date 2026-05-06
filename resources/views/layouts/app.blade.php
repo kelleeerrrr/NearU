@@ -475,15 +475,19 @@
 
     /* ── CARDS ── */
     .dorm-card {
-      background: var(--card);
+      background: linear-gradient(to bottom, #e8f7ee 0%, #f0f9e8 30%, #fff9e6 70%, #fef3d2 100%);
       border-radius: var(--rad);
       padding: 1.1rem;
       margin-bottom: 1rem;
       box-shadow: var(--sh);
-      border: 1.5px solid var(--border);
+      border: 1.5px solid rgba(45, 125, 79, 0.25);
       transition: transform var(--transition), box-shadow var(--transition);
     }
-    .dorm-card:hover { transform: translateY(-3px); box-shadow: var(--sh2); }
+    .dorm-card:hover { 
+      transform: translateY(-3px); 
+      box-shadow: 0 8px 32px rgba(45, 125, 79, 0.2); 
+      border-color: rgba(45, 125, 79, 0.35);
+    }
 
     /* ── TYPE BADGES ── */
     .type-badge {
@@ -496,9 +500,9 @@
       font-weight: 800;
       letter-spacing: .2px;
     }
-    .type-badge.Room     { background: #e8f5ee; color: #1f5c38; }
-    .type-badge.Bedspace { background: var(--blue-lt); color: #1d4ed8; }
-    .type-badge.Unit     { background: var(--gold-lt); color: #92400E; }
+    .type-badge.Room     { background: #2D7D4F; color: #fff; box-shadow: 0 2px 8px rgba(45, 125, 79, 0.3); }
+    .type-badge.Bedspace { background: #3B82F6; color: #fff; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3); }
+    .type-badge.Unit     { background: #F2B705; color: #1F2933; box-shadow: 0 2px 8px rgba(242, 183, 5, 0.3); }
 
     /* ── META PILLS ── */
     .mpill {
@@ -506,15 +510,16 @@
       align-items: center;
       gap: .22rem;
       padding: .24rem .65rem;
-      background: var(--bg);
+      background: #fff;
       border-radius: 20px;
       font-size: .72rem;
       font-weight: 600;
-      color: var(--t2);
-      border: 1px solid var(--border);
+      color: #374151;
+      border: 1.5px solid #e5e7eb;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     }
-    .mpill.ok   { background: var(--green-lt); color: var(--green); border-color: #b2dfca; }
-    .mpill.blue { background: var(--blue-lt);  color: #1d4ed8;      border-color: #bfdbfe; }
+    .mpill.ok   { background: #2D7D4F; color: #fff; border-color: #2D7D4F; box-shadow: 0 1px 4px rgba(45, 125, 79, 0.2); }
+    .mpill.blue { background: #3B82F6; color: #fff; border-color: #3B82F6; box-shadow: 0 1px 4px rgba(59, 130, 246, 0.2); }
 
     /* ── BUTTONS ── */
     .btn-row {
