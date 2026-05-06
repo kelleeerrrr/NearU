@@ -66,7 +66,7 @@
               : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400';
 
             $inCmp  = in_array($dorm->id, session('compare', []));
-            $saved  = in_array($dorm->id, session('saved', []));
+            $saved  = auth()->check() && auth()->user()->savedListings()->where('dorm_listing_id', $dorm->id)->exists();
             $rating = $dorm->rating ? round($dorm->rating) : 0;
             $avgRating = $dorm->rating ?? 0;
             $empty  = 5 - $rating;
@@ -109,6 +109,11 @@
                   @endforeach
                 </div>
                 <div class="dist-overlay">📍 {{ $dorm->walk_minutes }}-min walk</div>
+                <span class="heart-overlay" id="heart-{{ $dorm->id }}"
+                      style="color:{{ $saved ? 'var(--gold)' : 'white' }}"
+                      onclick="Saved.toggle({{ $dorm->id }}, event)">
+                  {{ $saved ? '♥' : '♡' }}
+                </span>
               </div>
             @else
               <div class="carousel">
@@ -118,35 +123,44 @@
                   loading="lazy"
                   onclick="UI.openLb(this.src)">
                 <div class="dist-overlay">📍 {{ $dorm->walk_minutes }}-min walk</div>
+                <span class="heart-overlay" id="heart-{{ $dorm->id }}"
+                      style="color:{{ $saved ? 'var(--gold)' : 'white' }}"
+                      onclick="Saved.toggle({{ $dorm->id }}, event)">
+                  {{ $saved ? '♥' : '♡' }}
+                </span>
               </div>
             @endif
 
-            {{-- RATING ROW --}}
-            <div class="rat-row">
-              <span class="stars">{!! str_repeat('★', $rating) !!}{!! str_repeat('☆', $empty) !!}</span>
-              <span class="rv">{{ number_format($dorm->rating ?? 0, 1) }}</span>
-              <span class="rc">({{ $dorm->reviews()->count() }} reviews)</span>
-            </div>
-
-            {{-- TYPE BADGE + HEART --}}
-            <div class="card-top">
-              <div class="type-badge {{ $dorm->type }}">
-                @if($dorm->type === 'Room') 🛏️
-                @elseif($dorm->type === 'Bedspace') 🛌
-                @else 🏠
-                @endif
-                {{ $dorm->type }}
+            {{-- PRICE & RATINGS CONTAINER --}}
+            <div class="price-rating-container">
+              <div class="price-name-container">
+                <div class="card-street">{{ $dorm->street }}</div>
+                <div class="card-price">₱{{ number_format($dorm->price, 0) }} <small>/ month</small></div>
               </div>
-              <span class="heart" id="heart-{{ $dorm->id }}"
-                    style="color:{{ $saved ? '#C8102E' : 'var(--border)' }}"
-                    onclick="Saved.toggle({{ $dorm->id }}, event)">
-                {{ $saved ? '♥' : '♡' }}
-              </span>
+              <div class="rat-row">
+                <span class="stars">{!! str_repeat('★', $rating) !!}{!! str_repeat('☆', $empty) !!}</span>
+                <span class="rv">{{ number_format($dorm->rating ?? 0, 1) }}</span>
+                <span class="rc">({{ $dorm->reviews()->count() }})</span>
+              </div>
             </div>
 
-            {{-- STREET & PRICE --}}
-            <div class="card-street">{{ $dorm->street }}</div>
-            <div class="card-price">₱{{ number_format($dorm->price, 0) }} <small>/ month</small></div>
+            {{-- TYPE BADGE --}}
+            <div class="type-badge {{ $dorm->type }}">
+              @if($dorm->type === 'Room') 🛏️
+              @elseif($dorm->type === 'Bedspace') 🛌
+              @else 🏠
+              @endif
+              {{ $dorm->type }}
+            </div>
+
+            {{-- OWNER CHIP --}}
+            @if($dorm->owner)
+              <div class="owner-chip" onclick="UI.openOwner({{ $dorm->owner->id }})">
+                <span style="color:var(--green)">✓</span>
+                <span>{{ $dorm->owner->first_name }} {{ $dorm->owner->last_name }}</span>
+                <span style="font-size:.6rem;">VERIFIED OWNER</span>
+              </div>
+            @endif
 
             {{-- META PILLS --}}
             <div class="metas">
@@ -155,17 +169,6 @@
               <span class="mpill ok">✅ {{ $dorm->status }}</span>
               @if($dorm->wifi_included) <span class="mpill ok">📶 WiFi</span> @endif
             </div>
-
-            {{-- OWNER CHIP --}}
-            @if($dorm->owner)
-              <div class="owner-chip" onclick="OwnerProfile.show({{ $dorm->owner->id }})">
-                👤 <strong>{{ $dorm->owner->name }}</strong>
-                @if($dorm->owner->is_verified ?? false)
-                  <span style="color:var(--green);font-size:.65rem;">✓</span>
-                @endif
-                <span style="opacity:.5;font-size:.7rem;">· View profile →</span>
-              </div>
-            @endif
 
             {{-- INCLUSIONS BOX --}}
             <div class="inc-box">
@@ -181,11 +184,11 @@
 
             {{-- BUTTONS ROW 1: Reviews + Directions --}}
             <div class="btn-row">
-              <button class="btn btn-out"
+              <button class="btn btn-green"
                 onclick="Reviews.show({{ $dorm->id }}, @js($dorm->street))">
                 ⭐ Reviews ({{ $dorm->reviews()->count() }})
               </button>
-              <button class="btn btn-green"
+              <button class="btn btn-gold"
                 onclick="Directions.get({{ $dorm->id }}, {{ $dorm->latitude ?? 0 }}, {{ $dorm->longitude ?? 0 }}, '{{ addslashes($dorm->street) }}')">
                 🧭 Directions
               </button>
@@ -197,7 +200,7 @@
                 onclick="Compare.toggle({{ $dorm->id }})">
                 {{ $inCmp ? '✓ Added' : '⚖️ Compare' }}
               </button>
-              <button class="btn btn-gold"
+              <button class="btn btn-schedule"
                 onclick="Schedule.open({{ $dorm->id }}, '{{ addslashes($dorm->street) }}', '{{ $dorm->type }}', {{ $dorm->price }}, '{{ addslashes($dorm->owner->name ?? '') }}')">
                 📅 Schedule
               </button>
@@ -225,9 +228,12 @@
         </div>
 
       </div>{{-- /#dormList --}}
-    </div>{{-- /.listings --}}
+    </div>{{-- /.listings -->}
 
-  </div>{{-- /#home --}}
+    {{-- White space for scrollability --}}
+    <div style="height: 120px;"></div>
+    
+  </div>{{-- /#home -->}}
 
   {{-- BOTTOM NAV --}}
   <div class="bot-nav">
@@ -359,7 +365,7 @@
   .hero-badge { display:inline-flex; align-items:center; gap:.22rem; background:rgba(255,255,255,.12); padding:.22rem .65rem; border-radius:20px; font-size:.74rem; font-weight:700; border:1px solid rgba(255,255,255,.2); }
 
   /* SEARCH */
-  .search-wrap { margin:-10px 1.2rem .75rem; position:relative; z-index:3; }
+  .search-wrap { margin:0 1.2rem .75rem; position:relative; z-index:3; }
   .search-wrap input { width:100%; padding:.9rem 1.2rem .9rem 2.9rem; border:2px solid var(--border); border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none; background:var(--card); color:var(--t1); box-shadow:var(--sh); transition:border var(--transition),box-shadow var(--transition); }
   .search-wrap input:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(45,125,79,.1),var(--sh); }
   .si { position:absolute; left:1rem; top:50%; transform:translateY(-50%); font-size:.95rem; pointer-events:none; }
@@ -381,74 +387,197 @@
   .sec-lbl::after { content:''; flex:1; height:1px; background:var(--border); }
 
   /* CARD */
-  .dorm-card { background:var(--card); border-radius:var(--rad); padding:1.1rem; margin-bottom:1rem; box-shadow:var(--sh); border:1.5px solid var(--border); transition:transform var(--transition),box-shadow var(--transition),border-color var(--transition); }
-  .dorm-card:hover { transform:translateY(-3px); box-shadow:var(--sh2); }
-  .dorm-card.cmp-on { border-color:var(--gold); box-shadow:0 0 0 3px rgba(242,183,5,.18); }
+  .dorm-card { 
+    background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
+    border-radius:20px; 
+    padding:1.5rem; 
+    margin-bottom:1.5rem; 
+    box-shadow:0 8px 24px rgba(45,125,79,0.1); 
+    border:2px solid var(--border); 
+    transition:all 0.3s ease; 
+    position:relative;
+    overflow:hidden;
+  }
+  
+  .dorm-card::before {
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:4px;
+    background:linear-gradient(90deg, var(--green), var(--gold));
+  }
+  
+  .dorm-card::after {
+    content:'✨';
+    position:absolute;
+    top:-5px;
+    right:15px;
+    font-size:1rem;
+    transform:rotate(15deg);
+    color:var(--gold);
+    opacity:0.7;
+  }
+  
+  .dorm-card:hover { 
+    transform:translateY(-4px) scale(1.02); 
+    box-shadow:0 12px 32px rgba(45,125,79,0.18); 
+    border-color:var(--green);
+  }
+  
+  .dorm-card.cmp-on { 
+    border-color:var(--gold); 
+    box-shadow:0 0 0 3px rgba(242,183,5,.18), 0 12px 32px rgba(242,183,5,0.15); 
+  }
+  
+  .dorm-card.cmp-on::before {
+    background:linear-gradient(90deg, var(--gold), #f59e0b);
+  }
 
   /* CAROUSEL */
-  .carousel { position:relative; border-radius:12px; overflow:hidden; margin-bottom:.9rem; background:var(--bg); }
+  .carousel { position:relative; border-radius:16px; overflow:hidden; margin-bottom:.9rem; background:linear-gradient(135deg, var(--bg) 0%, #f8fafc 100%); box-shadow:0 4px 12px rgba(45,125,79,0.1); }
   .carousel-inner { display:flex; transition:transform .35s cubic-bezier(.4,0,.2,1); }
   .carousel-slide { min-width:100%; height:185px; flex-shrink:0; }
-  .carousel-slide img { width:100%; height:100%; object-fit:cover; cursor:pointer; transition:transform .3s; }
+  .carousel-slide img { width:100%; height:100%; object-fit:cover; cursor:pointer; transition:transform .3s; border-radius:16px; }
   .carousel-slide img:hover { transform:scale(1.02); }
   .carousel-dots { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:5px; }
-  .c-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.5); transition:all .2s; cursor:pointer; }
-  .c-dot.on { background:#fff; width:18px; border-radius:3px; }
-  .carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.85); border:none; border-radius:50%; width:30px; height:30px; font-size:.85rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.2); transition:all .18s; z-index:2; }
-  .carousel-btn:hover { background:#fff; transform:translateY(-50%) scale(1.08); }
-  .carousel-btn.prev { left:8px; }
-  .carousel-btn.next { right:8px; }
-  .dist-overlay { position:absolute; top:10px; right:10px; background:rgba(0,0,0,.55); color:#fff; padding:.24rem .7rem; border-radius:20px; font-size:.72rem; font-weight:700; backdrop-filter:blur(4px); }
+  .c-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.6); transition:all .2s; cursor:pointer; }
+  .c-dot.on { background:var(--gold); width:18px; border-radius:3px; box-shadow:0 2px 6px rgba(242,183,5,0.3); }
+  .carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.9); border:none; border-radius:50%; width:32px; height:32px; font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,.15); transition:all .2s; z-index:2; }
+  .carousel-btn:hover { background:#fff; transform:translateY(-50%) scale(1.1); box-shadow:0 4px 12px rgba(0,0,0,.2); }
+  .carousel-btn.prev { left:10px; }
+  .carousel-btn.next { right:10px; }
+  .dist-overlay { position:absolute; top:10px; right:10px; background:linear-gradient(135deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.4) 100%); color:#fff; padding:.3rem .8rem; border-radius:25px; font-size:.72rem; font-weight:700; backdrop-filter:blur(6px); box-shadow:0 2px 8px rgba(0,0,0,.2); }
   .lazy-pending { opacity:0; transition:opacity .35s; }
   .lazy-loaded  { opacity:1; }
 
   /* CARD BODY */
-  .rat-row { display:flex; align-items:center; gap:.38rem; margin-bottom:.52rem; }
-  .stars { color:var(--gold); font-size:.82rem; letter-spacing:-.5px; }
-  .rv    { font-weight:800; font-size:.82rem; color:var(--t1); }
-  .rc    { font-size:.74rem; color:var(--t2); }
-  .card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.45rem; }
-  .type-badge { display:inline-flex; align-items:center; gap:.24rem; padding:.24rem .75rem; border-radius:20px; font-size:.72rem; font-weight:800; }
-  .type-badge.Room     { background:#e8f5ee; color:#1f5c38; }
-  .type-badge.Bedspace { background:var(--blue-lt); color:#1d4ed8; }
-  .type-badge.Unit     { background:var(--gold-lt); color:#92400E; }
-  .heart { font-size:1.25rem; cursor:pointer; transition:transform .2s,color .2s; line-height:1; }
-  .heart:hover { transform:scale(1.25); }
-  .card-street { font-weight:800; font-size:1rem; margin-bottom:.1rem; color:var(--t1); }
-  .card-price  { font-family:'Syne',sans-serif; font-size:1.32rem; font-weight:800; color:var(--green); margin-bottom:.48rem; }
+  .price-rating-container { 
+    position:relative; 
+    margin-bottom:0.6rem; 
+    display:flex; 
+    align-items:flex-start; 
+    justify-content:space-between; 
+    gap:1rem;
+  }
+  .price-name-container {
+    flex:1;
+  }
+  .rat-row { 
+    display:flex; 
+    align-items:center; 
+    gap:.3rem; 
+    position:absolute; 
+    top:0; 
+    right:0; 
+    background:linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.9) 100%); 
+    padding:.3rem .6rem; 
+    border-radius:12px; 
+    box-shadow:0 2px 8px rgba(0,0,0,0.08); 
+    border:1px solid var(--border);
+  }
+  .stars { color:var(--gold); font-size:.75rem; letter-spacing:-.5px; }
+  .rv    { font-weight:800; font-size:.75rem; color:var(--t1); }
+  .rc    { font-size:.68rem; color:var(--t2); }
+  .card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.8rem; }
+  .type-badge { display:inline-flex; align-items:center; gap:.24rem; padding:.3rem .8rem; border-radius:25px; font-size:.7rem; font-weight:800; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
+  .type-badge.Room     { background:linear-gradient(135deg, #e8f5ee 0%, #d1fae5 100%); color:#1f5c38; border:1px solid #a7f3d0; }
+  .type-badge.Bedspace { background:linear-gradient(135deg, var(--blue-lt) 0%, #dbeafe 100%); color:#1d4ed8; border:1px solid #bfdbfe; }
+  .type-badge.Unit     { background:linear-gradient(135deg, var(--gold-lt) 0%, #fef3c7 100%); color:#92400E; border:1px solid #fde68a; }
+  .heart-overlay { 
+    position:absolute; 
+    bottom:10px; 
+    right:10px; 
+    font-size:1.4rem; 
+    cursor:pointer; 
+    transition:all .3s; 
+    line-height:1; 
+    background:linear-gradient(135deg, var(--green) 0%, var(--gold) 100%); 
+    width:40px; 
+    height:40px; 
+    border-radius:50%; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    box-shadow:0 4px 12px rgba(45,125,79,0.3); 
+    z-index:3;
+  }
+  .heart-overlay:hover { 
+    transform:scale(1.2) rotate(10deg); 
+    box-shadow:0 6px 20px rgba(45,125,79,0.4); 
+  }
+  .card-street { font-weight:800; font-size:1rem; margin-bottom:0.8rem; color:var(--t1); }
+  .card-price  { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; color:var(--green); margin-bottom:0; }
   .card-price small { font-size:.7rem; font-weight:500; color:var(--t2); font-family:'DM Sans',sans-serif; }
-  .metas { display:flex; flex-wrap:wrap; gap:.38rem; margin-bottom:.8rem; }
-  .mpill { display:inline-flex; align-items:center; gap:.22rem; padding:.24rem .65rem; background:var(--bg); border-radius:20px; font-size:.72rem; font-weight:600; color:var(--t2); border:1px solid var(--border); }
-  .mpill.ok   { background:var(--green-lt); color:var(--green); border-color:#b2dfca; }
-  .mpill.blue { background:var(--blue-lt);  color:#1d4ed8;      border-color:#bfdbfe; }
-  .owner-chip { display:inline-flex; align-items:center; gap:.3rem; padding:.22rem .65rem; background:var(--bg); border:1.5px solid var(--border); border-radius:20px; font-size:.72rem; font-weight:700; color:var(--t2); cursor:pointer; transition:all .18s; margin-bottom:.5rem; }
-  .owner-chip:hover { border-color:var(--green); color:var(--green); background:var(--green-lt); }
-  .inc-box  { background:var(--bg); border-radius:13px; padding:.75rem .9rem; margin-bottom:.78rem; border:1px solid var(--border); }
+  .metas { display:flex; flex-wrap:wrap; gap:.6rem; margin-bottom:1.2rem; }
+  .mpill { display:inline-flex; align-items:center; gap:.22rem; padding:.3rem .7rem; background:linear-gradient(135deg, var(--bg) 0%, #f8fafc 100%); border-radius:25px; font-size:.68rem; font-weight:700; color:var(--t2); border:1.5px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+  .mpill.ok   { background:linear-gradient(135deg, var(--green-lt) 0%, #d1fae5 100%); color:var(--green); border-color:#86efac; }
+  .mpill.blue { background:linear-gradient(135deg, var(--blue-lt) 0%, #dbeafe 100%);  color:#1d4ed8;      border-color:#93c5fd; }
+  .owner-chip { 
+    display:inline-flex; 
+    align-items:center; 
+    gap:.3rem; 
+    padding:.3rem 1.5rem .3rem .7rem; 
+    background:linear-gradient(135deg, var(--bg) 0%, #f8fafc 100%); 
+    border:2px solid var(--border); 
+    border-radius:25px; 
+    font-size:.68rem; 
+    font-weight:700; 
+    color:var(--t2); 
+    cursor:pointer; 
+    transition:all .25s; 
+    margin:0.6rem 0; 
+    box-shadow:0 2px 6px rgba(0,0,0,0.05); 
+    position:relative;
+  }
+  .owner-chip::after {
+    content:'→';
+    position:absolute;
+    right:0.7rem;
+    font-size:0.8rem;
+    color:var(--t2);
+    transition:all .25s;
+  }
+  .owner-chip:hover { 
+    border-color:var(--green); 
+    color:var(--green); 
+    background:linear-gradient(135deg, var(--green-lt) 0%, #d1fae5 100%); 
+    transform:translateY(-2px); 
+    box-shadow:0 4px 12px rgba(45,125,79,0.15);
+  }
+  .owner-chip:hover::after {
+    color:var(--green);
+    transform:translateX(2px);
+  }
+  .inc-box  { background:linear-gradient(135deg, var(--bg) 0%, #f8fafc 100%); border-radius:16px; padding:1rem 1.2rem; margin-bottom:1rem; border:1.5px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.05); }
   .inc-ttl  { font-weight:800; font-size:.68rem; color:var(--t2); text-transform:uppercase; letter-spacing:.8px; margin-bottom:.42rem; }
   .inc-grid { display:grid; grid-template-columns:1fr 1fr; gap:.28rem; }
   .inc-i    { font-size:.76rem; color:var(--t1); display:flex; align-items:center; gap:.24rem; }
 
   /* BUTTONS */
   .btn-row { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.45rem; }
-  .btn { padding:.68rem .5rem; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:700; cursor:pointer; border:none; transition:all var(--transition); text-align:center; white-space:nowrap; }
+  .btn { padding:.68rem .5rem; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:700; cursor:pointer; transition:all var(--transition); text-align:center; white-space:nowrap; }
   .btn:active { transform:scale(.97) !important; }
-  .btn-green { background:var(--green); color:#fff; box-shadow:0 3px 10px rgba(45,125,79,.28); }
+  .btn-green { background:var(--green); color:#fff; border:2px solid var(--green); box-shadow:0 3px 10px rgba(45,125,79,.28); }
   .btn-green:hover { background:var(--green-dk); transform:translateY(-1px); }
   .btn-out   { background:transparent; border:2px solid var(--green); color:var(--green); }
   .btn-out:hover { background:var(--green); color:#fff; }
-  .btn-gold  { background:var(--gold); color:#1F2933; box-shadow:0 3px 10px rgba(242,183,5,.3); }
+  .btn-gold  { background:var(--gold); color:#1F2933; border:2px solid var(--gold); box-shadow:0 3px 10px rgba(242,183,5,.3); }
   .btn-gold:hover { background:var(--gold-dk); transform:translateY(-1px); }
-  .btn-cmp   { background:transparent; border:2px solid var(--gold); color:var(--gold-dk); }
+  .btn-cmp   { background:#fff; border:3px solid var(--gold) !important; color:var(--gold-dk); }
   .btn-cmp.on { background:var(--gold); color:#1F2933; }
-  .btn-blue  { background:var(--blue); color:#fff; box-shadow:0 3px 10px rgba(59,130,246,.28); }
+  .btn-blue  { background:var(--blue); color:#fff; border:2px solid var(--blue); box-shadow:0 3px 10px rgba(59,130,246,.28); }
   .btn-blue:hover { background:#2563eb; transform:translateY(-1px); }
+  .btn-schedule { background:#fff; color:var(--green); border:3px solid var(--green) !important; }
+  .btn-schedule:hover { background:var(--green); color:#fff; }
   .btn-full  { width:100%; padding:.84rem; font-size:.9rem; margin-bottom:.42rem; }
   .empty    { text-align:center; padding:3rem 1rem; color:var(--t2); }
   .empty-ic { font-size:3.5rem; margin-bottom:.72rem; }
   .empty p  { font-weight:600; font-size:.88rem; }
 
   /* COMPARE BAR */
-  #cmp-bar { position:fixed; bottom:72px; left:50%; transform:translateX(-50%); max-width:480px; width:100%; background:var(--green); color:#fff; padding:11px 1.3rem; display:flex; justify-content:space-between; align-items:center; z-index:300; box-shadow:0 -2px 12px rgba(45,125,79,.3); }
+  #cmp-bar { position:fixed; bottom:110px; left:50%; transform:translateX(-50%); max-width:480px; width:100%; background:var(--green); color:#fff; padding:11px 1.3rem; display:flex; justify-content:space-between; align-items:center; z-index:1600; box-shadow:0 -2px 12px rgba(45,125,79,.3); }
   #cmp-bar.hide { display:none; }
   #cmp-bar .cb-t { font-size:.84rem; font-weight:700; }
   #cmp-bar .cb-btn { background:var(--gold); color:#1F2933; border:none; border-radius:22px; padding:8px 16px; font-weight:800; font-size:.78rem; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .18s; }
@@ -530,6 +659,12 @@ const UI = {
   },
   closeLb() { document.getElementById('lb').classList.remove('active'); },
 
+  openOwner(ownerId) {
+    if (!ownerId) return;
+    // Open owner profile page
+    window.location.href = `/owners/${ownerId}`;
+  },
+
   initLazyImages() {
     const imgs = document.querySelectorAll('img[data-src]');
     if (!('IntersectionObserver' in window)) {
@@ -571,26 +706,81 @@ const Carousel = {
 };
 
 const Saved = {
-  _saved: new Set({{ Js::from(session('saved', [])) }}),
+  _saved: new Set(@json(auth()->check() ? auth()->user()->savedListings()->pluck('dorm_listing_id') : [])),
+  _loading: new Set(),
   toggle(id, evt) {
     evt.stopPropagation();
+    
+    // Prevent multiple clicks while loading
+    if (this._loading.has(id)) return;
+    
     const heart = document.getElementById('heart-' + id);
+    const isCurrentlySaved = this._saved.has(id);
+    
+    // Optimistic UI update - change immediately
+    if (isCurrentlySaved) {
+      this._saved.delete(id); 
+      heart.textContent = '♡'; 
+      heart.style.color = 'white';
+    } else {
+      this._saved.add(id); 
+      heart.textContent = '♥'; 
+      heart.style.color = 'var(--gold)';
+    }
+    
+    // Show immediate feedback
+    showToast(isCurrentlySaved ? '💔 Removed' : '❤️ Saved!', 'ok');
+    
+    // Send to server in background (subtle loading state)
+    this._loading.add(id);
+    heart.style.pointerEvents = 'none';
+    heart.style.opacity = '0.8';
+    
     fetch('/dorms/' + id + '/save', {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':window.csrfToken },
       body: JSON.stringify({ dorm_id: id }),
     })
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) {
+        throw new Error(`HTTP error! status: ${r.status}`);
+      }
+      return r.json();
+    })
     .then(data => {
-      if (data.saved) {
-        this._saved.add(id); heart.textContent = '♥'; heart.style.color = '#C8102E';
-        showToast('❤️ Saved!', 'ok');
-      } else {
-        this._saved.delete(id); heart.textContent = '♡'; heart.style.color = 'var(--border)';
-        showToast('💔 Removed');
+      // If server response differs from optimistic update, correct it
+      if (data.saved !== !isCurrentlySaved) {
+        if (data.saved) {
+          this._saved.add(id); 
+          heart.textContent = '♥'; 
+          heart.style.color = 'var(--gold)';
+          showToast('❤️ Saved!', 'ok');
+        } else {
+          this._saved.delete(id); 
+          heart.textContent = '♡'; 
+          heart.style.color = 'white';
+          showToast('💔 Removed');
+        }
       }
     })
-    .catch(() => showToast('⚠️ Could not save', 'warn'));
+    .catch(error => {
+      // Revert on error
+      if (isCurrentlySaved) {
+        this._saved.add(id); 
+        heart.textContent = '♥'; 
+        heart.style.color = 'var(--gold)';
+      } else {
+        this._saved.delete(id); 
+        heart.textContent = '♡'; 
+        heart.style.color = 'white';
+      }
+      showToast('⚠️ Could not save', 'warn');
+    })
+    .finally(() => {
+      this._loading.delete(id);
+      heart.style.pointerEvents = 'auto';
+      heart.style.opacity = '1';
+    });
   },
 };
 
