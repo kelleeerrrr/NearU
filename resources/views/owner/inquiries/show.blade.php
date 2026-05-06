@@ -145,7 +145,7 @@ button {
 <div class="page">
 
     <div style="text-align: left; margin-bottom: 10px; color: #666; font-size: 12px;">
-        <a href="{{ route('owner.inquiries.index') }}" class="back-btn" style="background: #2D7D4F; color: white; padding: 8px 10px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600;">
+        <a href="{{ route('owner.inquiries.index') }}" class="back-btn" style="background: #2D7D4F; color: white; padding: 8px 10px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: background 0.3s ease;">
             ← Back
         </a>
     </div>

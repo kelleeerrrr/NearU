@@ -9,16 +9,19 @@
 /* HEADER */
 .header{
     display:flex;
-    justify-content:space-between;
     align-items:center;
     padding:1rem;
     font-weight:800;
 }
 
 .back{
+    background: #2D7D4F;
+    color: white;
     text-decoration:none;
-    color:var(--green);
+    padding: 8px 10px;
+    border-radius: 8px;
     font-weight:600;
+    transition: background 0.3s ease;
 }
 
 /* GRID */
@@ -84,7 +87,7 @@
 <!-- HEADER -->
 <div class="header">
     <a href="{{ route('owner.dashboard') }}" class="back">← Back</a>
-    <div>📊 Statistics</div>
+    <div style="margin-left: 10px;">📊 Statistics</div>
     <div></div>
 </div>
 

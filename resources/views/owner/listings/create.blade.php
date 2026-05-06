@@ -290,7 +290,7 @@ input[readonly]:focus { border-color: var(--border); box-shadow: none; }
 {{-- ── SUB-HEADER ── --}}
 <div class="listing-header">
   <div class="listing-header-row">
-    <a href="{{ route('owner.listings.index') }}" class="back-btn">‹ Back</a>
+    <a href="{{ route('owner.listings.index') }}" class="back-btn" style="background: #2D7D4F; color: white; padding: 8px 10px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: background 0.3s ease;">← Back</a>
     <div class="listing-header-title">🏠 Add Listing</div>
   </div>
 

@@ -5,7 +5,14 @@
 @section('content')
 
 <div style="padding:1rem;">
-    <h3>📅 Visit Requests</h3>
+    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+        <div style="color: #666; font-size: 12px;">
+            <a href="{{ route('owner.dashboard') }}" class="back-btn" style="background: #2D7D4F; color: white; padding: 8px 10px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: background 0.3s ease;">
+                ← Back
+            </a>
+        </div>
+        <h3 style="margin: 0; margin-left: 10px;">📅 Visit Requests</h3>
+    </div>
 </div>
 
 @forelse($visits as $visit)

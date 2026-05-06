@@ -3,6 +3,7 @@
 @section('title', 'Edit Listing — NearU')
 
 @push('styles')
+
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -178,9 +179,7 @@ body {
 
 <div class="edit-container">
   <div class="edit-header">
-    <a href="{{ route('owner.listings.index') }}" class="back-link">
-      ← Back
-    </a>
+    <a href="{{ route('owner.listings.index') }}" class="back-btn" style="background: #2D7D4F; color: white; padding: 8px 10px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: background 0.3s ease;">← Back</a>
     <h1 class="edit-title">Edit Listing</h1>
   </div>
 
