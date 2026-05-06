@@ -83,7 +83,8 @@ class UserController extends Controller
 
         $user = Auth::user();
 
-        if ($request->hasFile('profile_photo')) {
+        $uploadedFile = $request->file('profile_photo');
+        if ($request->hasFile('profile_photo') && $uploadedFile && $uploadedFile->isValid()) {
             // Delete old photo if exists
             if ($user->profile_photo_path) {
                 Storage::delete($user->profile_photo_path);

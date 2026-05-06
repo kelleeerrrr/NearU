@@ -2,276 +2,312 @@
 
 @section('title', 'Chat with ' . $otherUser->name . ' - NearU')
 
+@push('styles')
+<style>
+.page { padding: 1rem; }
+
+.header {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 398px;
+    font-weight: 800;
+    background: var(--card);
+    border-radius: 18px;
+    padding: 1rem;
+    border: 1.5px solid var(--border);
+    z-index: 999;
+    box-shadow: var(--sh);
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.header-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.header-details h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.header-details p {
+    margin: 0.2rem 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.listing-info {
+    color: var(--green);
+    font-weight: 500;
+}
+
+.chat-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 140px);
+    padding-bottom: 0;
+}
+
+.chat-container {
+    position: fixed;
+    top: 175px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 398px;
+    bottom: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 14px 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+}
+
+.msg {
+    max-width: 70%;
+    padding: .6rem .8rem;
+    border-radius: 12px;
+    font-size: .85rem;
+}
+
+.left {
+    background: #E8F7EE;
+    align-self: flex-start;
+}
+
+.right {
+    background: var(--green);
+    color: white;
+    align-self: flex-end;
+}
+
+input {
+    flex: 1;
+    padding: .6rem;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: .6rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--green-dk);
+}
+
+.message-input-container {
+    position: fixed;
+    bottom: 105px;
+
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 398px;
+    box-sizing: border-box;
+
+    display: flex;
+    gap: 10px;
+
+    background: var(--card);
+    border-radius: 18px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--sh);
+
+    z-index: 1500;
+}
+
+.message-input-wrapper {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+}
+
+.message-input-field {
+    flex: 1;
+    padding: .6rem .8rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.message-input-field:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(45, 125, 79, .12);
+}
+
+.send-message-btn {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: .6rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.send-message-btn:hover {
+    background: var(--green-dk);
+}
+</style>
+@endpush
+
 @section('content')
 <div class="wrap">
     @include('partials.navbar')
 
     <div class="screen active">
 
-        <!-- Chat Area -->
-        <div class="chat-page">
+        <div class="page">
 
-            <!-- Header -->
-            <header class="chat-header" aria-label="Conversation Header">
-                <div class="chat-user">
-                    <div class="chat-avatar" aria-hidden="true">
-                        {{ strtoupper(substr($otherUser->name, 0, 1)) }}
-                    </div>
-
-                    <div class="chat-user-info">
-                        <h2 class="chat-name">{{ $otherUser->name }}</h2>
-                        <p class="chat-role">
-                            {{ $otherUser->user_type === 'owner' ? 'Property Owner' : 'Student' }}
-                        </p>
-                        <p class="chat-listing" style="font-size: 0.85rem; color: #666; margin-top: 0.25rem;">
-                            📍 {{ $listing->street }}
-                        </p>
+            <div class="header">
+                <div class="header-info">
+                    <div class="header-avatar">{{ strtoupper(substr($otherUser->name, 0, 1)) }}</div>
+                    <div class="header-details">
+                        <h3>{{ $otherUser->name }}</h3>
+                        <p>{{ $otherUser->user_type === 'owner' ? 'Property Owner' : 'Student' }}</p>
+                        <p class="listing-info">📍 {{ $listing->street }}</p>
                     </div>
                 </div>
-            </header>
+            </div>
 
-            <!-- Messages -->
-            <main id="chatMsgs" class="chat-messages" aria-live="polite">
-                @forelse($messages as $message)
-                    <div class="message-row {{ $message->sender_id === auth()->id() ? 'mine' : 'theirs' }}">
-                        <div class="chat-bubble">
-                            {{ $message->message }}
+            <div class="chat-container">
+                <div class="chat" id="chatMsgs">
+
+                    @forelse($messages as $msg)
+                        <div class="msg {{ $msg->sender_id == auth()->id() ? 'right' : 'left' }}">
+                            {{ $msg->message }}
+                            <div style="font-size: 0.7rem; opacity: 0.7; margin-top: 0.3rem;">
+                                {{ $msg->created_at->diffForHumans() }}
+                            </div>
                         </div>
-                    </div>
-                @empty
-                    <div class="empty-chat">
-                        No messages yet. Start the conversation 👋
-                    </div>
-                @endforelse
-            </main>
+                    @empty
+                        <div style="text-align: center; padding: 2rem; color: #666;">
+                            No messages yet. Start the conversation!
+                        </div>
+                    @endforelse
 
-            <!-- Input -->
-            <footer class="chat-input-wrap">
-                <form method="POST"
-                      action="{{ route('messages.send', [$listing->id, $otherUser->id]) }}"
-                      class="chat-form">
-                    @csrf
-                    <input type="hidden" name="listing_id" value="{{ $listing->id }}">
-
-                    <label for="message" class="sr-only">Type your message</label>
-
-                    <input
-                        id="message"
-                        name="message"
-                        type="text"
-                        class="chat-input"
-                        placeholder="Type a message..."
-                        maxlength="500"
-                        autocomplete="off"
-                        required
-                    >
-
-                    <button type="submit" class="send-btn" aria-label="Send message">
-                        Send
-                    </button>
-                </form>
-            </footer>
+                </div>
+            </div>
 
         </div>
     </div>
+    </div>
+
+    <form id="messageForm" method="POST" action="{{ route('messages.send', [$listing->id, $otherUser->id]) }}">
+        @csrf
+        <div class="message-input-container">
+            <div class="message-input-wrapper">
+                <input type="text" id="messageInput" name="message" placeholder="Type a message..." required maxlength="500">
+                <button type="submit" class="send-message-btn">Send Message</button>
+            </div>
+        </div>
+    </form>
 
     @include('partials.footer')
 </div>
-
-<style>
-/* ---------- Layout ---------- */
-.chat-page{
-    display:flex;
-    flex-direction:column;
-    height:calc(100vh - 130px);
-    background:#f8fafc;
-}
-
-/* ---------- Header ---------- */
-.chat-header{
-    position:sticky;
-    top:0;
-    z-index:10;
-    background:#ffffff;
-    border-bottom:1px solid #e5e7eb;
-    padding:14px 18px;
-}
-
-.chat-user{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.chat-avatar{
-    width:46px;
-    height:46px;
-    border-radius:50%;
-    background:linear-gradient(135deg,#2563eb,#1d4ed8);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    font-size:1rem;
-    flex-shrink:0;
-}
-
-.chat-name{
-    margin:0;
-    font-size:1rem;
-    font-weight:700;
-    color:#111827;
-}
-
-.chat-role{
-    margin:2px 0 0;
-    font-size:.82rem;
-    color:#6b7280;
-}
-
-/* ---------- Messages ---------- */
-.chat-messages{
-    flex:1;
-    overflow-y:auto;
-    padding:18px 14px 22px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    scroll-behavior:smooth;
-}
-
-.message-row{
-    display:flex;
-}
-
-.message-row.mine{
-    justify-content:flex-end;
-}
-
-.message-row.theirs{
-    justify-content:flex-start;
-}
-
-.chat-bubble{
-    max-width:75%;
-    padding:11px 14px;
-    border-radius:18px;
-    font-size:.95rem;
-    line-height:1.45;
-    word-wrap:break-word;
-    box-shadow:0 2px 6px rgba(0,0,0,.05);
-}
-
-/* My message */
-.mine .chat-bubble{
-    background:#2563eb;
-    color:#fff;
-    border-bottom-right-radius:6px;
-}
-
-/* Other message */
-.theirs .chat-bubble{
-    background:#ffffff;
-    color:#111827;
-    border:1px solid #e5e7eb;
-    border-bottom-left-radius:6px;
-}
-
-/* Empty State */
-.empty-chat{
-    margin:auto;
-    text-align:center;
-    color:#6b7280;
-    font-size:.95rem;
-}
-
-/* ---------- Input ---------- */
-.chat-input-wrap{
-    position:sticky;
-    bottom:0;
-    background:#fff;
-    border-top:1px solid #e5e7eb;
-    padding:12px;
-}
-
-.chat-form{
-    display:flex;
-    gap:10px;
-    align-items:center;
-}
-
-.chat-input{
-    flex:1;
-    height:46px;
-    border:1px solid #d1d5db;
-    border-radius:24px;
-    padding:0 16px;
-    font-size:.95rem;
-    outline:none;
-    transition:.2s;
-}
-
-.chat-input:focus{
-    border-color:#2563eb;
-    box-shadow:0 0 0 3px rgba(37,99,235,.12);
-}
-
-.send-btn{
-    border:none;
-    background:#2563eb;
-    color:#fff;
-    padding:0 18px;
-    height:46px;
-    border-radius:24px;
-    font-weight:600;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.send-btn:hover{
-    background:#1d4ed8;
-}
-
-.send-btn:active{
-    transform:scale(.97);
-}
-
-/* Accessibility */
-.sr-only{
-    position:absolute;
-    width:1px;
-    height:1px;
-    padding:0;
-    margin:-1px;
-    overflow:hidden;
-    clip:rect(0,0,0,0);
-    border:0;
-}
-
-/* Mobile */
-@media (max-width:768px){
-    .chat-bubble{
-        max-width:85%;
-    }
-
-    .chat-page{
-        height:calc(100vh - 110px);
-    }
-}
-</style>
 @endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const chatMsgs = document.getElementById('chatMsgs');
-    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    const chatMsgs = document.querySelector('.chat');
+    if (chatMsgs) {
+        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    }
 
-    const input = document.getElementById('message');
+    const input = document.getElementById('messageInput');
+    const form = document.getElementById('messageForm');
+    
     if(input){
         input.focus();
     }
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        formData.append('listing_id', '{{ $listing->id }}');
+        formData.append('receiver_id', '{{ $otherUser->id }}');
+        
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`Server responded with ${response.status}: ${text}`);
+                });
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Store message value before clearing input
+            const messageText = input.value;
+            input.value = '';
+            
+            // Add new message to chat dynamically
+            const chatMsgs = document.getElementById('chatMsgs');
+            const newMessage = document.createElement('div');
+            newMessage.className = 'msg right';
+            newMessage.innerHTML = `
+                ${messageText}
+                <div style="font-size: 0.7rem; opacity: 0.7; margin-top: 0.3rem;">
+                    just now
+                </div>
+            `;
+            chatMsgs.appendChild(newMessage);
+            
+            // Scroll to bottom
+            chatMsgs.scrollTop = chatMsgs.scrollHeight;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to send message: ' + error.message);
+        });
+        return false;
+    });
 });
 </script>
 @endpush

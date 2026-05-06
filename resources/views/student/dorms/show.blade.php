@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $dorm->street . ' - NearU')
+@section('title', $listing->street . ' - NearU')
 
 @section('content')
 <div class="wrap">
@@ -8,13 +8,13 @@
 
   <div class="screen active">
     <div class="cs">
-      <h2>{{ $dorm->street }}</h2>
+      <h2>{{ $listing->street }}</h2>
 
       <!-- Image Carousel -->
       <div class="carousel" style="margin-bottom: 1rem;">
         <div class="carousel-inner">
-          @if($dorm->photos)
-            @foreach($dorm->photos as $photo)
+          @if($listing->photos)
+            @foreach($listing->photos as $photo)
             <div class="carousel-slide">
               <img src="{{ asset('storage/' . $photo) }}" alt="Dorm image">
             </div>
@@ -29,43 +29,43 @@
 
       <!-- Price and Type -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <div class="card-price" style="margin: 0;">₱{{ number_format($dorm->price, 0) }}<small>/month</small></div>
-        <div class="type-badge {{ $dorm->type }}">{{ $dorm->type }}</div>
+        <div class="card-price" style="margin: 0;">₱{{ number_format($listing->price, 0) }}<small>/month</small></div>
+        <div class="type-badge {{ $listing->type }}">{{ $listing->type }}</div>
       </div>
 
       <!-- Details -->
       <div class="metas" style="margin-bottom: 1rem;">
-        <div class="mpill">{{ $dorm->bathroom }}</div>
-        <div class="mpill">{{ $dorm->gender_policy }}</div>
-        <div class="mpill">{{ $dorm->walk_minutes }} min walk</div>
-        @if($dorm->wifi_included)
+        <div class="mpill">{{ $listing->bathroom }}</div>
+        <div class="mpill">{{ $listing->gender_policy }}</div>
+        <div class="mpill">{{ $listing->walk_minutes }} min walk</div>
+        @if($listing->wifi_included)
         <div class="mpill ok">WiFi Included</div>
         @endif
-        @if($dorm->pets_allowed)
+        @if($listing->pets_allowed)
         <div class="mpill">Pets Allowed</div>
         @endif
       </div>
 
       <!-- Includes -->
-      @if($dorm->furnishings || $dorm->appliances || $dorm->bills_included)
+      @if($listing->furnishings || $listing->appliances || $listing->bills_included)
       <div class="inc-box" style="margin-bottom: 1rem;">
         <div class="inc-ttl">What's Included</div>
         <div class="inc-grid">
-          @if($dorm->furnishings)
-          <div class="inc-i">🛋️ {{ $dorm->furnishings }}</div>
+          @if($listing->furnishings)
+          <div class="inc-i">🛋️ {{ $listing->furnishings }}</div>
           @endif
-          @if($dorm->appliances)
-          <div class="inc-i">🔌 {{ $dorm->appliances }}</div>
+          @if($listing->appliances)
+          <div class="inc-i">🔌 {{ $listing->appliances }}</div>
           @endif
-          @if($dorm->bills_included)
-          <div class="inc-i">💡 {{ $dorm->bills_included }}</div>
+          @if($listing->bills_included)
+          <div class="inc-i">💡 {{ $listing->bills_included }}</div>
           @endif
         </div>
       </div>
       @endif
 
       <!-- House Rules -->
-      @if($dorm->curfew)
+      @if($listing->curfew)
       <div class="inc-box" style="margin-bottom: 1rem;">
         <div class="inc-ttl">House Rules</div>
         <div class="inc-grid">
@@ -76,28 +76,28 @@
 
       <!-- Owner Info -->
       <div class="owner-chip" style="margin-bottom: 1rem;">
-        👤 Owner: {{ $dorm->owner->name }}
-        @if($dorm->owner->phone)
-        📞 {{ $dorm->owner->phone }}
+        👤 Owner: {{ $listing->owner->name }}
+        @if($listing->owner->phone)
+        📞 {{ $listing->owner->phone }}
         @endif
       </div>
 
       <!-- Action Buttons -->
       <div class="btn-row" style="margin-bottom: 1rem;">
         @auth
-        <button class="btn btn-out" onclick="toggleSave({{ $dorm->id }})">
-          @if(auth()->user()->savedListings()->where('dorm_listing_id', $dorm->id)->exists())
+        <button class="btn btn-out" onclick="toggleSave({{ $listing->id }})">
+          @if(auth()->user()->savedListings()->where('dorm_listing_id', $listing->id)->exists())
             ❤️ Saved
           @else
             🤍 Save
           @endif
         </button>
-        <button class="btn btn-green" onclick="scheduleVisit({{ $dorm->id }})">📅 Schedule Visit</button>
+        <button class="btn btn-green" onclick="scheduleVisit({{ $listing->id }})">📅 Schedule Visit</button>
         @endauth
       </div>
 
       @auth
-      <a href="{{ route('messages.show', [$dorm->id, $dorm->owner->id]) }}" class="btn btn-blue btn-full">💬 Message Owner</a>
+      <a href="{{ route('messages.show', [$listing->id, $listing->owner->id]) }}" class="btn btn-blue btn-full">💬 Message Owner</a>
       @endauth
     </div>
   </div>
@@ -133,3 +133,5 @@ function scheduleVisit(dormId) {
 }
 </script>
 @endpush
+
+@endsection

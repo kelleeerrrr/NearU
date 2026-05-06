@@ -73,6 +73,12 @@ class DormController extends Controller
             'visit' => $visit
         ]);
     }
+
+    /*
+    |----------------------------------------
+    | SHOW LISTING
+    |----------------------------------------
+    */
     public function show($id)
     {
         $listing = DormListing::with(['images', 'reviews.user'])->findOrFail($id);
@@ -80,6 +86,11 @@ class DormController extends Controller
         return view('student.dorms.show', compact('listing'));
     }
 
+    /*
+    |----------------------------------------
+    | SAVE / UNSAVE
+    |----------------------------------------
+    */
     public function toggleSave(Request $request, $id)
     {
         $userId = auth()->id();
@@ -176,7 +187,7 @@ class DormController extends Controller
 
     /*
     |----------------------------------------
-    | CREATE LISTING (FULL SAVE)
+    | CREATE LISTING
     |----------------------------------------
     */
     public function store(Request $request)
@@ -190,59 +201,45 @@ class DormController extends Controller
             'street' => 'required|string|max:255',
             'price' => 'required|numeric',
             'type' => 'required|string',
+            'photos' => 'array|max:10',
+            'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
-
-        // FIX: convert arrays properly
-        $furnishings = json_encode($request->furnishings ?? []);
-        $appliances = json_encode($request->appliances ?? []);
-        $bills = json_encode($request->bills ?? []);
-
-        // FIX: walk minutes
-        $walkMinutes = (int) $request->walk_minutes;
-
-        // FIX: curfew constraint
-        $curfew = $request->curfew;
-        if (is_numeric($curfew)) {
-            $curfew .= 'PM';
-        }
 
         $dorm = DormListing::create([
             'owner_id' => Auth::id(),
             'street' => $request->street,
             'price' => $request->price,
             'type' => $request->type,
-
             'gender_policy' => $request->gender_policy,
-            'walk_minutes' => $walkMinutes,
+            'walk_minutes' => (int) $request->walk_minutes,
             'bathroom' => $request->bathroom,
-
-            'furnishings' => $furnishings,
-            'appliances' => $appliances,
-            'bills_included' => $bills,
-
-            'curfew' => $curfew,
-
+            'furnishings' => json_encode($request->furnishings ?? []),
+            'appliances' => json_encode($request->appliances ?? []),
+            'bills_included' => json_encode($request->bills ?? []),
+            'curfew' => is_numeric($request->curfew) ? $request->curfew . 'PM' : $request->curfew,
             'wifi' => $request->has('wifi') ? 1 : 0,
             'pets' => $request->has('pets') ? 1 : 0,
-
             'nearby_landmarks' => $request->nearby_landmarks,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
-
-            'status' => 'Available',
+            'status' => 'available',
         ]);
 
+        /*
+        |----------------------------------------
+        | IMAGE UPLOAD (MULTIPLE + COVER LOGIC)
+        |----------------------------------------
+        */
         if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $i => $file) {
-                if (!$file || !$file->isValid()) {
-                    continue; // Skip invalid files
-                }
+            $files = $request->file('photos');
+
+            foreach ($files as $index => $file) {
                 $path = $file->store('dorms', 'public');
 
                 DormListingImage::create([
                     'dorm_listing_id' => $dorm->id,
                     'path' => $path,
-                    'is_cover' => $i === 0,
+                    'is_cover' => $index === 0, // FIRST IMAGE = COVER
                 ]);
             }
         }
@@ -265,7 +262,9 @@ class DormController extends Controller
 
         $dormsDataJson = $dormListings->map(function ($dorm) {
 
-            $cover = $dorm->images->first();
+            // ✅ always use cover first
+            $cover = $dorm->images->where('is_cover', true)->first()
+                ?? $dorm->images->first();
 
             return [
                 'id' => $dorm->id,
@@ -328,10 +327,7 @@ class DormController extends Controller
         }
 
         return view('dorms.index', [
-            'dormListings' => $query
-                ->where('status', 'Available')
-                ->latest()
-                ->get()
+            'dormListings' => $query->where('status', 'available')->latest()->get()
         ]);
     }
 

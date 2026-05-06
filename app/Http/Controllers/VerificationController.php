@@ -11,9 +11,18 @@ class VerificationController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'file' => 'required|file|max:5120',
             'type' => 'required|string'
         ]);
+
+        // Additional validation to ensure file is readable
+        $uploadedFile = $request->file('file');
+        if (!$uploadedFile || !$uploadedFile->isValid()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid file upload.'
+            ], 400);
+        }
 
         $user = Auth::user();
 

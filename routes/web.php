@@ -180,6 +180,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/student/home', [DormController::class, 'indexStudent'])
+        ->middleware('auth')
         ->name('student.home');
 
     Route::post('/dorms/{id}/schedule-visit', [DormController::class, 'scheduleVisit'])
@@ -418,7 +419,7 @@ Route::middleware('auth')->group(function () {
             $listing = \App\Models\DormListing::where('owner_id', auth()->id())
                 ->findOrFail($id);
 
-            $listing->status = 'available';
+            $listing->status = 'Available';
             $listing->save();
 
             return back();
@@ -431,7 +432,7 @@ Route::middleware('auth')->group(function () {
             $listing = \App\Models\DormListing::where('owner_id', auth()->id())
                 ->findOrFail($id);
 
-            $listing->status = 'unavailable';
+            $listing->status = 'Unavailable';
             $listing->save();
 
             return back();

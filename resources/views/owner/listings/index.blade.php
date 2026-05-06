@@ -4,7 +4,7 @@
 
 @push('styles')
 <style>
-
+/* PAGE TITLE */
 .page-title{
     font-family:'Syne';
     font-size:1.1rem;
@@ -12,6 +12,7 @@
     margin-bottom:.8rem;
 }
 
+/* HEADER */
 .header-actions{
   display:flex;
   justify-content:space-between;
@@ -19,6 +20,7 @@
   padding:1rem 1.2rem;
 }
 
+/* CREATE BUTTON */
 .create-btn{
   background:var(--green);
   color:#fff;
@@ -29,6 +31,7 @@
   cursor:pointer;
 }
 
+/* FILTER */
 .filter-bar{
   display:flex;
   gap:.5rem;
@@ -50,20 +53,83 @@
   border:none;
 }
 
+/* LISTING CARD */
 .listing-card{
   background:var(--card);
-  margin:0 1.2rem .8rem;
+  margin:0 1.2rem 1.2rem; /* ✅ bottom spacing */
   padding:1rem;
   border-radius:14px;
   border:1px solid var(--border);
+  transition:all .2s ease;
 }
+
+.listing-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 6px 16px rgba(0,0,0,0.12);
+}
+
+/* =========================
+   BUTTON SYSTEM (HCI CLEAN)
+========================= */
+
+.action-btn{
+  padding:.45rem .75rem;
+  border-radius:8px;
+  font-size:.75rem;
+  font-weight:700;
+  text-decoration:none;
+  border:none;
+  cursor:pointer;
+  transition:all .2s ease;
+  display:inline-block;
+}
+
+/* EDIT - BLUE (primary action) */
+.btn-edit{
+  background:#2563eb;
+  color:#fff;
+}
+
+.btn-edit:hover{
+  background:#1d4ed8;
+  transform:translateY(-2px);
+}
+
+/* DELETE - RED (danger) */
+.btn-delete{
+  background:#dc2626;
+  color:#fff;
+}
+
+.btn-delete:hover{
+  background:#b91c1c;
+  transform:translateY(-2px);
+}
+
+/* STATUS BUTTONS */
+.btn-warning{
+  background:#f59e0b;
+  color:#fff;
+}
+
+.btn-success{
+  background:var(--green);
+  color:#fff;
+}
+
+.btn-warning:hover,
+.btn-success:hover{
+  transform:translateY(-2px);
+  opacity:.9;
+}
+
 </style>
 @endpush
 
 @section('content')
 
 @php
-    $statusFilter = request('status'); // available / unavailable / null
+    $statusFilter = request('status');
 @endphp
 
 {{-- HEADER --}}
@@ -118,7 +184,7 @@
 
         {{-- EDIT --}}
         <a href="{{ route('owner.listings.edit', $listing->id) }}"
-           style="padding:.4rem .7rem;background:var(--blue);color:#fff;border-radius:8px;font-size:.75rem;text-decoration:none;">
+           class="action-btn btn-edit">
             Edit
         </a>
 
@@ -130,19 +196,19 @@
             @method('DELETE')
 
             <button type="submit"
-                    style="padding:.4rem .7rem;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:.75rem;">
+                    class="action-btn btn-delete">
                 Delete
             </button>
         </form>
 
-        {{-- STATUS TOGGLE (2 STATES ONLY) --}}
+        {{-- STATUS TOGGLE --}}
         @if($listing->status === 'available')
 
             <form method="POST"
                   action="{{ route('owner.listings.unavailable', $listing->id) }}">
                 @csrf
                 <button type="submit"
-                        style="padding:.4rem .7rem;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:.75rem;">
+                        class="action-btn btn-warning">
                     Mark Unavailable
                 </button>
             </form>
@@ -153,7 +219,7 @@
                   action="{{ route('owner.listings.available', $listing->id) }}">
                 @csrf
                 <button type="submit"
-                        style="padding:.4rem .7rem;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:.75rem;">
+                        class="action-btn btn-success">
                     Mark Available
                 </button>
             </form>

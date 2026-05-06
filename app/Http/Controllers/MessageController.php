@@ -13,7 +13,38 @@ class MessageController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | STUDENT MESSAGES - LISTING-BASED
+    | HELPER: COUNT OWNER UNREPLIED INQUIRIES
+    |--------------------------------------------------------------------------
+    */
+    public static function getOwnerUnreadInquiryCount($ownerId)
+    {
+        $conversations = Message::whereHas('listing', function ($query) use ($ownerId) {
+                $query->where('owner_id', $ownerId);
+            })
+            ->where(function ($q) use ($ownerId) {
+                $q->where('receiver_id', $ownerId)
+                  ->orWhere('sender_id', $ownerId);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy(function ($message) use ($ownerId) {
+                $otherUserId = $message->sender_id === $ownerId
+                    ? $message->receiver_id
+                    : $message->sender_id;
+
+                return ($message->dorm_listing_id ?? $message->listing_id) . '_' . $otherUserId;
+            });
+
+        // ✅ Count conversations where LAST message is from student
+        return $conversations->filter(function ($messages) use ($ownerId) {
+            $lastMessage = $messages->sortByDesc('created_at')->first();
+            return $lastMessage && $lastMessage->sender_id !== $ownerId;
+        })->count();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT MESSAGES
     |--------------------------------------------------------------------------
     */
 
@@ -27,7 +58,10 @@ class MessageController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->groupBy(function ($message) {
-                $otherUserId = $message->sender_id == Auth::id() ? $message->receiver_id : $message->sender_id;
+                $otherUserId = $message->sender_id == Auth::id()
+                    ? $message->receiver_id
+                    : $message->sender_id;
+
                 return ($message->dorm_listing_id ?? $message->listing_id) . '_' . $otherUserId;
             });
 
@@ -56,6 +90,7 @@ class MessageController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // ✅ mark as read
         Message::where(function ($q) use ($listingId) {
                 $q->where('dorm_listing_id', $listingId)
                   ->orWhere('listing_id', $listingId);
@@ -75,11 +110,8 @@ class MessageController extends Controller
         ]);
 
         $listing = DormListing::findOrFail($request->listing_id);
-
-        // ✅ ALWAYS use listing owner as receiver
         $receiverId = $listing->owner_id;
 
-        // ❗ Safety check (prevents your exact crash)
         if (!User::where('id', $receiverId)->exists()) {
             return back()->with('error', 'Listing owner does not exist.');
         }
@@ -107,17 +139,12 @@ class MessageController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | OWNER INQUIRIES - LISTING-BASED
+    | OWNER INQUIRIES
     |--------------------------------------------------------------------------
     */
 
     public function ownerInquiries()
     {
-        // if (Auth::user()->verification_status !== 'approved') {
-        //     return redirect()->route('owner.dashboard')
-        //         ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
-        // }
-
         $ownerId = Auth::id();
 
         $grouped = Message::whereHas('listing', function ($query) use ($ownerId) {
@@ -131,23 +158,24 @@ class MessageController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->groupBy(function ($message) use ($ownerId) {
-                $otherUserId = $message->sender_id === $ownerId ? $message->receiver_id : $message->sender_id;
+                $otherUserId = $message->sender_id === $ownerId
+                    ? $message->receiver_id
+                    : $message->sender_id;
+
                 return ($message->dorm_listing_id ?? $message->listing_id) . '_' . $otherUserId;
             });
 
-        return view('owner.inquiries.index', compact('grouped'));
+        // ✅ ADD THIS
+        $unreadCount = self::getOwnerUnreadInquiryCount($ownerId);
+
+        return view('owner.inquiries.index', compact('grouped', 'unreadCount'));
     }
 
     public function ownerConversation($listingId, $userId)
     {
-        // if (Auth::user()->verification_status !== 'approved') {
-        //     return redirect()->route('owner.dashboard')
-        //         ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
-        // }
-
-        // ✅ LISTING-BASED: Show conversation for specific listing + user
-        $listing = \App\Models\DormListing::where('owner_id', Auth::id())
+        $listing = DormListing::where('owner_id', Auth::id())
             ->findOrFail($listingId);
+
         $student = User::findOrFail($userId);
 
         $messages = Message::where(function ($q) use ($listingId) {
@@ -180,17 +208,11 @@ class MessageController extends Controller
 
     public function ownerReply(Request $request, $listingId, $userId)
     {
-        // if (Auth::user()->verification_status !== 'approved') {
-        //     return redirect()->route('owner.dashboard')
-        //         ->with('error', 'You must be verified to access inquiries. Please complete your verification first.');
-        // }
-
         $request->validate([
             'message' => 'required|string|max:1000',
         ]);
 
-        // Verify ownership
-        $listing = \App\Models\DormListing::where('owner_id', Auth::id())
+        $listing = DormListing::where('owner_id', Auth::id())
             ->findOrFail($listingId);
 
         Message::create([
@@ -202,7 +224,6 @@ class MessageController extends Controller
             'is_read' => false,
         ]);
 
-        // ✅ ENHANCED NOTIFICATIONS: Include listing context
         Notification::create([
             'user_id' => $userId,
             'dorm_listing_id' => $listingId,
@@ -217,7 +238,7 @@ class MessageController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | DELETE MESSAGE
+    | DELETE
     |--------------------------------------------------------------------------
     */
 

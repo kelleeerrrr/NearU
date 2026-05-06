@@ -15,6 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create verified owner account (hardcoded)
+        $verifiedOwner = User::create([
+            'name' => 'Verified Owner',
+            'email' => 'verified@gmail.com',
+            'phone' => '09123456789',
+            'user_type' => 'owner',
+            'password' => bcrypt('12345678'),
+            'verification_status' => 'approved',
+        ]);
+
         // Create sample users
         $owner1 = User::create([
             'name' => 'Maria Santos',

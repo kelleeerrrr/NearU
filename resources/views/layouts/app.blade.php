@@ -89,23 +89,32 @@
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
       color: var(--t1);
-      position: relative;
+      display: flex;
+      justify-content: center;
+      background: #e5e7eb;
     }
 
     
-    html {
+    html, body {
+      height: 100%;
       overflow-x: hidden;
       transition: background .3s, color .3s;
     }
 
     /* ── WRAP ── */
     .wrap {
-      max-width: 480px;
+      width: 100%;
+      max-width: 430px;
       margin: 0 auto;
       background: var(--surface);
       min-height: 100vh;
       position: relative;
-      padding-bottom: 82px;
+      padding-top: 70px;
+      padding-bottom: 20px;
+      overflow: hidden;
+
+      box-shadow: 0 0 1px rgba(0,0,0,0.05),
+                0 10px 40px rgba(0,0,0,0.15);
     }
 
     /* ── SCREEN TRANSITIONS ── */
@@ -125,9 +134,13 @@
       justify-content: space-between;
       align-items: center;
       color: #fff;
-      position: sticky;
+      position: fixed;
       top: 0;
-      z-index: 1500;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      z-index: 2000;
       box-shadow: 0 2px 12px rgba(45, 125, 79, .25);
     }
 
@@ -320,8 +333,8 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      width: calc(100% - 40px);
-      max-width: 440px;
+      width: calc(100vw - 32px);
+      max-width: 398px;
       background: rgba(255, 251, 235, 0.9);
       backdrop-filter: blur(10px);
       border-radius: 25px;
