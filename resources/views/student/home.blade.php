@@ -182,11 +182,11 @@
 
             {{-- BUTTONS ROW 1: Reviews + Directions --}}
             <div class="btn-row">
-              <button class="btn btn-out"
+              <button class="btn btn-green"
                 onclick="Reviews.show({{ $dorm->id }}, @js($dorm->street))">
                 ⭐ Reviews ({{ $dorm->reviews()->count() }})
               </button>
-              <button class="btn btn-green"
+              <button class="btn btn-gold"
                 onclick="Directions.get({{ $dorm->id }}, {{ $dorm->latitude ?? 0 }}, {{ $dorm->longitude ?? 0 }}, '{{ addslashes($dorm->street) }}')">
                 🧭 Directions
               </button>
@@ -198,7 +198,7 @@
                 onclick="Compare.toggle({{ $dorm->id }})">
                 {{ $inCmp ? '✓ Added' : '⚖️ Compare' }}
               </button>
-              <button class="btn btn-gold"
+              <button class="btn btn-schedule"
                 onclick="Schedule.open({{ $dorm->id }}, '{{ addslashes($dorm->street) }}', '{{ $dorm->type }}', {{ $dorm->price }}, '{{ addslashes($dorm->owner->name ?? '') }}')">
                 📅 Schedule
               </button>
@@ -431,18 +431,20 @@
 
   /* BUTTONS */
   .btn-row { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; margin-bottom:.45rem; }
-  .btn { padding:.68rem .5rem; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:700; cursor:pointer; border:none; transition:all var(--transition); text-align:center; white-space:nowrap; }
+  .btn { padding:.68rem .5rem; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:700; cursor:pointer; transition:all var(--transition); text-align:center; white-space:nowrap; }
   .btn:active { transform:scale(.97) !important; }
-  .btn-green { background:var(--green); color:#fff; box-shadow:0 3px 10px rgba(45,125,79,.28); }
+  .btn-green { background:var(--green); color:#fff; border:2px solid var(--green); box-shadow:0 3px 10px rgba(45,125,79,.28); }
   .btn-green:hover { background:var(--green-dk); transform:translateY(-1px); }
   .btn-out   { background:transparent; border:2px solid var(--green); color:var(--green); }
   .btn-out:hover { background:var(--green); color:#fff; }
-  .btn-gold  { background:var(--gold); color:#1F2933; box-shadow:0 3px 10px rgba(242,183,5,.3); }
+  .btn-gold  { background:var(--gold); color:#1F2933; border:2px solid var(--gold); box-shadow:0 3px 10px rgba(242,183,5,.3); }
   .btn-gold:hover { background:var(--gold-dk); transform:translateY(-1px); }
-  .btn-cmp   { background:transparent; border:2px solid var(--gold); color:var(--gold-dk); }
+  .btn-cmp   { background:#fff; border:3px solid var(--gold) !important; color:var(--gold-dk); }
   .btn-cmp.on { background:var(--gold); color:#1F2933; }
-  .btn-blue  { background:var(--blue); color:#fff; box-shadow:0 3px 10px rgba(59,130,246,.28); }
+  .btn-blue  { background:var(--blue); color:#fff; border:2px solid var(--blue); box-shadow:0 3px 10px rgba(59,130,246,.28); }
   .btn-blue:hover { background:#2563eb; transform:translateY(-1px); }
+  .btn-schedule { background:#fff; color:var(--green); border:3px solid var(--green) !important; }
+  .btn-schedule:hover { background:var(--green); color:#fff; }
   .btn-full  { width:100%; padding:.84rem; font-size:.9rem; margin-bottom:.42rem; }
   .empty    { text-align:center; padding:3rem 1rem; color:var(--t2); }
   .empty-ic { font-size:3.5rem; margin-bottom:.72rem; }
