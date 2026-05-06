@@ -4,13 +4,20 @@
 
 @php
     function getNotificationRedirectUrl($notification) {
+        // Safety checks
+        if (!$notification) {
+            return route('owner.dashboard');
+        }
+        
         // Debug: Log notification type
-        \Log::info('Owner Notification type: ' . $notification->type . ' - Title: ' . $notification->title);
+        \Log::info('Owner Notification type: ' . ($notification->type ?? 'null') . ' - Title: ' . ($notification->title ?? 'null'));
         
         switch($notification->type) {
             case 'message':
-                if ($notification->listing && $notification->data['sender_id'] ?? null) {
-                    return route('messages.show', [$notification->listing->id, $notification->data['sender_id']]);
+                $data = $notification->data ?? [];
+                $senderId = is_array($data) ? ($data['sender_id'] ?? null) : null;
+                if ($notification->listing && $senderId) {
+                    return route('messages.show', [$notification->listing->id, $senderId]);
                 }
                 return route('owner.inquiries.index');
             case 'inquiry':
@@ -70,8 +77,17 @@
     <div style="margin-top:1rem;">
 
         @forelse($notifications as $notif)
+            @php
+                // Safety checks for notification properties
+                if (!$notif) continue;
+                $notifId = $notif->id ?? 0;
+                $notifTitle = $notif->title ?? 'Unknown Notification';
+                $notifMessage = $notif->message ?? '';
+                $notifIsRead = $notif->is_read ?? true;
+                $notifCreatedAt = $notif->created_at ?? now();
+            @endphp
             <div class="notification-item" 
-                 data-notification-id="{{ $notif->id }}"
+                 data-notification-id="{{ $notifId }}"
                  data-redirect-url="{{ getNotificationRedirectUrl($notif) }}"
                  style="
                 padding:14px;
@@ -81,13 +97,13 @@
                 background:#fff;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                {{ !$notif->is_read ? 'border-left: 4px solid #2D7D4F;' : '' }}
+                {{ !$notifIsRead ? 'border-left: 4px solid #2D7D4F;' : '' }}
             " onclick="handleNotificationClick(this)">
                 <div style="display:flex; justify-content:space-between; gap:1rem; align-items:flex-start;">
-                    <strong style="{{ $notif->is_read ? 'font-weight: 600;' : 'font-weight: 800;' }}">{{ $notif->title }}</strong>
-                    <span style="font-size:0.8rem; color:#6b7280;">{{ $notif->created_at->diffForHumans() }}</span>
+                    <strong style="{{ $notifIsRead ? 'font-weight: 600;' : 'font-weight: 800;' }}">{{ $notifTitle }}</strong>
+                    <span style="font-size:0.8rem; color:#6b7280;">{{ $notifCreatedAt->diffForHumans() }}</span>
                 </div>
-                <p style="margin:0.45rem 0 0; color:#4b5563; {{ $notif->is_read ? 'font-weight: 400;' : 'font-weight: 600;' }}">{{ $notif->message }}</p>
+                <p style="margin:0.45rem 0 0; color:#4b5563; {{ $notifIsRead ? 'font-weight: 400;' : 'font-weight: 600;' }}">{{ $notifMessage }}</p>
 
                 @if($notif->listing)
                     <p style="margin:0.75rem 0 0; font-size:0.9rem; color:#1f5c38;">
@@ -96,7 +112,7 @@
                 @endif
 
                 <div style="margin-top:0.8rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
-                    @if(!$notif->is_read)
+                    @if(!$notifIsRead)
                         <span class="unread-badge" style="background:#E8F7EE; color:#176f3a; padding:0.25rem 0.6rem; border-radius:999px; font-size:0.75rem;">Unread</span>
                     @endif
                 </div>

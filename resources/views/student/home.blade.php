@@ -366,7 +366,7 @@
 
   /* SEARCH */
   .search-wrap { margin:0 1.2rem .75rem; position:relative; z-index:3; }
-  .search-wrap input { width:100%; padding:.9rem 1.2rem .9rem 2.9rem; border:2px solid var(--border); border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none; background:var(--card); color:var(--t1); box-shadow:var(--sh); transition:border var(--transition),box-shadow var(--transition); }
+  .search-wrap input { width:100%; padding:.9rem 1.2rem .9rem 2.9rem; border:2px solid var(--green); border-radius:50px; font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none; background:var(--card); color:var(--t1); box-shadow:var(--sh); transition:border var(--transition),box-shadow var(--transition); }
   .search-wrap input:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(45,125,79,.1),var(--sh); }
   .si { position:absolute; left:1rem; top:50%; transform:translateY(-50%); font-size:.95rem; pointer-events:none; }
 
@@ -374,8 +374,8 @@
   .chips-wrap { padding:0 1.2rem .85rem; overflow-x:auto; }
   .chips-wrap::-webkit-scrollbar { display:none; }
   .chips { display:flex; gap:.5rem; width:max-content; }
-  .chip { padding:.46rem 1rem; border:1.5px solid var(--border); border-radius:50px; background:var(--card); font-size:.77rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:all .18s; color:var(--t1); display:flex; align-items:center; gap:.3rem; }
-  .chip:hover { border-color:var(--green); color:var(--green); }
+  .chip { padding:.46rem 1rem; border:1.5px solid var(--green); border-radius:50px; background:var(--card); font-size:.77rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:all .18s; color:var(--t1); display:flex; align-items:center; gap:.3rem; }
+  .chip:hover { border-color:var(--green); color:var(--green); background:rgba(45,125,79,0.05); }
   .chip.on    { background:var(--green); color:#fff; border-color:var(--green); }
   .active-filters { padding:0 1.2rem .7rem; display:flex; gap:.42rem; flex-wrap:wrap; }
   .af-tag { display:inline-flex; align-items:center; gap:.3rem; padding:.3rem .75rem; background:var(--green-lt); border:1.5px solid var(--green); border-radius:50px; font-size:.73rem; font-weight:700; color:var(--green); cursor:pointer; }

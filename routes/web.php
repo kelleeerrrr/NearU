@@ -18,6 +18,7 @@ use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\VisitScheduleController;
 use App\Http\Controllers\Admin\OwnerVerificationController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\StatisticsController;
 
 /*
@@ -76,7 +77,7 @@ Route::middleware('guest')->group(function () {
 
             // ✅ REDIRECT BASED ON USER TYPE
             return $user->user_type === 'admin'
-                ? redirect()->route('admin.owner-verifications.index')
+                ? redirect()->route('admin.dashboard')
                 : ($user->user_type === 'owner'
                     ? redirect()->route('owner.dashboard')
                     : redirect()->route('student.home'));
@@ -511,6 +512,14 @@ Route::middleware('auth')->group(function () {
 */
 
 Route::prefix('admin')->middleware('auth')->group(function () {
+
+    // DASHBOARD
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('admin.dashboard');
+
+    // PROFILE
+    Route::get('/profile', [DashboardController::class, 'profile'])
+        ->name('admin.profile');
 
     // LIST
     Route::get('/owner-verifications', [OwnerVerificationController::class, 'index'])
