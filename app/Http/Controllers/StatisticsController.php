@@ -85,9 +85,9 @@ class StatisticsController extends Controller
 
         $totalVisits = $visits->count();
 
-        $pendingVisits = $visits->where('status', 'pending')->count();
-        $approvedVisits = $visits->where('status', 'confirmed')->count();
-        $completedVisits = $visits->where('status', 'completed')->count();
+        $pendingVisits = $visits->where('status', 'Pending')->count();
+        $approvedVisits = $visits->where('status', 'Confirmed')->count();
+        $completedVisits = $visits->where('status', 'Completed')->count();
 
         /*
         |--------------------------------------------------------------------------

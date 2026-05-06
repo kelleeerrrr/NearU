@@ -295,9 +295,6 @@ Tap to upload photos (max 10)<br>
 <label>Curfew</label>
 <input type="text" name="curfew" placeholder="e.g. 10PM">
 
-<label><input type="checkbox" name="wifi"> WiFi Included</label>
-<label><input type="checkbox" name="pets"> Pets Allowed</label>
-
 <label>Nearby Places</label>
 <input type="text" name="nearby_landmarks"
 placeholder="e.g. 7/11, Alfamart, BSU Gate, Market">

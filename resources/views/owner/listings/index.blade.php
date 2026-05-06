@@ -115,7 +115,7 @@
 
         {{-- EDIT --}}
         <a href="{{ route('owner.listings.edit', $listing->id) }}"
-           style="padding:.4rem .7rem;background:var(--blue);color:#fff;border-radius:8px;font-size:.75rem;text-decoration:none;">
+           style="padding:.4rem .7rem;background:var(--gold);color:#fff;border-radius:8px;font-size:.75rem;text-decoration:none;">
             Edit
         </a>
 
