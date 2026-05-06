@@ -142,6 +142,16 @@
   </button>
 </div>
 
+<!-- Success Notification -->
+@if(session('success'))
+<div id="successNotification" class="success-notification">
+    <div class="notification-content">
+        <div class="notification-icon">✓</div>
+        <div class="notification-message">{{ session('success') }}</div>
+    </div>
+</div>
+@endif
+
 {{-- FILTER --}}
 <div class="filter-bar">
 
@@ -202,7 +212,7 @@
         </form>
 
         {{-- STATUS TOGGLE --}}
-        @if($listing->status === 'available')
+        @if(strtolower($listing->status) === 'available')
 
             <form method="POST"
                   action="{{ route('owner.listings.unavailable', $listing->id) }}">
@@ -237,3 +247,62 @@
 @endforelse
 
 @endsection
+
+@if(session('success'))
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const notification = document.getElementById('successNotification');
+    if (notification) {
+        // Show notification
+        notification.style.display = 'flex';
+        
+        // Auto-hide after 3 seconds
+        setTimeout(function() {
+            notification.style.opacity = '0';
+            setTimeout(function() {
+                notification.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
+});
+</script>
+
+<style>
+.success-notification {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    margin: 0 1.2rem 1rem;
+    display: none;
+    align-items: center;
+    transition: opacity 0.3s ease;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-icon {
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.notification-message {
+    font-weight: 600;
+    font-size: 14px;
+}
+</style>
+@endpush
+@endif

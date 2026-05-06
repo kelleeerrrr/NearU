@@ -4,395 +4,266 @@
 
 @push('styles')
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
 
-  :root {
-    --bg: #F3F8F5;
-    --card: #ffffff;
-    --border: #D4E8DB;
-    --border-focus: #2D7D4F;
-    --green: #2D7D4F;
-    --green-dark: #236040;
-    --green-light: #EAF4EE;
-    --text-primary: #1A2E22;
-    --text-secondary: #5A7A66;
-    --text-muted: #8FA898;
-    --red: #E53E3E;
-    --shadow-sm: 0 1px 3px rgba(45,125,79,0.08);
-    --shadow-md: 0 4px 20px rgba(45,125,79,0.10);
-    --shadow-lg: 0 8px 40px rgba(45,125,79,0.13);
-    --radius: 14px;
-    --radius-sm: 8px;
-  }
+.edit-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+.edit-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
 
-  body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text-primary);
-    min-height: 100vh;
-  }
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #666;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.back-link:hover {
+  background: #f8f8f8;
+  border-color: #999;
+}
 
-  /* ── Page wrapper ── */
-  .edit-page {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 2rem 1.25rem 3rem;
-    animation: fadeUp .45s ease both;
-  }
+.edit-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #333;
+}
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+.form-group {
+  margin-bottom: 20px;
+}
 
-  /* ── Back button ── */
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-    font-size: .85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-decoration: none;
-    padding: .45rem .85rem .45rem .6rem;
-    border-radius: 999px;
-    background: transparent;
-    border: 1.5px solid var(--border);
-    transition: background .18s, color .18s, border-color .18s, box-shadow .18s;
-    margin-bottom: 1.75rem;
-  }
-  .back-btn:hover {
-    background: var(--green-light);
-    color: var(--green);
-    border-color: var(--green);
-    box-shadow: 0 2px 8px rgba(45,125,79,.12);
-  }
-  .back-btn svg { flex-shrink: 0; }
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
 
-  /* ── Page header ── */
-  .page-header {
-    margin-bottom: 1.75rem;
-  }
-  .page-header .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-    font-size: .75rem;
-    font-weight: 700;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-    color: var(--green);
-    background: var(--green-light);
-    border: 1px solid #C0DFC9;
-    padding: .3rem .75rem;
-    border-radius: 999px;
-    margin-bottom: .85rem;
-  }
-  .page-header h1 {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    line-height: 1.2;
-  }
-  .page-header p {
-    margin-top: .4rem;
-    font-size: .9rem;
-    color: var(--text-secondary);
-  }
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
 
-  /* ── Card ── */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-  }
+.form-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+}
 
-  .card-section {
-    padding: 1.5rem 1.75rem;
-  }
-  .card-section + .card-section {
-    border-top: 1px solid var(--border);
-  }
-  .section-label {
-    font-size: .7rem;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 1.1rem;
-  }
+.form-select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 15px;
+  font-family: inherit;
+  background: white;
+  cursor: pointer;
+}
 
-  /* ── Field grid ── */
-  .fields-grid {
-    display: grid;
-    gap: 1.1rem;
-  }
-  .fields-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
 
-  /* ── Form field ── */
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: .45rem;
-  }
-  .field label {
-    font-size: .82rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-  }
-  .field label span.req {
-    color: var(--red);
-    margin-left: 2px;
-  }
-  .field input,
-  .field select {
-    width: 100%;
-    padding: .7rem .9rem;
-    font-family: inherit;
-    font-size: .93rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    background: #FAFCFB;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    outline: none;
-    transition: border-color .18s, box-shadow .18s, background .18s;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  .field input:focus,
-  .field select:focus {
-    border-color: var(--green);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(45,125,79,.12);
-  }
-  .field input::placeholder { color: var(--text-muted); font-weight: 400; }
+.btn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
 
-  /* Custom select arrow */
-  .select-wrap {
-    position: relative;
-  }
-  .select-wrap select { padding-right: 2.5rem; cursor: pointer; }
-  .select-wrap::after {
-    content: '';
-    pointer-events: none;
-    position: absolute;
-    right: .85rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0; height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid var(--text-muted);
-  }
+.btn-cancel {
+  background: transparent;
+  color: #666;
+  border: 2px solid #ddd;
+}
 
-  /* Price prefix */
-  .input-prefix {
-    position: relative;
-  }
-  .input-prefix .prefix {
-    position: absolute;
-    left: .9rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: .88rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    pointer-events: none;
-  }
-  .input-prefix input { padding-left: 2rem; }
+.btn-cancel:hover {
+  background: #f8f8f8;
+  border-color: #999;
+}
 
-  /* ── Footer (actions) ── */
-  .card-footer {
-    padding: 1.25rem 1.75rem;
-    background: #FAFCFB;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: .75rem;
-  }
+.btn-submit {
+  background: #4CAF50;
+  color: white;
+  flex: 1;
+}
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: .4rem;
-    padding: .7rem 1.4rem;
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: .9rem;
-    font-weight: 700;
-    cursor: pointer;
-    border: none;
-    transition: background .18s, box-shadow .18s, transform .12s;
-    text-decoration: none;
-  }
-  .btn:active { transform: scale(.97); }
+.btn-submit:hover {
+  background: #45a049;
+}
 
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1.5px solid var(--border);
-  }
-  .btn-ghost:hover { background: var(--green-light); color: var(--green); border-color: var(--green); }
+.alert-error {
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  color: #e53e3e;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
 
-  .btn-primary {
-    background: var(--green);
-    color: #fff;
-    box-shadow: 0 2px 10px rgba(45,125,79,.25);
-  }
-  .btn-primary:hover {
-    background: var(--green-dark);
-    box-shadow: 0 4px 16px rgba(45,125,79,.35);
-  }
+.alert-error ul {
+  margin: 10px 0 0 20px;
+}
 
-  /* ── Validation errors ── */
-  @if($errors->any())
-  .alert-error {
-    background: #FFF5F5;
-    border: 1px solid #FED7D7;
-    border-radius: var(--radius-sm);
-    padding: .85rem 1rem;
-    margin-bottom: 1.25rem;
-    font-size: .85rem;
-    color: var(--red);
-  }
-  .alert-error ul { padding-left: 1.1rem; margin-top: .3rem; }
-  @endif
-
-  /* ── Responsive ── */
-  @media (max-width: 480px) {
-    .fields-row { grid-template-columns: 1fr; }
-    .card-section { padding: 1.25rem; }
-    .card-footer { flex-direction: column-reverse; }
-    .card-footer .btn { width: 100%; justify-content: center; }
-    .page-header h1 { font-size: 1.4rem; }
-  }
+.success-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #4CAF50;
+  color: white;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(76,175,80,0.3);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  min-width: 300px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 16px;
+}
 </style>
 @endpush
 
 @section('content')
 
-<div class="edit-page">
+<!-- Success Notification -->
+@if(session('success'))
+<div id="successNotification" class="success-notification">
+  {{ session('success') }}
+</div>
+@endif
 
-  {{-- Back button --}}
-  <a href="{{ route('owner.listings.index') }}" class="back-btn">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Back to Listings
-  </a>
-
-  {{-- Page header --}}
-  <div class="page-header">
-    <div class="badge">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-        <path d="M11.5 2.5a2.121 2.121 0 013 3L5 15H2v-3L11.5 2.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-      </svg>
-      Edit Mode
-    </div>
-    <h1>Edit Listing</h1>
-    <p>Update your listing details. Changes will reflect immediately.</p>
+<div class="edit-container">
+  <div class="edit-header">
+    <a href="{{ route('owner.listings.index') }}" class="back-link">
+      ← Back
+    </a>
+    <h1 class="edit-title">Edit Listing</h1>
   </div>
 
-  {{-- Validation errors --}}
   @if($errors->any())
-  <div class="alert-error">
-    <strong>Please fix the following errors:</strong>
-    <ul>
-      @foreach($errors->all() as $error)
-        <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  </div>
+    <div class="alert-error">
+      <strong>Please fix the following errors:</strong>
+      <ul>
+        @foreach($errors->all() as $error)
+          <li>{{ $error }}</li>
+        @endforeach
+      </ul>
+    </div>
   @endif
 
-  {{-- Form card --}}
-  <div class="card">
+  <form method="POST" action="{{ route('owner.listings.update', $listing->id) }}" enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
 
-    <form method="POST" action="{{ route('owner.listings.update', $listing->id) }}">
-      @csrf
-      @method('PUT')
+    <div class="form-group">
+      <label class="form-label" for="street">Street Address</label>
+      <select name="street" id="street" class="form-select" required>
+        <option value="">Select street...</option>
+        <option value="Mars" {{ old('street', $listing->street) == 'Mars' ? 'selected' : '' }}>Mars</option>
+        <option value="Jupiter" {{ old('street', $listing->street) == 'Jupiter' ? 'selected' : '' }}>Jupiter</option>
+        <option value="Earth" {{ old('street', $listing->street) == 'Earth' ? 'selected' : '' }}>Earth</option>
+        <option value="Venus" {{ old('street', $listing->street) == 'Venus' ? 'selected' : '' }}>Venus</option>
+        <option value="Saturn" {{ old('street', $listing->street) == 'Saturn' ? 'selected' : '' }}>Saturn</option>
+        <option value="Other" {{ old('street', $listing->street) == 'Other' ? 'selected' : '' }}>Other</option>
+      </select>
+    </div>
 
-      {{-- Location & Pricing --}}
-      <div class="card-section">
-        <div class="section-label">Location &amp; Pricing</div>
+    <div class="form-group">
+      <label class="form-label" for="price">Monthly Price (₱)</label>
+      <input type="number" name="price" id="price" class="form-input" 
+             value="{{ old('price', $listing->price) }}" 
+             placeholder="0.00" min="0" required>
+    </div>
 
-        <div class="fields-grid">
-          <div class="field">
-            <label for="street">Street Address <span class="req">*</span></label>
-            <input id="street" type="text" name="street"
-                   value="{{ old('street', $listing->street) }}"
-                   placeholder="e.g. 123 Rizal Ave."
-                   required>
-          </div>
+    <div class="form-group">
+      <label class="form-label" for="type">Type</label>
+      <select name="type" id="type" class="form-select" required>
+        <option value="Room" {{ old('type', $listing->type) == 'Room' ? 'selected' : '' }}>Room</option>
+        <option value="Bedspace" {{ old('type', $listing->type) == 'Bedspace' ? 'selected' : '' }}>Bedspace</option>
+        <option value="Studio" {{ old('type', $listing->type) == 'Studio' ? 'selected' : '' }}>Studio</option>
+      </select>
+    </div>
 
-          <div class="field">
-            <label for="price">Monthly Price <span class="req">*</span></label>
-            <div class="input-prefix">
-              <span class="prefix">₱</span>
-              <input id="price" type="number" name="price"
-                     value="{{ old('price', $listing->price) }}"
-                     placeholder="0"
-                     min="0"
-                     required>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="form-group">
+      <label class="form-label" for="status">Status</label>
+      <select name="status" id="status" class="form-select" required>
+        <option value="available" {{ strtolower(old('status', $listing->status)) == 'available' ? 'selected' : '' }}>Available</option>
+        <option value="unavailable" {{ strtolower(old('status', $listing->status)) == 'unavailable' ? 'selected' : '' }}>Unavailable</option>
+      </select>
+    </div>
 
-      {{-- Listing Details --}}
-      <div class="card-section">
-        <div class="section-label">Listing Details</div>
-
-        <div class="fields-row">
-          <div class="field">
-            <label for="type">Type</label>
-            <div class="select-wrap">
-              <select id="type" name="type">
-                <option value="Bedspace"  {{ old('type', $listing->type) == 'Bedspace'  ? 'selected' : '' }}>Bedspace</option>
-                <option value="Room"      {{ old('type', $listing->type) == 'Room'      ? 'selected' : '' }}>Room</option>
-                <option value="Studio"    {{ old('type', $listing->type) == 'Studio'    ? 'selected' : '' }}>Studio</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="status">Status</label>
-            <div class="select-wrap">
-              <select id="status" name="status">
-                <option value="available"   {{ old('status', $listing->status) == 'available'   ? 'selected' : '' }}>Available</option>
-                <option value="unavailable" {{ old('status', $listing->status) == 'unavailable' ? 'selected' : '' }}>Unavailable</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {{-- Actions --}}
-      <div class="card-footer">
-        <a href="{{ route('owner.listings.index') }}" class="btn btn-ghost">
-          Cancel
-        </a>
-        <button type="submit" class="btn btn-primary">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-            <path d="M13.5 4.5l-7 7L3 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Save Changes
-        </button>
-      </div>
-
-    </form>
-  </div>
-
+    <div class="form-actions">
+      <a href="{{ route('owner.listings.index') }}" class="btn btn-cancel">
+        Cancel
+      </a>
+      <button type="submit" class="btn btn-submit">
+        Update Listing
+      </button>
+    </div>
+  </form>
 </div>
 
 @endsection
+
+@if(session('success'))
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const notification = document.getElementById('successNotification');
+    if (notification) {
+        // Show notification
+        notification.style.display = 'block';
+        
+        // Auto-hide after 3 seconds
+        setTimeout(function() {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+});
+</script>
+@endpush
+@endif

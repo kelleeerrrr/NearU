@@ -29,7 +29,9 @@ class OwnerDashboardController extends Controller
 
         $listingIds = $listings->pluck('id');
 
-        $activeListings = $listings->where('status', 'available')->count();
+        $activeListings = $listings->filter(function ($listing) {
+                return strtolower($listing->status) === 'available';
+            })->count();
 
         /*
         |--------------------------------------------------------------------------

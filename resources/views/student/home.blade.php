@@ -92,7 +92,7 @@
                 <div class="carousel-inner" id="ci-{{ $dorm->id }}">
                   @foreach($photos as $photo)
                     <div class="carousel-slide">
-                      <img src="{{ asset('storage/dorms/' . $photo) }}"
+                      <img src="{{ asset('storage/' . $photo) }}"
                           alt="{{ $dorm->street }}"
                           loading="lazy"
                           style="width:100%;height:185px;object-fit:cover;cursor:pointer;border-radius:12px;"
@@ -176,7 +176,6 @@
                 @if($dorm->appliances)     <div class="inc-i">🔌 {{ Str::limit($dorm->appliances, 18) }}</div> @endif
                 @if($dorm->bills_included) <div class="inc-i">💡 {{ Str::limit($dorm->bills_included, 16) }}</div> @endif
                 @if($dorm->curfew)         <div class="inc-i">🕐 {{ $dorm->curfew }}</div> @endif
-                <div class="inc-i">🐾 {{ $dorm->pets_allowed ? 'Pets OK' : 'No pets' }}</div>
               </div>
             </div>
 

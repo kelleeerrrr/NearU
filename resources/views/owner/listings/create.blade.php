@@ -155,6 +155,18 @@
   color: var(--gold-text); letter-spacing: .05em;
 }
 
+.more-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, .44);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
 /* FIELDS */
 .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
 .field:last-child { margin-bottom: 0; }
@@ -210,11 +222,29 @@ select {
 
 /* MAP */
 #map {
-  height: 220px;
+  height: 220px !important;
+  width: 100% !important;
   border-radius: 14px;
   border: 1px solid var(--border);
   margin-top: 10px;
   z-index: 1;
+  position: relative;
+  background: #f0f0f0;
+}
+
+/* Ensure Leaflet tiles display properly */
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 14px;
+}
+
+.leaflet-tile-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-marker-pane {
+  z-index: 2 !important;
 }
 .coords-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
 .map-hint {
@@ -306,7 +336,7 @@ input[readonly]:focus { border-color: var(--border); box-shadow: none; }
     <div class="upload-zone" onclick="document.getElementById('photos').click()">
       <div class="upload-icon">📷</div>
       <p>Tap to upload photos</p>
-      <small>Up to 10 photos · First photo becomes the cover</small>
+      <small>Up to 6 photos · First photo becomes the cover</small>
     </div>
     <input type="file" id="photos" name="photos[]" multiple hidden accept="image/*">
     <div class="photo-grid" id="grid"></div>
@@ -359,9 +389,9 @@ input[readonly]:focus { border-color: var(--border); box-shadow: none; }
       <div class="field">
         <label>Gender Policy</label>
         <select name="gender_policy">
-          <option>Male</option>
+          <option>Any</option>
           <option>Female</option>
-          <option>Mixed</option>
+          <option>Male</option>
         </select>
       </div>
       <div class="field">
@@ -470,27 +500,53 @@ input[readonly]:focus { border-color: var(--border); box-shadow: none; }
 <script>
 /* ── PHOTO UPLOAD WITH WORKING PREVIEW ── */
 let files = [];
-const input = document.getElementById('photos');
-const grid  = document.getElementById('grid');
+let input, grid;
+const maxFiles = 6;
 
-input.addEventListener('change', function(e) {
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  input = document.getElementById('photos');
+  grid = document.getElementById('grid');
+  
+  if (input) {
+    input.addEventListener('change', function(e) {
   const newFiles = Array.from(e.target.files);
-  files = [...files, ...newFiles].slice(0, 10);
+  const combined = [...files, ...newFiles];
+  if (combined.length > maxFiles) {
+    alert('You can upload up to 6 photos only.');
+  }
+  files = combined.slice(0, maxFiles);
   input.value = ''; // reset so same file can be re-added
   renderPhotos();
+    });
+  }
+  
+  // Initialize map after DOM is ready
+  initializeMap();
 });
 
 function renderPhotos() {
-  // Rebuild the DataTransfer so the input reflects current files array
+  console.log('renderPhotos called, files count:', files.length);
+  console.log('grid element:', grid);
+  console.log('input element:', input);
+  
+  if (!grid) {
+    console.error('Grid element not found!');
+    return;
+  }
+  
   const dt = new DataTransfer();
   files.forEach(f => dt.items.add(f));
   input.files = dt.files;
 
-  // Clear grid and re-render each photo
   grid.innerHTML = '';
+  const maxPreview = 3;
+  const overflow = files.length > maxPreview ? files.length - maxPreview : 0;
 
   files.forEach(function(file, index) {
+    console.log('Processing file:', file.name, 'index:', index);
     const url = URL.createObjectURL(file);
+    console.log('Created URL:', url);
 
     const item = document.createElement('div');
     item.className = 'photo-item';
@@ -508,6 +564,14 @@ function renderPhotos() {
       item.appendChild(badge);
     }
 
+    // Show "more" overlay on the last visible photo if there are more photos
+    if (index === maxPreview - 1 && overflow > 0) {
+      const overlay = document.createElement('div');
+      overlay.className = 'more-overlay';
+      overlay.textContent = '+' + overflow + ' more';
+      item.appendChild(overlay);
+    }
+
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'del-btn';
@@ -517,7 +581,10 @@ function renderPhotos() {
     });
     item.appendChild(delBtn);
 
-    grid.appendChild(item);
+    // Only append if this photo should be visible in the preview
+    if (index < maxPreview) {
+      grid.appendChild(item);
+    }
   });
 }
 
@@ -526,33 +593,73 @@ function removePhoto(index) {
   renderPhotos();
 }
 
-/* ── MAP (exact same as your original HTML) ── */
-const defaultLat = 13.78456;
-const defaultLng = 121.07428;
+/* ── MAP INITIALIZATION ── */
+function initializeMap() {
+  console.log('Initializing map...');
+  const mapElement = document.getElementById('map');
+  console.log('Map element found:', mapElement);
+  
+  if (!mapElement) {
+    console.error('Map element not found!');
+    return;
+  }
+  
+  const defaultLat = 13.78456;
+  const defaultLng = 121.07428;
 
-var map = L.map('map').setView([defaultLat, defaultLng], 16);
+  // Ensure map container has proper dimensions
+  mapElement.style.height = '220px';
+  mapElement.style.width = '100%';
+  mapElement.style.backgroundColor = '#f0f0f0'; // Add background color for debugging
+  
+  console.log('Map element styles:', {
+    height: mapElement.style.height,
+    width: mapElement.style.width,
+    display: getComputedStyle(mapElement).display,
+    visibility: getComputedStyle(mapElement).visibility,
+    zIndex: getComputedStyle(mapElement).zIndex
+  });
+  
+  try {
+    console.log('Creating Leaflet map...');
+    var map = L.map('map').setView([defaultLat, defaultLng], 16);
+    console.log('Map created successfully');
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
 
-var marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+    // Initialize marker
+    var marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
 
-function setCoords(lat, lng) {
-  document.getElementById('lat').value = lat.toFixed(6);
-  document.getElementById('lng').value = lng.toFixed(6);
+    function setCoords(lat, lng) {
+      const latInput = document.getElementById('lat');
+      const lngInput = document.getElementById('lng');
+      if (latInput) latInput.value = lat.toFixed(6);
+      if (lngInput) lngInput.value = lng.toFixed(6);
+    }
+
+    setCoords(defaultLat, defaultLng);
+
+    marker.on('dragend', function(e) {
+      var p = marker.getLatLng();
+      setCoords(p.lat, p.lng);
+    });
+
+    map.on('click', function(e) {
+      marker.setLatLng(e.latlng);
+      setCoords(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Fix map display issues
+    setTimeout(function() {
+      map.invalidateSize();
+    }, 500);
+    
+  } catch (error) {
+    console.error('Map initialization error:', error);
+  }
 }
-
-setCoords(defaultLat, defaultLng);
-
-marker.on('dragend', function(e) {
-  var p = marker.getLatLng();
-  setCoords(p.lat, p.lng);
-});
-
-map.on('click', function(e) {
-  marker.setLatLng(e.latlng);
-  setCoords(e.latlng.lat, e.latlng.lng);
-});
 </script>
 @endpush

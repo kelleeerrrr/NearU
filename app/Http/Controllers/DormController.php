@@ -9,6 +9,7 @@ use App\Models\SavedListing;
 use App\Models\VisitSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DormController extends Controller
 {
@@ -201,7 +202,7 @@ class DormController extends Controller
             'street' => 'required|string|max:255',
             'price' => 'required|numeric',
             'type' => 'required|string',
-            'photos' => 'array|max:10',
+            'photos' => 'array|max:6',
             'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
@@ -217,12 +218,12 @@ class DormController extends Controller
             'appliances' => json_encode($request->appliances ?? []),
             'bills_included' => json_encode($request->bills ?? []),
             'curfew' => is_numeric($request->curfew) ? $request->curfew . 'PM' : $request->curfew,
-            'wifi' => $request->has('wifi') ? 1 : 0,
-            'pets' => $request->has('pets') ? 1 : 0,
+            'wifi_included' => $request->has('wifi') ? 1 : 0,
+            'pets_allowed' => $request->has('pets') ? 1 : 0,
             'nearby_landmarks' => $request->nearby_landmarks,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
-            'status' => 'available',
+            'status' => 'Available',
         ]);
 
         /*
@@ -250,15 +251,112 @@ class DormController extends Controller
 
     /*
     |----------------------------------------
+    | UPDATE LISTING
+    |----------------------------------------
+    */
+    public function update(Request $request, $id)
+    {
+        $dorm = DormListing::findOrFail($id);
+
+        // Check if the authenticated user owns this listing
+        if ($dorm->owner_id !== Auth::id()) {
+            return redirect()->route('owner.listings.index')
+                ->with('error', 'You are not authorized to edit this listing.');
+        }
+
+        $request->validate([
+            'street' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'type' => 'required|string',
+            'photos' => 'array|max:6',
+            'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
+        // Update basic listing information
+        $dorm->update([
+            'street' => $request->street,
+            'price' => $request->price,
+            'type' => $request->type,
+            'gender_policy' => $request->gender_policy,
+            'walk_minutes' => (int) $request->walk_minutes,
+            'bathroom' => $request->bathroom,
+            'furnishings' => json_encode($request->furnishings ?? []),
+            'appliances' => json_encode($request->appliances ?? []),
+            'bills_included' => json_encode($request->bills ?? []),
+            'curfew' => is_numeric($request->curfew) ? $request->curfew . 'PM' : $request->curfew,
+            'wifi_included' => $request->has('wifi') ? 1 : 0,
+            'pets_allowed' => $request->has('pets') ? 1 : 0,
+            'nearby_landmarks' => $request->nearby_landmarks,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+        ]);
+
+        /*
+        |----------------------------------------
+        | PHOTO MANAGEMENT FOR UPDATE
+        |----------------------------------------
+        */
+        
+        // Handle photos to delete
+        if ($request->has('photos_to_delete')) {
+            $photosToDelete = json_decode($request->photos_to_delete, true) ?? [];
+            foreach ($photosToDelete as $photoPath) {
+                $image = $dorm->images()->where('path', $photoPath)->first();
+                if ($image) {
+                    // Delete file from storage
+                    Storage::disk('public')->delete($image->path);
+                    // Delete database record
+                    $image->delete();
+                }
+            }
+        }
+
+        // Handle new photo uploads
+        if ($request->hasFile('photos')) {
+            $files = $request->file('photos');
+            $currentPhotoCount = $dorm->images()->count();
+            
+            foreach ($files as $index => $file) {
+                // Check if we've reached the limit
+                if ($currentPhotoCount >= 6) {
+                    break;
+                }
+                
+                $path = $file->store('dorms', 'public');
+
+                DormListingImage::create([
+                    'dorm_listing_id' => $dorm->id,
+                    'path' => $path,
+                    'is_cover' => $currentPhotoCount === 0, // First image becomes cover if no existing cover
+                ]);
+                
+                $currentPhotoCount++;
+            }
+        }
+
+        return redirect()->route('owner.listings.index')
+            ->with('success', 'Listing updated successfully!');
+    }
+
+    /*
+    |----------------------------------------
     | STUDENT HOME
     |----------------------------------------
     */
     public function indexStudent()
     {
-        $dormListings = DormListing::where('status', 'Available')
+        $dormListings = DormListing::where(function ($query) {
+                $query->where('status', 'Available')
+                      ->orWhere('status', 'available');
+            })
             ->with(['owner', 'images'])
             ->latest()
             ->get();
+
+        \Log::info('Student home dorm listings loaded', [
+            'count' => $dormListings->count(),
+            'statuses' => $dormListings->pluck('status')->unique()->values()->all(),
+        ]);
 
         $dormsDataJson = $dormListings->map(function ($dorm) {
 
@@ -277,6 +375,9 @@ class DormController extends Controller
                 'photo' => $cover
                     ? asset('storage/' . $cover->path)
                     : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400',
+                'imgs' => $dorm->images->map(function($image) {
+                    return asset('storage/' . $image->path);
+                })->toArray(),
             ];
         });
 
@@ -327,7 +428,7 @@ class DormController extends Controller
         }
 
         return view('dorms.index', [
-            'dormListings' => $query->where('status', 'available')->latest()->get()
+            'dormListings' => $query->where('status', 'Available')->latest()->get()
         ]);
     }
 

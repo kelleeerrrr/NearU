@@ -42,6 +42,21 @@ use App\Http\Controllers\StatisticsController;
 |--------------------------------------------------------------------------
 */
 
+
+// Direct file serving route to bypass storage issues
+Route::get('/photos/{filename}', function ($filename) {
+    $path = storage_path('app/public/dorms/' . $filename);
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    $mimeType = mime_content_type($path);
+    return response()->file($path, 200, [
+        'Content-Type' => $mimeType,
+        'Cache-Control' => 'public, max-age=31536000',
+        'Expires' => gmdate('D, d M Y H:i:s', strtotime('+1 year')),
+    ]);
+})->where('filename', '.*');
+
 Route::middleware('guest')->group(function () {
 
     Route::get('/login', fn () => view('auth.login'))->name('login');
@@ -324,7 +339,7 @@ Route::middleware('auth')->group(function () {
 
             // FILTER
             if ($request->status) {
-                $query->where('status', $request->status);
+                $query->whereRaw('LOWER(status) = ?', [strtolower($request->status)]);
             }
 
             $dormListings = $query->latest()->get();
@@ -389,31 +404,8 @@ Route::middleware('auth')->group(function () {
         | UPDATE
         |-----------------------------------------
         */
-        Route::put('/{id}', function (Request $request, $id) {
-
-            // ✅ VERIFICATION CHECK: Only approved owners can update listings
-            if (auth()->user()->verification_status !== 'approved') {
-                return redirect()->route('owner.dashboard')
-                    ->with('error', 'You must be verified to update listings. Please complete your verification first.');
-            }
-
-            $listing = \App\Models\DormListing::where('owner_id', auth()->id())
-                ->findOrFail($id);
-
-            $listing->update($request->only([
-                'street',
-                'price',
-                'type',
-                'latitude',
-                'longitude',
-                'status'
-            ]));
-
-            return redirect()
-                ->route('owner.listings.index')
-                ->with('success', 'Listing updated successfully');
-
-        })->name('update');
+        Route::put('/{id}', [\App\Http\Controllers\DormController::class, 'update'])
+            ->name('update');
         Route::post('/{id}/available', function ($id) {
 
             $listing = \App\Models\DormListing::where('owner_id', auth()->id())

@@ -18,7 +18,7 @@ class HomeController extends Controller
         ]);
 
         $dormListings = DormListing::with('owner')
-            ->where('status', '')
+            ->where('status', 'Available')
             ->latest()
             ->get();
 
@@ -63,8 +63,6 @@ class HomeController extends Controller
                                        function ($p) { return asset('storage/' . $p); },
                                        $photos
                                    ),
-                    'wifi'      => (bool) $d->wifi_included,
-                    'pets'      => (bool) $d->pets_allowed,
                     'curfew'    => $d->curfew,
                     'ownerId'   => $d->owner?->id,
                     'ownerName' => $d->owner?->name,

@@ -2,6 +2,20 @@
 
 @section('title', $listing->street . ' - NearU')
 
+@push('styles')
+<style>
+.carousel { position: relative; overflow: hidden; border-radius: 14px; background: #f8f9f7; }
+.carousel-inner { display: flex; transition: transform .35s ease; width: 100%; }
+.carousel-slide { min-width: 100%; flex-shrink: 0; position: relative; }
+.carousel-slide img { width: 100%; height: 320px; object-fit: cover; display: block; }
+.carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.92); border: none; box-shadow: 0 3px 12px rgba(0,0,0,.16); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #1a2e22; z-index: 2; }
+.carousel-arrow.prev { left: 12px; }
+.carousel-arrow.next { right: 12px; }
+.carousel-arrow:hover { transform: translateY(-50%) scale(1.05); }
+.carousel-indicator { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,.58); color: #fff; padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+</style>
+@endpush
+
 @section('content')
 <div class="wrap">
   @include('partials.navbar')
@@ -10,21 +24,51 @@
     <div class="cs">
       <h2>{{ $listing->street }}</h2>
 
+      @php
+        // Get photos from the images relationship (this is the correct way)
+        $images = $listing->images;
+        
+        // Create gallery using direct file serving route
+        $gallery = $images->map(function($image) {
+            $filename = basename($image->path);
+            return url('/photos/' . $filename);
+        })->values()->all();
+        
+        // Debug: Show raw data for troubleshooting
+        $rawImages = $listing->images->toArray();
+        
+        // Debug: Log gallery paths
+        // Uncomment the line below for debugging
+        @php logger()->info('Gallery paths for listing ' . $listing->id . ': ' . json_encode($gallery)); @endphp
+        
+        <!-- Temporary debug to see URLs -->
+        <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
+          <strong>Generated URLs:</strong><br>
+          @foreach($gallery as $url)
+            {{ $url }}<br>
+          @endforeach
+        </div>
+        
       <!-- Image Carousel -->
       <div class="carousel" style="margin-bottom: 1rem;">
-        <div class="carousel-inner">
-          @if($listing->photos)
-            @foreach($listing->photos as $photo)
+        <div class="carousel-inner" id="listing-carousel-inner">
+          @forelse($gallery as $photo)
             <div class="carousel-slide">
-              <img src="{{ asset('storage/' . $photo) }}" alt="Dorm image">
+              <img src="{{ $photo }}" alt="Dorm image">
             </div>
-            @endforeach
-          @else
+          @empty
             <div class="carousel-slide">
               <img src="https://via.placeholder.com/400x200?text=Dorm+Image" alt="Dorm image">
             </div>
-          @endif
+          @endforelse
         </div>
+
+        @if(count($gallery) > 1)
+          <button type="button" class="carousel-arrow prev" id="carousel-prev">‹</button>
+          <button type="button" class="carousel-arrow next" id="carousel-next">›</button>
+        @endif
+
+        <div class="carousel-indicator" id="carousel-indicator">1 / {{ count($gallery) ?: 1 }}</div>
       </div>
 
       <!-- Price and Type -->
@@ -69,7 +113,7 @@
       <div class="inc-box" style="margin-bottom: 1rem;">
         <div class="inc-ttl">House Rules</div>
         <div class="inc-grid">
-          <div class="inc-i">🕐 Curfew: {{ $dorm->curfew }}</div>
+          <div class="inc-i">🕐 Curfew: {{ $listing->curfew }}</div>
         </div>
       </div>
       @endif
@@ -131,6 +175,47 @@ function scheduleVisit(dormId) {
     }).then(() => alert('Visit scheduled!'));
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const inner = document.getElementById('listing-carousel-inner');
+  const prevBtn = document.getElementById('carousel-prev');
+  const nextBtn = document.getElementById('carousel-next');
+  const indicator = document.getElementById('carousel-indicator');
+  if (!inner) return;
+
+  const slides = inner.querySelectorAll('.carousel-slide');
+  const total = slides.length;
+  let index = 0;
+
+  function updateCarousel() {
+    inner.style.transform = `translateX(-${index * 100}%)`;
+    if (indicator) {
+      indicator.textContent = `${index + 1} / ${total}`;
+    }
+    if (prevBtn) {
+      prevBtn.style.display = total > 1 ? 'flex' : 'none';
+    }
+    if (nextBtn) {
+      nextBtn.style.display = total > 1 ? 'flex' : 'none';
+    }
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function() {
+      index = (index - 1 + total) % total;
+      updateCarousel();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function() {
+      index = (index + 1) % total;
+      updateCarousel();
+    });
+  }
+
+  updateCarousel();
+});
 </script>
 @endpush
 
