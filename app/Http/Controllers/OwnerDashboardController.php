@@ -17,7 +17,7 @@ class OwnerDashboardController extends Controller
 
         // 🏠 Listings
         $listings = DormListing::where('owner_id', $owner->id)->get();
-        $activeListings = $listings->where('status', 'available')->count();
+        $activeListings = $listings->where('status', 'Available')->count();
 
         // ⭐ Rating
         $avgRating = Review::whereIn('dorm_listing_id', $listings->pluck('id'))

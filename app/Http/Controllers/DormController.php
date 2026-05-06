@@ -77,7 +77,7 @@ class DormController extends Controller
     {
         $listing = DormListing::with(['images', 'reviews.user'])->findOrFail($id);
 
-        return view('dorms.show', compact('listing'));
+        return view('student.dorms.show', compact('listing'));
     }
 
     public function toggleSave(Request $request, $id)
@@ -229,11 +229,14 @@ class DormController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
 
-            'status' => 'available',
+            'status' => 'Available',
         ]);
 
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $i => $file) {
+                if (!$file || !$file->isValid()) {
+                    continue; // Skip invalid files
+                }
                 $path = $file->store('dorms', 'public');
 
                 DormListingImage::create([
@@ -255,7 +258,7 @@ class DormController extends Controller
     */
     public function indexStudent()
     {
-        $dormListings = DormListing::where('status', 'available')
+        $dormListings = DormListing::where('status', 'Available')
             ->with(['owner', 'images'])
             ->latest()
             ->get();
@@ -291,7 +294,7 @@ class DormController extends Controller
     */
     public function index()
     {
-        $dormListings = DormListing::where('status', 'available')
+        $dormListings = DormListing::where('status', 'Available')
             ->with(['owner', 'images'])
             ->latest()
             ->get();
@@ -326,7 +329,7 @@ class DormController extends Controller
 
         return view('dorms.index', [
             'dormListings' => $query
-                ->where('status', 'available')
+                ->where('status', 'Available')
                 ->latest()
                 ->get()
         ]);
@@ -380,7 +383,7 @@ class DormController extends Controller
     public function map()
     {
         return view('student.dorms.map', [
-            'dormListings' => DormListing::where('status', 'available')
+            'dormListings' => DormListing::where('status', 'Available')
                 ->with(['owner', 'images'])
                 ->get()
         ]);
