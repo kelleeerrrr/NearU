@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-<title>@yield('title', 'Owner Dashboard — NearU')</title>
+<title>@yield('title', 'Owner Dashboard')</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
 
@@ -18,7 +18,7 @@
 }
 
 :root{
-  --bg:#F0F7F2;
+  --bg:var(--green);
   --surface:#fff;
 
   --t1:#141F14;
@@ -35,11 +35,28 @@
   --sh:0 2px 14px rgba(45,125,79,.08);
 }
 
+/* ── DARK MODE ── */
+body.dark {
+  --bg:       #0a1410;
+  --surface:  #1a2a1f;
+  --card:     #243429;
+  --t1:       #dfeee4;
+  --t2:       #6a8a72;
+  --border:   #2e4034;
+  --green-lt: #0d2219;
+  --gold-lt:  #1a1500;
+  --blue-lt:  #0d1826;
+  --red-lt:   #1a050a;
+}
+
 body{
   font-family:'DM Sans',sans-serif;
   background:var(--bg);
   color:var(--t1);
+  position: relative;
+  transition: background .3s, color .3s;
 }
+
 
 .wrap{
   max-width:480px;
@@ -73,52 +90,61 @@ body{
 /* BOTTOM NAV */
 .bot-nav{
   position:fixed;
-  bottom:0;
+  bottom:20px;
   left:50%;
   transform:translateX(-50%);
-  width:100%;
-  max-width:480px;
-  background:#fff;
+  width:calc(100% - 40px);
+  max-width:440px;
+  background: rgba(255, 251, 235, 0.9);
+  backdrop-filter:blur(10px);
+  border-radius:25px;
   display:flex;
   justify-content:space-around;
-  padding:.6rem 0;
-  border-top:2px solid var(--gold);
-  box-shadow:0 -6px 20px rgba(0,0,0,.08);
-  z-index:100;
+  padding:8px 16px;
+  z-index:1500;
+  box-shadow:0 4px 20px rgba(242, 183, 5, 0.25);
+  border:2px solid #F2B705;
+}
+
+body.dark .bot-nav{
+  background: rgba(45, 35, 20, 0.9);
+  border:2px solid rgba(242, 183, 5, 0.5);
+  box-shadow:0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .nav-i{
   text-decoration:none;
-  color:var(--t2);
+  color:var(--t1);
   font-size:.7rem;
   font-weight:700;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:.15rem;
-  position:relative;
-  padding:.3rem .7rem;
+  gap:.2rem;
+  padding:8px 12px;
   border-radius:14px;
+  transition:all 0.2s ease;
 }
 
 .nav-i span{
   font-size:1.25rem;
+  transition:transform .2s;
 }
 
 .nav-i.active{
-  color:var(--gold-dk);
+  color:var(--t1);
+  background:rgba(255, 255, 255, 0.3);
 }
 
-.nav-i.active::before{
-  content:'';
-  position:absolute;
-  top:-4px;
-  width:42px;
-  height:42px;
-  background:var(--gold-lt);
-  border-radius:12px;
-  z-index:-1;
+.nav-i.active span{
+  transform:scale(1.15);
 }
+
+.nav-i:hover:not(.active){
+  color:var(--t1);
+  transform:translateY(-2px);
+}
+
 </style>
 
 @stack('styles')
@@ -173,6 +199,23 @@ body{
   </a>
 
 </div>
+
+  {{-- Global JS helpers (dark mode) --}}
+  <script>
+    // ── Dark mode: restore saved preference ──────────────────
+    if (localStorage.getItem('dm') === 'true') {
+      document.body.classList.add('dark');
+    }
+
+    // ── Dark mode toggle (called from owner account toggle) ─────────
+    window.toggleDark = function() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('dm', document.body.classList.contains('dark'));
+    };
+
+    // ── CSRF token for fetch() calls ─────────────────────────
+    window.csrfToken = '{{ csrf_token() }}';
+  </script>
 
 </body>
 </html>
