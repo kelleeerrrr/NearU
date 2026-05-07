@@ -22,10 +22,103 @@
 .enhanced-price { font-size: 1.8rem; font-weight: 800; color: #2D7D4F; }
 .enhanced-price small { font-size: 0.9rem; opacity: 0.8; }
 
+.price-type.inc-box { 
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  padding: 1.2rem; 
+  border-radius: 14px; 
+  margin-bottom: 1rem; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  border: 1px solid #e9ecef;
+}
+
+.inc-ttl { 
+  font-size: 1.1rem; 
+  font-weight: 700; 
+  margin-bottom: 0.5rem; 
+  color: #2D7D4F;
+  text-shadow: 0 2px 4px rgba(45, 125, 79, 0.1);
+}
+
+.inc-grid { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 0.5rem; 
+  margin-bottom: 1.5rem; 
+}
+
+.inc-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.inc-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.inc-icon { 
+  font-size: 1.2rem; 
+  color: #2D7D4F;
+}
+
+.inc-text { 
+  font-size: 0.9rem; 
+  color: var(--t1);
+  font-weight: 500;
+}
+
 .metas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
 .mpill { padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; transition: all 0.2s ease; }
 .mpill:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 .mpill.ok { background: linear-gradient(135deg, #2D7D4F, #4a9d6a); color: white; border: none; }
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-decoration: none;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.btn-green {
+  background: linear-gradient(135deg, #2D7D4F, #1f5c38);
+  color: white;
+  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.2);
+}
+
+.btn-blue {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
 </style>
 @endpush
 
@@ -51,10 +144,9 @@
       @php
         $images = $listing->images ?? collect([]);
         
-        // Create gallery using direct file serving route
+        // Create gallery using proper storage path
         $gallery = $images->map(function($image) {
-            $filename = basename($image->path);
-            return url('/photos/' . $filename);
+            return asset('storage/' . $image->path);
         })->values()->all();
       @endphp
 
@@ -104,14 +196,37 @@
       <div class="inc-box" style="margin-bottom: 1rem;">
         <div class="inc-ttl">What's Included</div>
         <div class="inc-grid">
-          @if($listing->furnishings)
-          <div class="inc-i">🛋️ {{ $listing->furnishings }}</div>
+          @if($listing->furnishings && is_iterable($listing->furnishings))
+            @foreach($listing->furnishings as $furnishing)
+              @if(!empty($furnishing))
+              <div class="inc-item">
+                <span class="inc-icon">🛋️</span>
+                <span class="inc-text">{{ $furnishing }}</span>
+              </div>
+              @endif
+            @endforeach
           @endif
-          @if($listing->appliances)
-          <div class="inc-i">🔌 {{ $listing->appliances }}</div>
+          
+          @if($listing->appliances && is_iterable($listing->appliances))
+            @foreach($listing->appliances as $appliance)
+              @if(!empty($appliance))
+              <div class="inc-item">
+                <span class="inc-icon">🔌</span>
+                <span class="inc-text">{{ $appliance }}</span>
+              </div>
+              @endif
+            @endforeach
           @endif
-          @if($listing->bills_included)
-          <div class="inc-i">💡 {{ $listing->bills_included }}</div>
+          
+          @if($listing->bills_included && is_iterable($listing->bills_included))
+            @foreach($listing->bills_included as $bill)
+              @if(!empty($bill))
+              <div class="inc-item">
+                <span class="inc-icon">💡</span>
+                <span class="inc-text">{{ $bill }}</span>
+              </div>
+              @endif
+            @endforeach
           @endif
         </div>
       </div>
@@ -136,22 +251,11 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="btn-row" style="margin-bottom: 1rem;">
+      <div class="btn-row" style="margin-bottom: 5rem;">
         @auth
-        <button class="btn btn-out" onclick="toggleSave({{ $listing->id }})">
-          @if(auth()->user()->savedListings()->where('dorm_listing_id', $listing->id)->exists())
-            ❤️ Saved
-          @else
-            🤍 Save
-          @endif
-        </button>
-        <button class="btn btn-green" onclick="scheduleVisit({{ $listing->id }})">📅 Schedule Visit</button>
+        <a href="{{ route('messages.show', [$listing->id, $listing->owner->id]) }}" class="btn btn-blue btn-full">💬 Message Owner</a>
         @endauth
       </div>
-
-      @auth
-      <a href="{{ route('messages.show', [$listing->id, $listing->owner->id]) }}" class="btn btn-blue btn-full">💬 Message Owner</a>
-      @endauth
     </div>
   </div>
 
@@ -164,27 +268,74 @@
 
 @push('scripts')
 <script>
-function toggleSave(dormId) {
-  fetch(`/dorms/${dormId}/save`, {
-    method: 'POST',
-    headers: {
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-    },
-  }).then(() => location.reload());
-}
+
+const Schedule = {
+  _selectedTime: null,
+  _dormId: null,
+
+  open(dormId, street, type, price, owner) {
+    this._dormId = dormId;
+    this._selectedTime = null;
+    document.querySelectorAll('.tslot').forEach(b => b.classList.remove('sel'));
+    document.getElementById('schedDormId').value = dormId;
+    document.getElementById('vNotes').value      = '';
+    document.getElementById('vDate').value       = '';
+    document.getElementById('schedInfo').innerHTML =
+      `<strong>${street}</strong> — ${type}<br>
+       <span style="color:var(--t2);">₱${Number(price).toLocaleString()}/mo · 👤 ${owner || 'Owner'}</span>`;
+    document.getElementById('schedModal').classList.add('active');
+  },
+
+  selTime(el) {
+    document.querySelectorAll('.tslot').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+    this._selectedTime = el.textContent.trim();
+  },
+
+  submit() {
+    const dt    = document.getElementById('vDate').value;
+    const notes = document.getElementById('vNotes').value;
+    if (!dt)                 { showToast('⚠️ Select a date', 'warn');      return; }
+    if (!this._selectedTime) { showToast('⚠️ Select a time slot', 'warn'); return; }
+
+    fetch('/visits', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':window.csrfToken },
+      body: JSON.stringify({ dorm_listing_id:this._dormId, visit_date:dt, visit_time:this._selectedTime, notes }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('schedModal').classList.remove('active');
+        showToast(`✅ Visit confirmed — ${dt} at ${this._selectedTime}!`, 'ok');
+      } else {
+        showToast('⚠️ ' + (data.message || 'Could not schedule'), 'warn');
+      }
+    })
+    .catch(() => showToast('⚠️ Could not schedule visit', 'warn'));
+  },
+};
 
 function scheduleVisit(dormId) {
   const date = prompt('Enter visit date (YYYY-MM-DD):');
   const time = prompt('Enter visit time (HH:MM):');
   if (date && time) {
-    fetch(`/dorms/${dormId}/schedule-visit`, {
+    fetch('/visits', {
       method: 'POST',
       headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': window.csrfToken
       },
-      body: `visit_date=${date}&visit_time=${time}`
-    }).then(() => alert('Visit scheduled!'));
+      body: JSON.stringify({ dorm_listing_id: dormId, visit_date: date, visit_time: time, notes: '' })
+    }).then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        showToast(`✅ Visit confirmed — ${date} at ${time}!`, 'ok');
+      } else {
+        showToast('⚠️ ' + (data.message || 'Could not schedule'), 'warn');
+      }
+    })
+    .catch(() => showToast('⚠️ Could not schedule visit', 'warn'));
   }
 }
 

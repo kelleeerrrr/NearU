@@ -32,6 +32,9 @@ class DormListing extends Model
         'longitude' => 'decimal:8',
         'wifi_included' => 'boolean',
         'pets_allowed' => 'boolean',
+        'furnishings' => 'array',
+        'appliances' => 'array',
+        'bills_included' => 'array',
     ];
 
     // OWNER
