@@ -14,21 +14,23 @@
       </div>
 
       <div class="stats-overview">
-        <div class="stat-card">
-          <div class="stat-number">{{ $totalUsers }}</div>
-          <div class="stat-label">Total Users</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ $students }}</div>
-          <div class="stat-label">Students</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ $owners }}</div>
-          <div class="stat-label">Owners</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ $userTypeDistribution['admins'] }}</div>
-          <div class="stat-label">Admins</div>
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-number">{{ $totalUsers }}</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ $students }}</div>
+            <div class="stat-label">Students</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ $userTypeDistribution['admins'] }}</div>
+            <div class="stat-label">Admins</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ $owners }}</div>
+            <div class="stat-label">Owners</div>
+          </div>
         </div>
       </div>
 
@@ -112,22 +114,34 @@
 
 .stats-overview {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-overview:first-child {
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-overview:last-child {
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .stat-card {
   background: white;
   border: 2px solid #2D7D4F;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem;
   text-align: center;
   box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1);
 }
 
 .stat-number {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #2D7D4F;
   margin-bottom: 0.5rem;
@@ -141,19 +155,19 @@
 }
 
 .charts-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .chart-card {
   background: white;
   border: 2px solid #2D7D4F;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1);
 }
 
 .chart-card h3 {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.75rem 0;
   color: #374151;
 }
 
@@ -161,7 +175,7 @@
   background: #f8fafc;
   border: 2px dashed #e5e7eb;
   border-radius: 8px;
-  padding: 2rem;
+  padding: 1.5rem;
   text-align: center;
   color: #6b7280;
 }

@@ -59,6 +59,11 @@ class ReportController extends Controller
             'admins' => User::where('user_type', 'admin')->count(),
         ];
 
+        // Listings statistics
+        $totalListings = DormListing::whereDate('created_at', '>=', $dateFrom)
+                                ->whereDate('created_at', '<=', $dateTo)
+                                ->count();
+
         // Verification status distribution for owners
         $verificationDistribution = User::where('user_type', 'owner')
             ->selectRaw('verification_status, COUNT(*) as count')
@@ -69,7 +74,7 @@ class ReportController extends Controller
         return view('admin.reports.users', compact(
             'totalUsers', 'students', 'owners', 'verifiedOwners',
             'recentUsers', 'userGrowth', 'monthlyStats',
-            'userTypeDistribution', 'verificationDistribution',
+            'userTypeDistribution', 'totalListings', 'verificationDistribution',
             'dateFrom', 'dateTo'
         ));
     }
@@ -196,6 +201,24 @@ class ReportController extends Controller
             'visits_month' => VisitSchedule::where('created_at', '>=', $thisMonth)->count(),
         ];
 
+        // Additional activity statistics
+        $completedVisits = VisitSchedule::where('created_at', '>=', $dateFrom)
+                                ->where('created_at', '<=', $dateTo)
+                                ->where('status', 'completed')
+                                ->count();
+        $totalNotifications = \App\Models\Notification::count();
+        $messagesThisMonth = Message::where('created_at', '>=', $thisMonth)->count();
+        $messagesThisWeek = Message::where('created_at', '>=', $thisWeek)->count();
+        $visitsThisMonth = VisitSchedule::where('created_at', '>=', $thisMonth)->count();
+        $pendingVisits = VisitSchedule::where('created_at', '>=', $dateFrom)
+                                ->where('created_at', '<=', $dateTo)
+                                ->where('status', 'pending')
+                                ->count();
+        $cancelledVisits = VisitSchedule::where('created_at', '>=', $dateFrom)
+                                ->where('created_at', '<=', $dateTo)
+                                ->where('status', 'cancelled')
+                                ->count();
+
         // Recent activity within date range
         $recentUsers = User::whereDate('created_at', '>=', $dateFrom)
             ->whereDate('created_at', '<=', $dateTo)
@@ -267,7 +290,7 @@ class ReportController extends Controller
             ->values();
 
         // Hourly activity for charts
-        $hourlyActivity = Message::selectRaw('HOUR(created_at) as hour, COUNT(*) as count')
+        $hourlyActivity = Message::selectRaw('EXTRACT(HOUR FROM created_at) as hour, COUNT(*) as count')
             ->whereDate('created_at', '>=', $dateFrom)
             ->whereDate('created_at', '<=', $dateTo)
             ->groupBy('hour')
@@ -275,7 +298,9 @@ class ReportController extends Controller
             ->get();
 
         return view('admin.reports.activity', compact(
-            'stats', 'recentActivity', 'hourlyActivity', 'dateFrom', 'dateTo'
+            'stats', 'recentActivity', 'hourlyActivity',
+            'completedVisits', 'totalNotifications', 'messagesThisMonth', 'messagesThisWeek',
+            'visitsThisMonth', 'pendingVisits', 'cancelledVisits', 'dateFrom', 'dateTo'
         ));
     }
 

@@ -117,6 +117,7 @@
   box-shadow: 0 2px 8px rgba(45, 125, 79, 0.3);
   transition: all 0.2s;
   white-space: nowrap;
+  margin-left: auto;
 }
 
 .btn-back:hover {

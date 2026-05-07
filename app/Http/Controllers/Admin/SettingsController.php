@@ -80,13 +80,20 @@ class SettingsController extends Controller
 
     public function storage()
     {
+        // Calculate only application storage usage
+        $profilePhotosSize = $this->getDirectorySize('profile_photos');
+        $dormPhotosSize = $this->getDirectorySize('dorms');
+        $verificationDocsSize = $this->getDirectorySize('verifications');
+        
         $storageInfo = [
-            'total_space' => disk_total_space('/'),
-            'free_space' => disk_free_space('/'),
-            'used_space' => disk_total_space('/') - disk_free_space('/'),
+            'total_space' => $profilePhotosSize + $dormPhotosSize + $verificationDocsSize,
+            'used_space' => $profilePhotosSize + $dormPhotosSize + $verificationDocsSize,
+            'free_space' => 0, // Not applicable for app storage
         ];
 
-        $storageInfo['usage_percentage'] = ($storageInfo['used_space'] / $storageInfo['total_space']) * 100;
+        $storageInfo['usage_percentage'] = $storageInfo['total_space'] > 0 
+            ? ($storageInfo['used_space'] / $storageInfo['total_space']) * 100 
+            : 0;
 
         // Get file counts and sizes in storage directories
         $profilePhotos = Storage::disk('public')->allFiles('profile_photos');
@@ -116,7 +123,7 @@ class SettingsController extends Controller
             
             foreach ($files as $file) {
                 try {
-                    $fileSize = Storage::disk('public')->size($directory . '/' . $file);
+                    $fileSize = Storage::disk('public')->size($file);
                     $size += $fileSize;
                 } catch (\Exception $e) {
                     // Skip files that can't be sized

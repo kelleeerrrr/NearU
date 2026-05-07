@@ -15,11 +15,11 @@
 
       <div class="stats-overview">
         <div class="stat-card">
-          <div class="stat-number">{{ $totalMessages }}</div>
+          <div class="stat-number">{{ $stats['messages_month'] ?? 0 }}</div>
           <div class="stat-label">Total Messages</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number">{{ $totalVisits }}</div>
+          <div class="stat-number">{{ $stats['visits_month'] ?? 0 }}</div>
           <div class="stat-label">Total Visits</div>
         </div>
         <div class="stat-card">
@@ -48,7 +48,7 @@
         </div>
 
         <div class="detail-section">
-          <h3>📅 Visit Statistics</h3>
+          <h3>� Visit Activity</h3>
           <div class="activity-stats">
             <div class="activity-item">
               <span class="activity-label">Visits This Month:</span>
@@ -64,6 +64,14 @@
             </div>
           </div>
         </div>
+
+        <div class="chart-card">
+          <h3>📊 Hourly Activity</h3>
+          <div class="chart-placeholder">
+            <p>Activity distribution throughout the day</p>
+            <small>Chart integration would go here</small>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -74,7 +82,7 @@
 
 @push('styles')
 <style>
-.page-header { margin-bottom: 1.5rem; }
+.page-header { margin-bottom: 1rem; }
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -100,13 +108,13 @@
   box-shadow: 0 4px 12px rgba(45, 125, 79, 0.4);
   text-decoration: none;
 }
-.stats-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-.stat-card { background: white; border: 2px solid #2D7D4F; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1); }
-.stat-number { font-size: 2rem; font-weight: 800; color: #2D7D4F; margin-bottom: 0.5rem; }
+.stats-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card { background: white; border: 2px solid #2D7D4F; border-radius: 12px; padding: 1rem; text-align: center; box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1); }
+.stat-number { font-size: 1.8rem; font-weight: 800; color: #2D7D4F; margin-bottom: 0.5rem; }
 .stat-label { color: #6b7280; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; }
-.detailed-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-.detail-section { background: white; border: 2px solid #2D7D4F; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1); }
-.detail-section h3 { margin: 0 0 1rem 0; color: #374151; }
+.detailed-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.detail-section { background: white; border: 2px solid #2D7D4F; border-radius: 12px; padding: 1rem; box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1); }
+.detail-section h3 { margin: 0 0 0.75rem 0; color: #374151; }
 .activity-stats { display: flex; flex-direction: column; gap: 0.75rem; }
 .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f8fafc; border-radius: 8px; border: 1px solid #e5e7eb; }
 .activity-label { color: #6b7280; font-weight: 600; }

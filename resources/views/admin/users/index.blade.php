@@ -83,11 +83,36 @@
 
 @push('styles')
 <style>
+/* Override mobile layout for admin users page */
+.wrap,
+.screen,
+.screen.active,
+.cs {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.wrap {
+  max-width: 900px !important;
+  width: 100% !important;
+}
+
 .users-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0.5rem;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(320px, 1fr)) !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  align-items: stretch;
+}
+
+.user-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+
+.user-info {
+  min-width: 0;
 }
 
 .user-card {
@@ -475,6 +500,8 @@
   box-shadow: 0 4px 12px rgba(45, 125, 79, 0.4);
 }
 </style>
+@endpush
+
 @push('scripts')
 <script>
 function filterByCategory() {
@@ -497,6 +524,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (category) {
     document.getElementById('categoryFilter').value = category;
   }
+  
 });
 </script>
 @endpush
