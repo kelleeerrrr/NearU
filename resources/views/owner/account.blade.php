@@ -36,6 +36,19 @@
   border:1.5px solid var(--border);
 }
 
+.green-btn{
+  background:transparent;
+  color:var(--green);
+  border:1.5px solid var(--green);
+  transition:all 0.2s ease;
+}
+
+.green-btn:hover{
+  background:var(--green);
+  color:#fff;
+  transform:translateY(-1px);
+}
+
 body.dark .back-btn{
   background:var(--green);
   color:#fff;
@@ -172,7 +185,11 @@ body.dark .back-btn{
   {{-- PROFILE --}}
   <div class="profile-card">
     <div class="avatar">
-      {{ strtoupper(substr($user->name, 0, 1)) }}
+      @if($user->profile_photo_path)
+        <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;">
+      @else
+        {{ strtoupper(substr($user->name, 0, 1)) }}
+      @endif
     </div>
     <div style="margin-bottom: 1rem;">
       <h2>{{ $user->name }}</h2>
@@ -180,6 +197,13 @@ body.dark .back-btn{
       <p>{{ $user->phone ?? 'No phone number' }}</p>
       <span class="badge">🏠 Owner Account</span>
     </div>
+  </div>
+
+  {{-- EDIT PROFILE BUTTON --}}
+  <div class="section">
+    <button class="icon-btn green-btn" style="width: 100%; justify-content: center;" onclick="window.location.href='{{ route('owner.profile.edit') }}'">
+      ✏️ Edit Profile
+    </button>
   </div>
 
   {{-- WARNING --}}

@@ -452,6 +452,46 @@ Route::middleware('auth')->group(function () {
     Route::get('/owner/account', fn () => view('owner.account'))
         ->name('owner.account');
 
+    Route::get('/owner/profile/edit', fn () => view('owner.edit', ['user' => auth()->user()]))
+        ->name('owner.profile.edit');
+
+    Route::put('/owner/profile', function (Request $request) {
+        $user = auth()->user();
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ]);
+
+        return redirect()->route('owner.account')
+            ->with('success');
+    })->name('owner.profile.update');
+
+    Route::post('/owner/profile/photo', function (Request $request) {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user = auth()->user();
+        
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = 'profile_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('profile_photos', $filename, 'public');
+            
+            $user->update(['profile_photo_path' => 'profile_photos/' . $filename]);
+        }
+
+        return response()->json(['success' => true]);
+    })->name('owner.profile.photo.update');
+
     /*
     |--------------------------------------------------------------------------
     | MESSAGES

@@ -111,24 +111,19 @@
   overflow:hidden;
 }
 
-/* Color variations for different listings */
-.listing-card:nth-child(3n+1){
+/* Color variations based on status */
+.listing-card.status-Available{
   background: linear-gradient(135deg, var(--green) 0%, #1e5a3a 100%);
   border:1px solid var(--green);
 }
 
-.listing-card:nth-child(3n+2){
+.listing-card.status-Unavailable{
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
   border:1px solid #fbbf24;
 }
 
-.listing-card:nth-child(3n+3){
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border:1px solid #3b82f6;
-}
-
 /* Status-based color overlays */
-.listing-card[data-status="available"]::before{
+.listing-card[data-status="Available"]::before{
   content: '';
   position: absolute;
   top: 0;
@@ -138,7 +133,7 @@
   background: linear-gradient(90deg, var(--green), #1e5a3a);
 }
 
-.listing-card[data-status="unavailable"]::before{
+.listing-card[data-status="Unavailable"]::before{
   content: '';
   position: absolute;
   top: 0;
@@ -274,13 +269,13 @@
         All
     </a>
 
-    <a href="{{ route('owner.listings.index', ['status' => 'available']) }}"
-       class="{{ $statusFilter === 'available' ? 'active' : '' }}">
+    <a href="{{ route('owner.listings.index', ['status' => 'Available']) }}"
+       class="{{ $statusFilter === 'Available' ? 'active' : '' }}">
         Available
     </a>
 
-    <a href="{{ route('owner.listings.index', ['status' => 'unavailable']) }}"
-       class="{{ $statusFilter === 'unavailable' ? 'active' : '' }}">
+    <a href="{{ route('owner.listings.index', ['status' => 'Unavailable']) }}"
+       class="{{ $statusFilter === 'Unavailable' ? 'active' : '' }}">
         Unavailable
     </a>
 
@@ -289,7 +284,7 @@
 {{-- LISTINGS --}}
 @forelse($dormListings as $listing)
 
-<div class="listing-card" data-status="{{ $listing->status }}">
+<div class="listing-card status-{{ $listing->status }}" data-status="{{ $listing->status }}">
 
     <div style="font-weight:800;">
         {{ $listing->street }}
