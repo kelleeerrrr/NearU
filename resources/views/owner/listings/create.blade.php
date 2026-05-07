@@ -439,9 +439,9 @@ input[readonly]:focus { border-color: var(--border); box-shadow: none; }
 
     <div class="sub-label">Bills Included</div>
     <div class="pill-group">
-      <label class="pill-label"><input type="checkbox" name="bills[]" value="Electricity"><span>⚡ Electricity</span></label>
-      <label class="pill-label"><input type="checkbox" name="bills[]" value="Water"><span>💧 Water</span></label>
-      <label class="pill-label"><input type="checkbox" name="bills[]" value="WiFi"><span>📶 WiFi</span></label>
+      <label class="pill-label"><input type="checkbox" name="bills_included[]" value="Electricity"><span>⚡ Electricity</span></label>
+      <label class="pill-label"><input type="checkbox" name="bills_included[]" value="Water"><span>💧 Water</span></label>
+      <label class="pill-label"><input type="checkbox" name="bills_included[]" value="WiFi"><span>📶 WiFi</span></label>
     </div>
 
   </div>

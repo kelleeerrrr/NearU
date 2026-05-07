@@ -175,23 +175,35 @@
               <div class="inc-ttl">Inclusions</div>
               <div class="inc-grid">
                 @if($dorm->bathroom)       <div class="inc-i">🚿 {{ $dorm->bathroom }}</div> @endif
-                @if($dorm->furnishings && is_iterable($dorm->furnishings))
-                  @foreach(array_slice($dorm->furnishings, 0, 2) as $furnishing)
+                @if($dorm->furnishings)
+                  @php
+                    $furnishings = is_array($dorm->furnishings) ? $dorm->furnishings : (json_decode($dorm->furnishings, true) ?: []);
+                    $displayFurnishings = array_slice($furnishings, 0, 2);
+                  @endphp
+                  @foreach($displayFurnishings as $furnishing)
                     @if(!empty($furnishing)) <div class="inc-i">🛏️ {{ Str::limit($furnishing, 15) }}</div> @endif
                   @endforeach
-                  @if(count($dorm->furnishings) > 2) <div class="inc-i">🛏️ +{{ count($dorm->furnishings) - 2 }} more</div> @endif
+                  @if(count($furnishings) > 2) <div class="inc-i">🛏️ +{{ count($furnishings) - 2 }} more</div> @endif
                 @endif
-                @if($dorm->appliances && is_iterable($dorm->appliances))
-                  @foreach(array_slice($dorm->appliances, 0, 2) as $appliance)
+                @if($dorm->appliances)
+                  @php
+                    $appliances = is_array($dorm->appliances) ? $dorm->appliances : (json_decode($dorm->appliances, true) ?: []);
+                    $displayAppliances = array_slice($appliances, 0, 2);
+                  @endphp
+                  @foreach($displayAppliances as $appliance)
                     @if(!empty($appliance)) <div class="inc-i">🔌 {{ Str::limit($appliance, 15) }}</div> @endif
                   @endforeach
-                  @if(count($dorm->appliances) > 2) <div class="inc-i">🔌 +{{ count($dorm->appliances) - 2 }} more</div> @endif
+                  @if(count($appliances) > 2) <div class="inc-i">🔌 +{{ count($appliances) - 2 }} more</div> @endif
                 @endif
-                @if($dorm->bills_included && is_iterable($dorm->bills_included))
-                  @foreach(array_slice($dorm->bills_included, 0, 2) as $bill)
+                @if($dorm->bills_included)
+                  @php
+                    $bills = is_array($dorm->bills_included) ? $dorm->bills_included : (json_decode($dorm->bills_included, true) ?: []);
+                    $displayBills = array_slice($bills, 0, 2);
+                  @endphp
+                  @foreach($displayBills as $bill)
                     @if(!empty($bill)) <div class="inc-i">💡 {{ Str::limit($bill, 15) }}</div> @endif
                   @endforeach
-                  @if(count($dorm->bills_included) > 2) <div class="inc-i">💡 +{{ count($dorm->bills_included) - 2 }} more</div> @endif
+                  @if(count($bills) > 2) <div class="inc-i">💡 +{{ count($bills) - 2 }} more</div> @endif
                 @endif
                 @if($dorm->curfew)         <div class="inc-i">🕐 {{ $dorm->curfew }}</div> @endif
               </div>

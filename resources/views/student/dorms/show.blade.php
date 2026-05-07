@@ -196,8 +196,11 @@
       <div class="inc-box" style="margin-bottom: 1rem;">
         <div class="inc-ttl">What's Included</div>
         <div class="inc-grid">
-          @if($listing->furnishings && is_iterable($listing->furnishings))
-            @foreach($listing->furnishings as $furnishing)
+          @if($listing->furnishings)
+            @php
+              $furnishings = is_array($listing->furnishings) ? $listing->furnishings : (json_decode($listing->furnishings, true) ?: []);
+            @endphp
+            @foreach($furnishings as $furnishing)
               @if(!empty($furnishing))
               <div class="inc-item">
                 <span class="inc-icon">🛋️</span>
@@ -207,8 +210,11 @@
             @endforeach
           @endif
           
-          @if($listing->appliances && is_iterable($listing->appliances))
-            @foreach($listing->appliances as $appliance)
+          @if($listing->appliances)
+            @php
+              $appliances = (is_array($listing->appliances)) ? $listing->appliances : ((json_decode($listing->appliances, true)) ?: []);
+            @endphp
+            @foreach($appliances as $appliance)
               @if(!empty($appliance))
               <div class="inc-item">
                 <span class="inc-icon">🔌</span>
@@ -218,8 +224,11 @@
             @endforeach
           @endif
           
-          @if($listing->bills_included && is_iterable($listing->bills_included))
-            @foreach($listing->bills_included as $bill)
+          @if($listing->bills_included)
+            @php
+              $bills = is_array($listing->bills_included) ? $listing->bills_included : (json_decode($listing->bills_included, true) ?: []);
+            @endphp
+            @foreach($bills as $bill)
               @if(!empty($bill))
               <div class="inc-item">
                 <span class="inc-icon">💡</span>
