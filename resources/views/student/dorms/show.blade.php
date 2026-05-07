@@ -14,68 +14,13 @@
 .carousel-arrow:hover { transform: translateY(-50%) scale(1.1); background: #fff; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
 .carousel-indicator { position: absolute; bottom: 16px; right: 16px; background: rgba(45,125,79,0.9); color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; backdrop-filter: blur(10px); }
 
-.listing-header { background: linear-gradient(135deg, #2D7D4F, #4a9d6a); color: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 6px 24px rgba(45,125,79,0.2); }
+.listing-header { background: linear-gradient(135deg, #ffe62a, #ebb540); color: #000; padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 6px 24px rgba(45,125,79,0.2); }
 .listing-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
 .listing-subtitle { opacity: 0.9; font-size: 0.95rem; }
 
 .price-type-row { background: white; padding: 1.2rem; border-radius: 14px; margin-bottom: 1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
 .enhanced-price { font-size: 1.8rem; font-weight: 800; color: #2D7D4F; }
 .enhanced-price small { font-size: 0.9rem; opacity: 0.8; }
-
-.price-type.inc-box { 
-  background: linear-gradient(135deg, #f8f9fa, #ffffff);
-  padding: 1.2rem; 
-  border-radius: 14px; 
-  margin-bottom: 1rem; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  border: 1px solid #e9ecef;
-}
-
-.inc-ttl { 
-  font-size: 1.1rem; 
-  font-weight: 700; 
-  margin-bottom: 0.5rem; 
-  color: #2D7D4F;
-  text-shadow: 0 2px 4px rgba(45, 125, 79, 0.1);
-}
-
-.inc-grid { 
-  display: flex; 
-  flex-wrap: wrap; 
-  gap: 0.5rem; 
-  margin-bottom: 1.5rem; 
-}
-
-.inc-item {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.4rem 0.6rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.2s ease;
-}
-
-.inc-item:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.inc-icon { 
-  font-size: 1.2rem; 
-  color: #2D7D4F;
-}
-
-.inc-text { 
-  font-size: 0.9rem; 
-  color: var(--t1);
-  font-weight: 500;
-}
 
 .metas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
 .mpill { padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; transition: all 0.2s ease; }
@@ -97,6 +42,169 @@
   text-decoration: none;
   min-height: 44px;
   white-space: nowrap;
+}
+
+/* Improved Layout Styles */
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8f9f7, #e8f5e8);
+  border-radius: 16px;
+  border: 1px solid #e8f5e8;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border: 1px solid #d4e8d4;
+  transition: all 0.2s ease;
+}
+
+.detail-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.1);
+}
+
+.detail-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.detail-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2D7D4F;
+}
+
+.info-section, .owner-section {
+  background: linear-gradient(135deg, #f8f9f7, #e8f5e8);
+  border-radius: 16px;
+  padding: 1rem;
+  border: 1px solid #e8f5e8;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #d4e8d4;
+}
+
+.section-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.section-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2D7D4F;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border: 1px solid #d4e8d4;
+}
+
+.rule-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.rule-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2D7D4F;
+}
+
+.owner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.owner-name, .owner-phone {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border: 1px solid #d4e8d4;
+  transition: all 0.2s ease;
+}
+
+.owner-name:hover, .owner-phone:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.1);
+}
+
+.owner-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.owner-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2D7D4F;
+}
+
+/* Inclusions Section Styles */
+.inclusions-section {
+  background: linear-gradient(135deg, #f8f9f7, #e8f5e8);
+  border-radius: 16px;
+  padding: 1rem;
+  border: 1px solid #e8f5e8;
+}
+
+.inclusions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.inclusion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border: 1px solid #d4e8d4;
+  transition: all 0.2s ease;
+}
+
+.inclusion-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.1);
+}
+
+.inclusion-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.inclusion-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2D7D4F;
 }
 
 .btn-green {
@@ -128,11 +236,12 @@
 
   <div class="screen active">
     <div class="cs">
-      <!-- Back Button -->
-      <div style="margin-bottom: 1rem;">
+      <!-- Back Button and Owner Name -->
+      <div style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
         <button class="icon-btn back-btn" onclick="history.back()" style="background: var(--green); color: white; border: none; padding: 0.6rem 1rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
-          ← Back
+          ← Back 
         </button>
+        <h2 style="margin: 0; font-size: 1.6rem; font-weight: 900; color: var(--green); font-family: 'Segoe UI', 'Arial', sans-serif; letter-spacing: 0.5px;">{{ $listing->owner->name }}'s Listings</h2>
       </div>
 
       <!-- Listing Header -->
@@ -179,32 +288,50 @@
       </div>
 
       <!-- Details -->
-      <div class="metas" style="margin-bottom: 1rem;">
-        <div class="mpill">{{ $listing->bathroom }}</div>
-        <div class="mpill">{{ $listing->gender_policy }}</div>
-        <div class="mpill">{{ $listing->walk_minutes }} min walk</div>
+      <div class="details-grid" style="margin-bottom: 1.5rem;">
+        <div class="detail-item">
+          <span class="detail-icon">🚿</span>
+          <span class="detail-text">{{ $listing->bathroom }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-icon">👥</span>
+          <span class="detail-text">{{ $listing->gender_policy }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-icon">🚶</span>
+          <span class="detail-text">{{ $listing->walk_minutes }} min walk</span>
+        </div>
         @if($listing->wifi_included)
-        <div class="mpill ok">WiFi Included</div>
+        <div class="detail-item">
+          <span class="detail-icon">📶</span>
+          <span class="detail-text">WiFi Included</span>
+        </div>
         @endif
         @if($listing->pets_allowed)
-        <div class="mpill">Pets Allowed</div>
+        <div class="detail-item">
+          <span class="detail-icon">🐾</span>
+          <span class="detail-text">Pets Allowed</span>
+        </div>
         @endif
       </div>
 
-      <!-- Includes -->
+      <!-- What's Included -->
       @if($listing->furnishings || $listing->appliances || $listing->bills_included)
-      <div class="inc-box" style="margin-bottom: 1rem;">
-        <div class="inc-ttl">What's Included</div>
-        <div class="inc-grid">
+      <div class="inclusions-section" style="margin-bottom: 1.5rem;">
+        <div class="section-title">
+          <span class="section-icon">📦</span>
+          <span class="section-text">What's Included</span>
+        </div>
+        <div class="inclusions-grid">
           @if($listing->furnishings)
             @php
               $furnishings = is_array($listing->furnishings) ? $listing->furnishings : (json_decode($listing->furnishings, true) ?: []);
             @endphp
             @foreach($furnishings as $furnishing)
               @if(!empty($furnishing))
-              <div class="inc-item">
-                <span class="inc-icon">🛋️</span>
-                <span class="inc-text">{{ $furnishing }}</span>
+              <div class="inclusion-item">
+                <span class="inclusion-icon">🛋️</span>
+                <span class="inclusion-text">{{ $furnishing }}</span>
               </div>
               @endif
             @endforeach
@@ -212,13 +339,13 @@
           
           @if($listing->appliances)
             @php
-              $appliances = (is_array($listing->appliances)) ? $listing->appliances : ((json_decode($listing->appliances, true)) ?: []);
+              $appliances = is_array($listing->appliances) ? $listing->appliances : (json_decode($listing->appliances, true) ?: []);
             @endphp
             @foreach($appliances as $appliance)
               @if(!empty($appliance))
-              <div class="inc-item">
-                <span class="inc-icon">🔌</span>
-                <span class="inc-text">{{ $appliance }}</span>
+              <div class="inclusion-item">
+                <span class="inclusion-icon">🔌</span>
+                <span class="inclusion-text">{{ $appliance }}</span>
               </div>
               @endif
             @endforeach
@@ -230,9 +357,9 @@
             @endphp
             @foreach($bills as $bill)
               @if(!empty($bill))
-              <div class="inc-item">
-                <span class="inc-icon">💡</span>
-                <span class="inc-text">{{ $bill }}</span>
+              <div class="inclusion-item">
+                <span class="inclusion-icon">💡</span>
+                <span class="inclusion-text">{{ $bill }}</span>
               </div>
               @endif
             @endforeach
@@ -243,24 +370,41 @@
 
       <!-- House Rules -->
       @if($listing->curfew)
-      <div class="inc-box" style="margin-bottom: 1rem;">
-        <div class="inc-ttl">House Rules</div>
-        <div class="inc-grid">
-          <div class="inc-i">🕐 Curfew: {{ $listing->curfew }}</div>
+      <div class="info-section" style="margin-bottom: 1.5rem;">
+        <div class="section-title">
+          <span class="section-icon">🕐</span>
+          <span class="section-text">House Rules</span>
+        </div>
+        <div class="rule-item">
+          <span class="rule-icon">🌙</span>
+          <span class="rule-text">Curfew: {{ $listing->curfew }}</span>
         </div>
       </div>
       @endif
 
       <!-- Owner Info -->
-      <div class="owner-chip" style="margin-bottom: 1rem;">
-        👤 Owner: {{ $listing->owner->name }}
-        @if($listing->owner->phone)
-        📞 {{ $listing->owner->phone }}
-        @endif
+      <div class="owner-section" style="margin-bottom: 1.5rem;">
+        <div class="section-title">
+          <span class="section-icon">👤</span>
+          <span class="section-text">Owner Information</span>
+        </div>
+        <div class="owner-info">
+          <div class="owner-name">
+            <span class="owner-icon">👤</span>
+            <span class="owner-text">{{ $listing->owner->name }}</span>
+          </div>
+          @if($listing->owner->phone)
+          <div class="owner-phone">
+            <span class="owner-icon">📞</span>
+            <span class="owner-text">{{ $listing->owner->phone }}</span>
+          </div>
+          @endif
+        </div>
       </div>
 
       <!-- Action Buttons -->
       <div class="btn-row" style="margin-bottom: 5rem;">
+        
         @auth
         <a href="{{ route('messages.show', [$listing->id, $listing->owner->id]) }}" class="btn btn-blue btn-full">💬 Message Owner</a>
         @endauth
@@ -278,73 +422,18 @@
 @push('scripts')
 <script>
 
-const Schedule = {
-  _selectedTime: null,
-  _dormId: null,
-
-  open(dormId, street, type, price, owner) {
-    this._dormId = dormId;
-    this._selectedTime = null;
-    document.querySelectorAll('.tslot').forEach(b => b.classList.remove('sel'));
-    document.getElementById('schedDormId').value = dormId;
-    document.getElementById('vNotes').value      = '';
-    document.getElementById('vDate').value       = '';
-    document.getElementById('schedInfo').innerHTML =
-      `<strong>${street}</strong> — ${type}<br>
-       <span style="color:var(--t2);">₱${Number(price).toLocaleString()}/mo · 👤 ${owner || 'Owner'}</span>`;
-    document.getElementById('schedModal').classList.add('active');
-  },
-
-  selTime(el) {
-    document.querySelectorAll('.tslot').forEach(b => b.classList.remove('sel'));
-    el.classList.add('sel');
-    this._selectedTime = el.textContent.trim();
-  },
-
-  submit() {
-    const dt    = document.getElementById('vDate').value;
-    const notes = document.getElementById('vNotes').value;
-    if (!dt)                 { showToast('⚠️ Select a date', 'warn');      return; }
-    if (!this._selectedTime) { showToast('⚠️ Select a time slot', 'warn'); return; }
-
-    fetch('/visits', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'X-CSRF-TOKEN':window.csrfToken },
-      body: JSON.stringify({ dorm_listing_id:this._dormId, visit_date:dt, visit_time:this._selectedTime, notes }),
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        document.getElementById('schedModal').classList.remove('active');
-        showToast(`✅ Visit confirmed — ${dt} at ${this._selectedTime}!`, 'ok');
-      } else {
-        showToast('⚠️ ' + (data.message || 'Could not schedule'), 'warn');
-      }
-    })
-    .catch(() => showToast('⚠️ Could not schedule visit', 'warn'));
-  },
-};
-
 function scheduleVisit(dormId) {
   const date = prompt('Enter visit date (YYYY-MM-DD):');
   const time = prompt('Enter visit time (HH:MM):');
   if (date && time) {
-    fetch('/visits', {
+    fetch(`/dorms/${dormId}/schedule-visit`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': window.csrfToken
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({ dorm_listing_id: dormId, visit_date: date, visit_time: time, notes: '' })
-    }).then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        showToast(`✅ Visit confirmed — ${date} at ${time}!`, 'ok');
-      } else {
-        showToast('⚠️ ' + (data.message || 'Could not schedule'), 'warn');
-      }
-    })
-    .catch(() => showToast('⚠️ Could not schedule visit', 'warn'));
+      body: `visit_date=${date}&visit_time=${time}`
+    }).then(() => alert('Visit scheduled!'));
   }
 }
 

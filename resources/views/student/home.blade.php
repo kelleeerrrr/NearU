@@ -157,8 +157,7 @@
             @if($dorm->owner)
               <div class="owner-chip" onclick="UI.openOwner({{ $dorm->owner->id }})">
                 <span style="color:var(--green)">✓</span>
-                <span>{{ $dorm->owner->first_name }} {{ $dorm->owner->last_name }}</span>
-                <span style="font-size:.6rem;">VERIFIED OWNER</span>
+                <span>{{ $dorm->owner->name }} {{ $dorm->owner->last_name }}</span>
               </div>
             @endif
 

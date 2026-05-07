@@ -11,6 +11,14 @@
   {{-- ── OWNER PROFILE SCREEN ── --}}
   <div id="ownerProfile" class="screen active">
 
+    {{-- BACK BUTTON AND OWNER NAME --}}
+    <div style="margin-top: .5rem; display: flex; align-items: center; gap: 1rem;">
+      <button class="icon-btn back-btn" onclick="history.back()" style="background: var(--green); color: white; border: none; padding: 0.6rem 1rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
+        ← Back 
+      </button>
+      <h2 style="margin: 0; font-size: 1.6rem; font-weight: 900; color: var(--green); font-family: 'Segoe UI', 'Arial', sans-serif; letter-spacing: 0.5px;">{{ $owner->name }}'s Profile</h2>
+    </div>
+
     {{-- ── OWNER INFO ── --}}
     <div class="cs owner-card">
     <div class="owner-profile">
@@ -99,9 +107,9 @@
 
             {{-- Status/Availability --}}
             <div class="listing-status">
-              <div class="status-badge {{ $listing->status === 'available' ? 'available' : 'occupied' }}">
-                @if($listing->status === 'available')
-                  <span class="material-symbols-outlined">check_circle</span>
+              <div class="status-badge {{ $listing->status === 'Available' ? 'available' : 'occupied' }}">
+                @if($listing->status === 'Available')
+                  <span class="material-symbols-outlined"></span>
                   Available
                 @else
                   Occupied
@@ -209,7 +217,6 @@
 
 /* 🌅 PAGE BACKGROUND */
 .owner-page {
-  background: linear-gradient(180deg, #3dab33 0%, #ffffff 60%);
   min-height: 100vh;
 }
 
@@ -396,7 +403,7 @@ body.dark .review-date {
 }
 
 .listing-card {
-  background: linear-gradient(135deg, #ffd52b, #df1b1b);
+  background: linear-gradient(135deg, #258100, #fffb10);
   border: 1px solid #e9ecef;
   border-radius: 14px;
   overflow: hidden;
@@ -504,11 +511,14 @@ body.dark .more-reviews {
 
 /* OWNER CARD */
 .owner-card {
-  background: white;
+  background: #ffc53d;
   border-radius: var(--rad);
   padding: 1.5rem;
   box-shadow: var(--sh);
   border: 1px solid var(--border);
+  margin-left: 1rem;
+  margin-right:1rem;
+
 }
 
 /* PROFILE */
@@ -585,7 +595,7 @@ body.dark .more-reviews {
 
 /* CARD */
 .owner-listing-card {
-  background: linear-gradient(180deg, #dfb622 0%, #ffffff 60%);
+  background: linear-gradient(180deg, #217238 0%, #ffffff 60%);
   border-radius: 16px;
   padding: 1rem;
   cursor: pointer;

@@ -95,6 +95,7 @@ body.dark {
   border-radius:18px;
   padding:1rem;
   box-shadow:var(--sh);
+
 }
 
 .section-title{
@@ -233,7 +234,7 @@ body.dark {
   </div>
 
   {{-- QUICK LINKS --}}
-  <div class="section">
+  <div class="section" style="margin-bottom: 4.5rem;">
     <div class="section-title">⚡ Quick Links</div>
 
     <div class="menu-item" onclick="window.location.href='/saved'">

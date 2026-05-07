@@ -141,7 +141,6 @@
     display: flex;
     flex-direction: column;
     gap: 1px;
-    
 }
 
 .zoom-btn {

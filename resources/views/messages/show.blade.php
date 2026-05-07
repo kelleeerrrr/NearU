@@ -18,7 +18,7 @@
     border-radius: 18px;
     padding: 1rem;
     border: 1.5px solid var(--border);
-    z-index: 999;
+    z-index: 100;
     box-shadow: var(--sh);
 }
 
@@ -193,7 +193,6 @@ button:hover {
     <div class="screen active">
 
         <div class="page">
-
             <div class="header">
                 <div class="header-info">
                     <div class="header-avatar">{{ strtoupper(substr($otherUser->name, 0, 1)) }}</div>
@@ -206,7 +205,7 @@ button:hover {
             </div>
 
             <div class="chat-container">
-                <div class="chat" id="chatMsgs">
+                <div class="chat">
 
                     @forelse($messages as $msg)
                         <div class="msg {{ $msg->sender_id == auth()->id() ? 'right' : 'left' }}">
