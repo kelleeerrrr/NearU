@@ -16,24 +16,9 @@
   <div class="tb-right">
 
     <!-- NOTIFICATIONS -->
-    <button class="ib"
-        onclick="window.location.href='{{ Route::has('notifications.index') ? route('notifications.index') : url('/notifications') }}'">
-
-      🔔
-
-      <span id="notifBadge" style="
-        position:absolute;
-        top:5px;
-        right:8px;
-        background:red;
-        color:white;
-        font-size:10px;
-        padding:2px 5px;
-        border-radius:50%;
-        display:{{ $unreadCount > 0 ? 'block' : 'none' }};
-      ">{{ $unreadCount }}</span>
-
-    </button>
+    <a href="{{ route('admin.notifications.index') }}" class="ib">
+        🔔
+    </a>
 
   </div>
 

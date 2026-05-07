@@ -28,6 +28,7 @@ class User extends Authenticatable
         'password',
         'profile_photo_path',
         'verification_status', // ✅ already correct
+        'status',
     ];
 
     /**
@@ -92,6 +93,11 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
     public function savedListings()
     {
         return $this->hasMany(SavedListing::class);
@@ -100,6 +106,11 @@ class User extends Authenticatable
     public function visitSchedules()
     {
         return $this->hasMany(VisitSchedule::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 
     /*

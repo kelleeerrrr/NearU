@@ -112,7 +112,7 @@
       min-height: 100vh;
       position: relative;
       padding-top: 60px;
-      padding-bottom: 20px;
+      padding-bottom: 100px;
       overflow-y: auto;
 
       box-shadow: 0 0 1px rgba(0,0,0,0.05),
@@ -301,6 +301,50 @@
     }
     .auth-link a:hover { text-decoration: underline; }
 
+    .back-link {
+      color: #2D7D4F;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background: rgba(45, 125, 79, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .back-link:hover {
+      text-decoration: none;
+      background: rgba(45, 125, 79, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(45, 125, 79, 0.15);
+    }
+
+    .btn-back {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+      padding: 0.5rem 1rem !important;
+      background: #2D7D4F !important;
+      color: #fff !important;
+      border-radius: 20px !important;
+      font-size: 0.75rem !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+      border: 2px solid #2D7D4F !important;
+      box-shadow: 0 2px 8px rgba(45, 125, 79, 0.3) !important;
+      transition: all 0.2s !important;
+      white-space: nowrap;
+    }
+
+    .btn-back:hover {
+      background: rgba(45, 125, 79, 0.8) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(45, 125, 79, 0.4) !important;
+    }
+
     /* Auth alerts */
     .auth-alert {
       border-radius: 12px;
@@ -366,7 +410,7 @@
       transform: translateX(-50%);
       width: calc(100vw - 32px);
       max-width: 398px;
-      background: rgba(255, 251, 235, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border-radius: 25px;
       display: flex;
@@ -674,6 +718,23 @@
     .dark body {
       background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
     }
+
+    /* Admin navigation active states */
+    .action-card {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .action-card.active {
+      background: var(--green) !important;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(45, 125, 79, 0.2);
+    }
+    
+    .action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(45, 125, 79, 0.15);
+    }
   </style>
 </head>
 
@@ -716,6 +777,11 @@
 
   {{-- Per-page scripts --}}
   @stack('scripts')
+  
+  {{-- Admin navigation script --}}
+  @if(request()->is('admin/*'))
+    <script src="{{ asset('js/admin-simple.js') }}" defer></script>
+  @endif
 
 </body>
 </html>

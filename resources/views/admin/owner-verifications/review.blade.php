@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Owner Verifications - Admin')
+@section('title', 'Review Owner Verification - Admin')
 
 @section('content')
 <div class="wrap">
@@ -10,25 +10,24 @@
     <div class="cs">
       <div class="page-header">
         <div class="header-left">
-          <h2>📋 Owner Verifications</h2>
-          <p>Review and manage owner verification requests</p>
+          <h2>🔍 Review Owner Verification</h2>
+          <p>Review owner details and verification documents</p>
         </div>
         <div class="header-right">
-          <a href="{{ route('admin.dashboard') }}" class="btn btn-back">
-            ← Back to Dashboard
+          <a href="{{ route('admin.owner-verifications.index') }}" class="btn btn-back">
+            ← Back to Verifications
           </a>
         </div>
       </div>
 
-  <div class="verifications-list">
-    @foreach($owners as $owner)
-      <div class="verification-card">
-        
+      <div class="review-card">
         <!-- Owner Info -->
         <div class="owner-info">
           <div class="owner-details">
             <h3>{{ $owner->name }}</h3>
             <p class="owner-email">{{ $owner->email }}</p>
+            <p class="owner-phone">{{ $owner->phone ?? 'Not provided' }}</p>
+            <p class="owner-address">{{ $owner->address ?? 'Not provided' }}</p>
           </div>
           
           <!-- Status Badge -->
@@ -45,73 +44,99 @@
 
         <!-- Documents Section -->
         <div class="documents-section">
-          <h4>📁 Documents</h4>
-          <div class="documents-grid">
-            @foreach($owner->verificationDocuments as $doc)
-              <div class="document-item">
-                <div class="doc-type">{{ strtoupper($doc->type) }}</div>
-                <button class="doc-btn" onclick="openDocumentModal('{{ asset('storage/' . $doc->file_path) }}', '{{ strtoupper($doc->type) }}')">
-                  View Document
-                </button>
-              </div>
-            @endforeach
+          <h4>📁 Verification Documents</h4>
+          @if($owner->verificationDocuments->count() > 0)
+            <div class="documents-grid">
+              @foreach($owner->verificationDocuments as $doc)
+                <div class="document-item">
+                  <div class="doc-type">{{ strtoupper($doc->type) }}</div>
+                  <button class="doc-btn" onclick="openDocumentModal('{{ asset('storage/' . $doc->file_path) }}', '{{ strtoupper($doc->type) }}')">
+                    View Document
+                  </button>
+                </div>
+              @endforeach
+            </div>
+          @else
+            <div class="no-documents">
+              <p>No verification documents uploaded.</p>
+            </div>
+          @endif
+        </div>
+
+        <!-- Additional Info -->
+        <div class="additional-info">
+          <h4>📋 Additional Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">User Type:</span>
+              <span class="info-value">{{ ucfirst($owner->user_type) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Created At:</span>
+              <span class="info-value">{{ $owner->created_at->format('M d, Y') }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Last Updated:</span>
+              <span class="info-value">{{ $owner->updated_at->format('M d, Y') }}</span>
+            </div>
           </div>
         </div>
 
         <!-- Actions -->
         <div class="actions-section">
           <div class="action-buttons">
-            <a href="{{ route('admin.owner-verifications.review', $owner->id) }}" class="btn btn-blue">
-              Review Details
-            </a>
-            
-            <form method="POST" action="{{ route('admin.owner-verifications.approve', $owner->id) }}" class="inline-form">
-              @csrf
-              <button type="submit" class="btn btn-green">
-                Approve
-              </button>
-            </form>
-            
-            <form method="POST" action="{{ route('admin.owner-verifications.reject', $owner->id) }}" class="inline-form">
-              @csrf
-              <button type="submit" class="btn btn-red">
-                Reject
-              </button>
-            </form>
+            @if($owner->verification_status === 'under_review')
+              <form method="POST" action="{{ route('admin.owner-verifications.approve', $owner->id) }}" class="inline-form">
+                @csrf
+                <button type="submit" class="btn btn-green" onclick="return confirm('Are you sure you want to approve this owner?')">
+                  ✅ Approve
+                </button>
+              </form>
+              
+              <form method="POST" action="{{ route('admin.owner-verifications.reject', $owner->id) }}" class="inline-form">
+                @csrf
+                <button type="submit" class="btn btn-red" onclick="return confirm('Are you sure you want to reject this owner?')">
+                  ❌ Reject
+                </button>
+              </form>
+            @elseif($owner->verification_status === 'approved')
+              <form method="POST" action="{{ route('admin.owner-verifications.reject', $owner->id) }}" class="inline-form">
+                @csrf
+                <button type="submit" class="btn btn-red" onclick="return confirm('Are you sure you want to reject this approved owner?')">
+                  ❌ Reject
+                </button>
+              </form>
+            @else
+              <form method="POST" action="{{ route('admin.owner-verifications.approve', $owner->id) }}" class="inline-form">
+                @csrf
+                <button type="submit" class="btn btn-green" onclick="return confirm('Are you sure you want to approve this owner?')">
+                  ✅ Approve
+                </button>
+              </form>
+            @endif
           </div>
         </div>
-
       </div>
-    @endforeach
-  </div>
-
-  @if($owners->isEmpty())
-    <div class="empty-state">
-      <div class="empty-icon">📋</div>
-      <h3>No Verification Requests</h3>
-      <p>There are currently no owner verification requests to review.</p>
-    </div>
-  @endif
     </div>
   </div>
 
   <!-- Bottom spacing for floating nav -->
-<div class="bottom-spacer"></div>
+  <div class="bottom-spacer"></div>
 
-<!-- Document Modal -->
-<div id="documentModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="modalTitle">Document Viewer</h3>
-      <button class="modal-close" onclick="closeDocumentModal()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <img id="modalImage" src="" alt="Document" style="max-width: 100%; max-height: 65vh; object-fit: contain; display: block; margin: 0 auto;">
+  <!-- Document Modal -->
+  <div id="documentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Document Viewer</h3>
+        <button class="modal-close" onclick="closeDocumentModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" src="" alt="Document" style="max-width: 100%; max-height: 65vh; object-fit: contain; display: block; margin: 0 auto;">
+      </div>
     </div>
   </div>
-</div>
 
-@include('partials.footer')
+  @include('partials.footer')
 </div>
 @endsection
 
@@ -149,9 +174,6 @@ document.addEventListener('keydown', function(event) {
   }
 });
 </script>
-@endpush
-
-@push('styles')
 @endpush
 
 @push('styles')
@@ -204,22 +226,16 @@ document.addEventListener('keydown', function(event) {
   color: #fff;
 }
 
-.verifications-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.verification-card {
+.review-card {
   background: #fff;
   border: 2px solid #2D7D4F;
   border-radius: 18px;
-  padding: 1rem;
+  padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.verification-card:hover {
+.review-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(45, 125, 79, 0.15);
 }
@@ -228,21 +244,23 @@ document.addEventListener('keydown', function(event) {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(45, 125, 79, 0.1);
 }
 
 .owner-details h3 {
   font-family: 'Syne', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--t1);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
-.owner-email {
+.owner-details p {
   color: var(--t2);
   font-size: 0.9rem;
-  margin: 0;
+  margin: 0.25rem 0;
 }
 
 .status-badge .badge {
@@ -278,128 +296,36 @@ document.addEventListener('keydown', function(event) {
 }
 
 .documents-section {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .documents-section h4 {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--t1);
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .documents-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, auto);
-  gap: 0.5rem;
-}
-
-.documents-grid::before,
-.documents-grid::after {
-  content: '';
-  flex-basis: 48%;
-  order: 2;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .document-item {
   background: #fff;
   border: 2px solid #2D7D4F;
   border-radius: 12px;
-  padding: 0.5rem;
+  padding: 1rem;
   text-align: center;
-  min-width: 0;
-  word-break: break-word;
-  flex: 1;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 400px) {
-  .documents-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, auto);
-    gap: 0.3rem;
-  }
-  
-  .document-item {
-    padding: 0.4rem;
-    font-size: 0.8rem;
-  }
-  
-  .doc-link {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
-    min-width: 100px;
-    height: 28px;
-    background: var(--green);
-    color: #fff;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-
-  .doc-btn {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
-    min-width: 100px;
-    background: #2D7D4F;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-
-  .doc-link {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
-    min-width: 100px;
-    height: 28px;
-  }
-}
-
 .doc-type {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #F2B705;
-  margin-bottom: 0.5rem;
-}
-
-.doc-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  color: #2D7D4F;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.8rem;
-  padding: 0.3rem 0.8rem;
-  border-radius: 8px;
-  background: rgba(45, 125, 79, 0.1);
-  transition: background 0.2s;
-  min-width: 120px;
-  height: 32px;
-  box-sizing: border-box;
-}
-
-.doc-link:hover {
-  background: rgba(45, 125, 79, 0.2);
-  text-decoration: none;
-  color: #2D7D4F;
+  margin-bottom: 0.75rem;
 }
 
 .doc-btn {
@@ -411,13 +337,10 @@ document.addEventListener('keydown', function(event) {
   text-decoration: none;
   font-weight: 600;
   font-size: 0.8rem;
-  padding: 0.3rem 0.8rem;
+  padding: 0.5rem 1rem;
   border-radius: 8px;
   background: rgba(45, 125, 79, 0.1);
   transition: background 0.2s;
-  min-width: 120px;
-  height: 32px;
-  box-sizing: border-box;
   border: none;
   cursor: pointer;
 }
@@ -428,16 +351,65 @@ document.addEventListener('keydown', function(event) {
   color: #2D7D4F;
 }
 
+.no-documents {
+  text-align: center;
+  padding: 2rem;
+  color: var(--t2);
+  background: rgba(45, 125, 79, 0.05);
+  border-radius: 12px;
+  border: 1px dashed rgba(45, 125, 79, 0.3);
+}
+
+.additional-info {
+  margin-bottom: 1.5rem;
+}
+
+.additional-info h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 1rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: rgba(45, 125, 79, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(45, 125, 79, 0.1);
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--t2);
+  font-size: 0.9rem;
+}
+
+.info-value {
+  font-weight: 600;
+  color: var(--t1);
+  font-size: 0.9rem;
+}
+
 .actions-section {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(45, 125, 79, 0.1);
 }
 
 .action-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
@@ -459,7 +431,7 @@ document.addEventListener('keydown', function(event) {
   padding: 0;
   border: none;
   background: none;
-  height: 36px;
+  height: 40px;
   box-sizing: border-box;
   line-height: 0;
   font-size: 0;
@@ -474,9 +446,9 @@ document.addEventListener('keydown', function(event) {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 25px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-decoration: none;
   border: 2px solid transparent;
@@ -484,18 +456,19 @@ document.addEventListener('keydown', function(event) {
   transition: all 0.2s;
   text-align: center;
   box-shadow: 0 2px 8px rgba(45, 125, 79, 0.2);
-  height: 36px;
+  height: 40px;
   line-height: 1;
   white-space: nowrap;
   box-sizing: border-box;
   vertical-align: middle;
+  min-width: 120px;
 }
 
 /* Ensure a.btn and button.btn are identical */
 a.btn, button.btn {
   margin: 0;
   font-family: inherit;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -503,39 +476,25 @@ a.btn, button.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
+  height: 40px;
   box-sizing: border-box;
   vertical-align: middle;
-  min-width: 100px;
+  min-width: 120px;
   text-align: center;
 }
 
 a.btn {
   text-decoration: none;
-  padding: 0.6rem 1.2rem;
-  min-width: 100px;
+  padding: 0.75rem 1.5rem;
 }
 
 button.btn {
   border: none;
-  padding: 0.6rem 1.2rem;
-  min-width: 100px;
+  padding: 0.75rem 1.5rem;
 }
 
 .btn:active {
   transform: scale(0.97);
-}
-
-.btn-blue {
-  background: linear-gradient(135deg, #3B82F6, #2563eb);
-  color: #fff;
-  border-color: #3B82F6;
-}
-
-.btn-blue:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .btn-green {
@@ -560,30 +519,6 @@ button.btn {
   background: linear-gradient(135deg, #a00c24, #C8102E);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--t2);
-}
-
-.empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-
-.empty-state h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--t1);
-  margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-  font-size: 0.9rem;
-  margin: 0;
 }
 
 .bottom-spacer {
@@ -658,23 +593,6 @@ button.btn {
   transition: all 0.2s;
 }
 
-.modal-close-btn {
-  background: #2D7D4F;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.modal-close-btn:hover {
-  background: #1f5c38;
-  transform: translateY(-1px);
-}
-
 .modal-close:hover {
   background: rgba(45, 125, 79, 0.1);
   color: #2D7D4F;
@@ -732,6 +650,10 @@ button.btn {
   
   .documents-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

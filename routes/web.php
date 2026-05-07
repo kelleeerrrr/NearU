@@ -19,7 +19,12 @@ use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\VisitScheduleController;
 use App\Http\Controllers\Admin\OwnerVerificationController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Middleware\AdminMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -537,31 +542,123 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->middleware('auth')->group(function () {
+Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(function () {
 
     // DASHBOARD
-    Route::get('/dashboard', [DashboardController::class, 'index'])
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
         ->name('admin.dashboard');
 
     // PROFILE
-    Route::get('/profile', [DashboardController::class, 'profile'])
+    Route::get('/profile', [\App\Http\Controllers\Admin\DashboardController::class, 'profile'])
         ->name('admin.profile');
 
-    // LIST
-    Route::get('/owner-verifications', [OwnerVerificationController::class, 'index'])
+    // OWNER VERIFICATIONS
+    Route::get('/owner-verifications', [\App\Http\Controllers\Admin\OwnerVerificationController::class, 'index'])
         ->name('admin.owner-verifications.index');
 
-    // REVIEW
-    Route::get('/owner-verifications/{id}/review', [OwnerVerificationController::class, 'review'])
+    Route::get('/owner-verifications/{id}/review', [\App\Http\Controllers\Admin\OwnerVerificationController::class, 'review'])
         ->name('admin.owner-verifications.review');
 
-    // APPROVE
-    Route::post('/owner-verifications/{id}/approve', [OwnerVerificationController::class, 'approve'])
+    Route::post('/owner-verifications/{id}/approve', [\App\Http\Controllers\Admin\OwnerVerificationController::class, 'approve'])
         ->name('admin.owner-verifications.approve');
 
-    // REJECT
-    Route::post('/owner-verifications/{id}/reject', [OwnerVerificationController::class, 'reject'])
+    Route::post('/owner-verifications/{id}/reject', [\App\Http\Controllers\Admin\OwnerVerificationController::class, 'reject'])
         ->name('admin.owner-verifications.reject');
+
+    // CATEGORIES
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)
+        ->names('admin.categories');
+
+    // NOTIFICATIONS
+    Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])
+        ->name('admin.notifications.index');
+
+    Route::get('/notifications/create', [\App\Http\Controllers\Admin\NotificationController::class, 'create'])
+        ->name('admin.notifications.create');
+
+    Route::post('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'store'])
+        ->name('admin.notifications.store');
+
+    Route::delete('/notifications/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])
+        ->name('admin.notifications.destroy');
+
+    Route::post('/notifications/{notification}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])
+        ->name('admin.notifications.markRead');
+
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])
+        ->name('admin.notifications.markAllRead');
+
+    // REPORTS
+    Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])
+        ->name('admin.reports.index');
+
+    Route::get('/reports/users', [\App\Http\Controllers\Admin\ReportController::class, 'users'])
+        ->name('admin.reports.users');
+
+    Route::get('/reports/listings', [\App\Http\Controllers\Admin\ReportController::class, 'listings'])
+        ->name('admin.reports.listings');
+
+    Route::get('/reports/activity', [\App\Http\Controllers\Admin\ReportController::class, 'activity'])
+        ->name('admin.reports.activity');
+
+    Route::get('/reports/export/users', [\App\Http\Controllers\Admin\ReportController::class, 'exportUsers'])
+        ->name('admin.reports.exportUsers');
+
+    Route::get('/reports/export/listings', [\App\Http\Controllers\Admin\ReportController::class, 'exportListings'])
+        ->name('admin.reports.exportListings');
+
+    // SETTINGS
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])
+        ->name('admin.settings.index');
+
+    Route::put('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])
+        ->name('admin.settings.update');
+
+    Route::get('/settings/storage', [\App\Http\Controllers\Admin\SettingsController::class, 'storage'])
+        ->name('admin.settings.storage');
+
+    Route::post('/settings/clear-cache', [\App\Http\Controllers\Admin\SettingsController::class, 'clearCache'])
+        ->name('admin.settings.clearCache');
+
+    Route::post('/settings/backup', [\App\Http\Controllers\Admin\SettingsController::class, 'backup'])
+        ->name('admin.settings.backup');
+
+    Route::post('/settings/test-email', [\App\Http\Controllers\Admin\SettingsController::class, 'testEmail'])
+        ->name('admin.settings.testEmail');
+
+    Route::get('/settings/backups', [\App\Http\Controllers\Admin\SettingsController::class, 'listBackups'])
+        ->name('admin.settings.listBackups');
+
+    Route::get('/settings/backups/download/{filename}', [\App\Http\Controllers\Admin\SettingsController::class, 'downloadBackup'])
+        ->name('admin.settings.downloadBackup');
+
+    Route::delete('/settings/backups/{filename}', [\App\Http\Controllers\Admin\SettingsController::class, 'deleteBackup'])
+        ->name('admin.settings.deleteBackup');
+
+    Route::get('/settings/system-info', [\App\Http\Controllers\Admin\SettingsController::class, 'systemInfo'])
+        ->name('admin.settings.systemInfo');
+
+    // USERS
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+        ->names('admin.users');
+
+    Route::post('/users/bulk-action', [\App\Http\Controllers\Admin\UserController::class, 'bulkAction'])
+        ->name('admin.users.bulkAction');
+
+    Route::get('/users/export', [\App\Http\Controllers\Admin\UserController::class, 'export'])
+        ->name('admin.users.export');
+
+    Route::post('/users/{user}/toggle-status', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])
+        ->name('admin.users.toggleStatus');
+
+    Route::post('/users/{user}/reset-password', [\App\Http\Controllers\Admin\UserController::class, 'resetPassword'])
+        ->name('admin.users.resetPassword');
+
+    Route::post('/users/{user}/verify', [\App\Http\Controllers\Admin\UserController::class, 'verify'])
+        ->name('admin.users.verify');
+
+    Route::post('/users/{user}/reject-verification', [\App\Http\Controllers\Admin\UserController::class, 'rejectVerification'])
+        ->name('admin.users.rejectVerification');
 });
 
 /*

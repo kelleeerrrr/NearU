@@ -40,6 +40,15 @@
     <div>{{ auth()->user()->user_type === 'admin' ? 'Verifications' : 'Messages' }}</div>
   </div>
 
+  <!-- SYSTEM REPORTS (ADMIN ONLY) -->
+  @if(auth()->user()->user_type === 'admin')
+  <div class="nav-i" id="nav-reports"
+       onclick="window.location.href='{{ route('admin.reports.index') }}'">
+    <span>📊</span>
+    <div>Reports</div>
+  </div>
+  @endif
+
   <!-- PROFILE -->
   <div class="nav-i" id="nav-profile"
        onclick="window.location.href='{{ 

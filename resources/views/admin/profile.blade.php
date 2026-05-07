@@ -62,6 +62,29 @@
           </div>
         </div>
       </div>
+
+      {{-- SETTINGS --}}
+      <div class="section">
+        <div class="section-title">⚙️ Settings</div>
+        
+        <div class="menu-items">
+          <a href="{{ route('admin.settings.index') }}" class="menu-item">
+            <span>System Settings</span>
+            <span>→</span>
+          </a>
+          
+          <a href="{{ route('admin.settings.storage') }}" class="menu-item">
+            <span>Storage Management</span>
+            <span>→</span>
+          </a>
+          
+                    
+          <a href="{{ route('admin.settings.systemInfo') }}" class="menu-item">
+            <span>System Information</span>
+            <span>→</span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -174,6 +197,10 @@ body.dark {
 }
 
 /* MENU ITEMS */
+.menu-items{
+  margin-top:0.5rem;
+}
+
 .menu-item{
   display:flex;
   justify-content:space-between;
@@ -182,12 +209,16 @@ body.dark {
   cursor:pointer;
   border-bottom:1px solid var(--border);
   transition:background 0.2s;
+  text-decoration:none;
+  color:inherit;
 }
 
 .menu-item:hover{
   background:var(--bg);
   margin:0 -1rem;
   padding:1rem;
+  text-decoration:none;
+  color:inherit;
 }
 
 .menu-item:last-child{

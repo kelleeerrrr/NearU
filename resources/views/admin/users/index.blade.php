@@ -1,0 +1,502 @@
+@extends('layouts.app')
+
+@section('title', 'Manage Users - Admin')
+
+@section('content')
+<div class="wrap">
+  @include('partials.navbar')
+
+  <div class="screen active">
+    <div class="cs">
+      <div class="page-header">
+        <div class="header-top">
+          <h2>👥 Manage Users</h2>
+          <a href="{{ route('admin.dashboard') }}" class="btn-back">← Back</a>
+        </div>
+      </div>
+      
+      <!-- Category Filter -->
+      <div class="category-filter" style="margin: 1rem 0;">
+        <label style="font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">Filter by Category:</label>
+        <select name="category" id="categoryFilter" onchange="filterByCategory()" style="padding: 0.5rem 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.9rem; color: #374151;">
+          <option value="">All Users</option>
+          <option value="student">🎓 Students</option>
+          <option value="owner">🏠 Owners</option>
+          <option value="admin">🛡️ Admins</option>
+        </select>
+      </div>
+
+      <!-- Users List -->
+      <div class="users-list">
+        @forelse($users as $user)
+          <div class="user-card">
+            <div class="user-info">
+              <div class="user-avatar">
+                {{ substr($user->name, 0, 1) }}
+              </div>
+              <div class="user-details">
+                <div class="user-name">{{ $user->name }}</div>
+                <div class="user-email">{{ $user->email }}</div>
+                <div class="user-meta">
+                  <span class="user-type {{ $user->user_type }}">{{ $user->user_type }}</span>
+                  @if($user->user_type === 'owner')
+                    <span class="verification-status {{ $user->verification_status ?? 'unverified' }}">
+                      {{ $user->verification_status ?? 'unverified' }}
+                    </span>
+                  @endif
+                  <span class="user-category">{{ $user->user_type }}</span>
+                  <span class="user-date">{{ $user->created_at->format('M d, Y') }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="user-actions">
+              <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-blue">View</a>
+              <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-green">Edit</a>
+              @if($user->id !== auth()->id())
+                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display: inline;">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-sm btn-red" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                </form>
+              @endif
+            </div>
+          </div>
+        @empty
+          <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <h3>No users found</h3>
+            <p>Try adjusting your search criteria</p>
+          </div>
+        @endforelse
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        {{ $users->links() }}
+      </div>
+    </div>
+  </div>
+
+  @include('partials.footer')
+</div>
+@endsection
+
+@push('styles')
+<style>
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.user-card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border: 2px solid #2D7D4F;
+  border-radius: 24px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(45, 125, 79, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.user-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(45, 125, 79, 0.03), rgba(45, 125, 79, 0.08));
+  border-radius: 50%;
+  transition: all 0.4s ease;
+}
+
+.user-card::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #6ee7b7, #34d399);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.3);
+  transition: all 0.3s ease;
+}
+
+.user-card:hover::before {
+  top: -30%;
+  right: -30%;
+}
+
+.user-card:hover::after {
+  transform: scale(1.5);
+  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.5);
+}
+
+.user-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(45, 125, 79, 0.25);
+  border-color: #1f5c38;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.user-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2D7D4F, #16a34a);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.3rem;
+  box-shadow: 0 6px 16px rgba(45, 125, 79, 0.3);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.user-avatar::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  border-radius: 20px;
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+.user-card:hover .user-avatar {
+  transform: rotate(5deg) scale(1.1);
+  box-shadow: 0 8px 20px rgba(45, 125, 79, 0.4);
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #1f2937;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.3px;
+  position: relative;
+  z-index: 1;
+}
+
+.user-email {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.user-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.user-type {
+  padding: 0.4rem 0.8rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.user-type::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2));
+  transition: left 0.3s ease;
+}
+
+.user-type:hover::before {
+  left: 100%;
+}
+
+.user-type.student {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.user-type.owner {
+  background: #fef3c7;
+  color: #92400E;
+}
+
+.user-type.admin {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.verification-status {
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.verification-status::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15));
+  transition: left 0.3s ease;
+}
+
+.verification-status:hover::before {
+  left: 100%;
+}
+
+.verification-status.verified {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.verification-status.under_review {
+  background: #fef3c7;
+  color: #92400E;
+}
+
+.verification-status.rejected {
+  background: #fecaca;
+  color: #dc2626;
+}
+
+.verification-status.unverified {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.user-date {
+  color: #9ca3af;
+  font-size: 0.7rem;
+}
+
+.user-category {
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.user-category::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(45, 125, 79, 0.1));
+  transition: left 0.3s ease;
+}
+
+.user-category:hover::before {
+  left: 100%;
+}
+
+.user-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+  flex-shrink: 0;
+  width: 100px;
+}
+
+.btn-sm {
+  padding: 0.8rem 1.2rem;
+  font-size: 0.85rem;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  transform: translateZ(0);
+}
+
+.btn-sm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2));
+  transition: left 0.3s ease;
+}
+
+.btn-sm:hover::before {
+  left: 100%;
+}
+
+.btn-blue {
+  background: #3B82F6 !important;
+  color: white !important;
+  border: 2px solid #3B82F6 !important;
+}
+
+.btn-blue:hover {
+  background: #2563EB !important;
+  border-color: #2563EB !important;
+}
+
+.btn-green {
+  background: #16a34a;
+  color: white;
+  border: 2px solid #16a34a;
+}
+
+.btn-green:hover {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.btn-red {
+  background: #dc2626;
+  color: white;
+  border: 2px solid #dc2626;
+}
+
+.btn-red:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.pagination {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.page-header {
+  margin-bottom: 1rem;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.header-top h2 {
+  margin: 0;
+  color: #374151;
+  font-size: 1.5rem;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #2D7D4F;
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid #2D7D4F;
+  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.3);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-back:hover {
+  background: #1f5c38;
+  border-color: #1f5c38;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.4);
+}
+</style>
+@push('scripts')
+<script>
+function filterByCategory() {
+  var categorySelect = document.getElementById('categoryFilter');
+  var category = categorySelect.value;
+  
+  // Redirect to filtered results
+  if (category) {
+    window.location.href = '{{ route("admin.users.index") }}?category=' + category;
+  } else {
+    window.location.href = '{{ route("admin.users.index") }}';
+  }
+}
+
+// Set initial category from URL parameter
+document.addEventListener('DOMContentLoaded', function() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var category = urlParams.get('category');
+  
+  if (category) {
+    document.getElementById('categoryFilter').value = category;
+  }
+});
+</script>
+@endpush
