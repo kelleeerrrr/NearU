@@ -79,8 +79,8 @@
 }
 
 .small{
-    font-size:.8rem;
-    color:var(--t2);
+    font-size:1rem;
+    color: #000;;
 }
 </style>
 
@@ -96,24 +96,24 @@
 
 <div class="grid-2">
 
-    <div class="stat">
-        <div class="big">{{ number_format($avgRating ?? 0, 1) }}</div>
-        <div class="label">⭐ Average Rating</div>
+    <div class="stat" style="background: linear-gradient(135deg, var(--green) 0%, #1e5a3a 100%); border: 1px solid var(--green);">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ number_format($avgRating ?? 0, 1) }}</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">⭐ Average Rating</div>
     </div>
 
-    <div class="stat">
-        <div class="big">{{ $totalMessages ?? 0 }}</div>
-        <div class="label">💬 Total Messages</div>
+    <div class="stat" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: 1px solid #fbbf24;">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ $totalMessages ?? 0 }}</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">💬 Total Messages</div>
     </div>
 
-    <div class="stat">
-        <div class="big">{{ $totalVisits ?? 0 }}</div>
-        <div class="label">📅 Total Visits</div>
+    <div class="stat" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: 1px solid #fbbf24;">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ $totalVisits ?? 0 }}</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">📅 Total Visits</div>
     </div>
 
-    <div class="stat">
-        <div class="big">{{ number_format($avgResponseTime ?? 0, 1) }}h</div>
-        <div class="label">⚡ Avg Response Time</div>
+    <div class="stat" style="background: linear-gradient(135deg, var(--green) 0%, #1e5a3a 100%); border: 1px solid var(--green);">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ number_format($avgResponseTime ?? 0, 1) }}h</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">⚡ Avg Response Time</div>
     </div>
 
 </div>
@@ -123,20 +123,20 @@
 
 <div class="grid-2">
 
-    <div class="stat">
-        <div class="big">{{ $conversionRate ?? 0 }}%</div>
-        <div class="label">Message → Visit Conversion</div>
+    <div class="stat" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: 1px solid #3b82f6;">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ $conversionRate ?? 0 }}%</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">Message → Visit Conversion</div>
     </div>
 
-    <div class="stat">
-        <div class="big">{{ $dropOffRate ?? 0 }}%</div>
-        <div class="label">Drop-off Rate</div>
+    <div class="stat" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: 1px solid #3b82f6;">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ $dropOffRate ?? 0 }}%</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">Drop-off Rate</div>
     </div>
 
 </div>
 
 <!-- RESPONSE RATE -->
-<div class="card">
+<div class="card" style="border: 2px solid #0e8833;">
 
     @php
         $responseRate = ($totalMessages ?? 0) > 0
@@ -161,24 +161,24 @@
 
 <div class="grid-2">
 
-    <div class="stat">
-        <div class="big">{{ $totalVisits ?? 0 }}</div>
-        <div class="label">Requested</div>
+    <div class="stat" style="background: linear-gradient(135deg, var(--green) 0%, #1e5a3a 100%); border: 1px solid var(--green);">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ $totalVisits ?? 0 }}</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">Requested</div>
     </div>
 
-    <div class="stat">
-        <div class="big">{{ $approvedVisits ?? 0 }}</div>
-        <div class="label">Approved</div>
+    <div class="stat" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: 1px solid #fbbf24;">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ $approvedVisits ?? 0 }}</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">Approved</div>
     </div>
 
-    <div class="stat">
-        <div class="big">{{ $pendingVisits ?? 0 }}</div>
-        <div class="label">Pending</div>
+    <div class="stat" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: 1px solid #fbbf24;">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ $pendingVisits ?? 0 }}</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">Pending</div>
     </div>
 
-    <div class="stat">
-        <div class="big">{{ $completedVisits ?? 0 }}</div>
-        <div class="label">Completed</div>
+    <div class="stat" style="background: linear-gradient(135deg, var(--green) 0%, #1e5a3a 100%); border: 1px solid var(--green);">
+        <div class="big" style="color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">{{ $completedVisits ?? 0 }}</div>
+        <div class="label" style="color: rgba(255,255,255,0.9) !important;">Completed</div>
     </div>
 
 </div>
@@ -192,7 +192,7 @@
         : 0;
 @endphp
 
-<div class="card">
+<div class="card" style="border: 2px solid #0e8833;">
 
     <div class="small">Occupancy Rate</div>
 
@@ -213,7 +213,7 @@
 <!-- TOP LISTING -->
 <div class="section">🏆 Top Performing Listing</div>
 
-<div class="card">
+<div class="card" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border: 1px solid #fbbf24;">
 
     <div style="font-weight:800;">
         {{ $topListing->street ?? 'No data yet' }}
