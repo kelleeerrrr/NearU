@@ -20,6 +20,24 @@ class OwnerController extends Controller
             ->with(['images', 'reviews.user'])
             ->get();
 
-        return view('owners.show', compact('owner', 'listings'));
+        // Get all reviews for this owner's listings
+        $reviews = \App\Models\Review::whereIn('dorm_listing_id', $listings->pluck('id'))
+            ->with('user')
+            ->latest()
+            ->get();
+
+        // Calculate statistics
+        $totalListings = $listings->count();
+        $totalReviews = $reviews->count();
+        $averageRating = $reviews->avg('rating') ?? 0;
+        
+        // Calculate response rate (simplified - could be enhanced with actual message data)
+        $totalInquiries = \App\Models\VisitSchedule::whereIn('dorm_listing_id', $listings->pluck('id'))->count();
+        $respondedInquiries = \App\Models\VisitSchedule::whereIn('dorm_listing_id', $listings->pluck('id'))
+            ->whereNotNull('status')
+            ->count();
+        $responseRate = $totalInquiries > 0 ? ($respondedInquiries / $totalInquiries) * 100 : 0;
+
+        return view('owners.show', compact('owner', 'listings', 'reviews', 'totalListings', 'totalReviews', 'averageRating', 'responseRate'));
     }
 }
