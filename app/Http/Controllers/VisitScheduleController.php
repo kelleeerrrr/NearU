@@ -13,12 +13,23 @@ class VisitScheduleController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $visits = VisitSchedule::with(['user', 'dormListing'])
-            ->whereHas('dormListing', fn ($q) => $q->where('owner_id', Auth::id()))
-            ->latest()
-            ->get();
+        // ✅ VERIFICATION CHECK: Only approved owners can access visits
+        if (auth()->user()->verification_status !== 'approved') {
+            return redirect()->route('owner.dashboard')
+                ->with('error', 'You must be verified to access visit requests. Please complete your verification first.');
+        }
+
+        $query = VisitSchedule::with(['user', 'dormListing'])
+            ->whereHas('dormListing', fn ($q) => $q->where('owner_id', Auth::id()));
+
+        // Filter by status if provided
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $visits = $query->latest()->get();
 
         return view('owner.visits.index', compact('visits'));
     }

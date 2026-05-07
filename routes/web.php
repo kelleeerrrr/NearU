@@ -163,19 +163,8 @@ Route::post('/logout', function (Request $request) {
 
 Route::middleware('auth')->group(function () {
 
-    Route::middleware(['auth'])->group(function () {
-
         // OWNER VISITS
-        Route::get('/owner/visits', function () {
-
-            // ✅ VERIFICATION CHECK: Only approved owners can access visits
-            if (auth()->user()->verification_status !== 'approved') {
-                return redirect()->route('owner.dashboard')
-                    ->with('error', 'You must be verified to access visit requests. Please complete your verification first.');
-            }
-
-            return app(VisitScheduleController::class)->index();
-        })
+        Route::get('/owner/visits', [VisitScheduleController::class, 'index'])
             ->name('owner.visits.index');
 
         // STUDENT VISITS (optional but recommended)
@@ -194,8 +183,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/owner/visits/{id}/status', [VisitScheduleController::class, 'updateStatus'])
             ->name('owner.visits.status.update');
 
-
-    });
+});
 
     Route::get('/student/home', [DormController::class, 'indexStudent'])
         ->middleware('auth')
@@ -502,8 +490,6 @@ Route::middleware('auth')->group(function () {
     */
     Route::get('/owner/statistics', [StatisticsController::class, 'index'])
     ->name('owner.statistics.index');
-
-});
 
 /*
 |--------------------------------------------------------------------------

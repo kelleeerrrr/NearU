@@ -43,21 +43,52 @@
 }
 
 .listing-card{
-    background:#fff;
-    border:1.5px solid #D6E8DC;
     border-radius:16px;
     padding:.9rem;
     margin-bottom:.8rem;
-    box-shadow:0 2px 10px rgba(45,125,79,.06);
     cursor:pointer;
     transition:.2s;
     display:block;
     text-decoration:none;
     color:inherit;
+    position:relative;
+    overflow:hidden;
+}
+
+/* Color variations based on reply status */
+.listing-card.needs-reply {
+    background: linear-gradient(135deg, var(--green) 0%, #1e5a3a 100%);
+    border:1px solid var(--green);
+}
+
+.listing-card.no-reply-needed {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border:1px solid #3b82f6;
 }
 
 .listing-card:hover{
     transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* Text styling for colored cards */
+.listing-card .listing-title{
+    color: #fff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.listing-card .listing-meta{
+    color: rgba(255,255,255,0.9) !important;
+}
+
+.listing-card .listing-message{
+    background: rgba(255,255,255,0.15);
+    border-left: 3px solid rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.95);
+}
+
+.listing-card .bold-text{
+    color: #fff !important;
 }
 
 .listing-title{
@@ -182,7 +213,7 @@
 }
 
 .needs-reply-flag {
-  background: linear-gradient(135deg, #fee, #fca5a5);
+  background: rgba(255,255,255,0.9);
   color: #d32f2f;
   padding: 4px 10px;
   border-radius: 12px;
@@ -190,48 +221,51 @@
   font-weight: 700;
   margin-top: 8px;
   display: inline-block;
-  border: 1px solid #fca5a5;
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .you-indicator {
-  color: #2D7D4F;
+  color: rgba(255,255,255,0.9);
   font-weight: 600;
   font-size: 11px;
   margin-left: 8px;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .unread-inquiry {
-  border-left: 4px solid #2D7D4F;
-  background: linear-gradient(to right, rgba(45,125,79,0.05), transparent);
+  border-left: 4px solid #fff;
+  background: linear-gradient(to right, rgba(255,255,255,0.1), transparent);
 }
 
 .unread-indicator {
-  color: #2D7D4F;
+  color: #fff;
   font-size: 8px;
   margin-left: 8px;
   animation: pulse 2s infinite;
+  text-shadow: 0 0 4px rgba(0,0,0,0.3);
 }
 
 .unread-badge {
-  background: #2D7D4F;
-  color: white;
+  background: rgba(255,255,255,0.9);
+  color: #141F14;
   padding: 0.3rem 0.6rem;
   border-radius: 12px;
   font-size: 0.7rem;
   font-weight: 700;
   min-width: 24px;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .unread-preview {
   font-weight: 600;
-  color: #141F14;
+  color: rgba(255,255,255,0.95);
 }
 
 .read-preview {
   font-weight: 400;
-  color: #5E6E5E;
+  color: rgba(255,255,255,0.85);
 }
 
 @keyframes pulse {
@@ -313,7 +347,7 @@
                     'listingId' => $listing->id,
                     'userId' => $student->id
                 ]) }}"
-               class="listing-card {{ $hasUnread ? 'unread-inquiry' : '' }}"
+               class="listing-card {{ $hasUnread ? 'unread-inquiry' : '' }} {{ !$ownerReplied ? 'needs-reply' : 'no-reply-needed' }}"
                data-listing="{{ $listing->id }}"
                data-read-status="{{ $hasUnread ? 'unread' : 'read' }}">
 

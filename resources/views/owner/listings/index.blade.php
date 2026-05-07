@@ -102,17 +102,77 @@
 
 /* LISTING CARD */
 .listing-card{
-  background:var(--card);
   margin:0 1.2rem 1.2rem; /* ✅ bottom spacing */
   padding:1rem;
   border-radius:14px;
   border:1px solid var(--border);
   transition:all .2s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Color variations for different listings */
+.listing-card:nth-child(3n+1){
+  background: linear-gradient(135deg, var(--green) 0%, #1e5a3a 100%);
+  border:1px solid var(--green);
+}
+
+.listing-card:nth-child(3n+2){
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border:1px solid #fbbf24;
+}
+
+.listing-card:nth-child(3n+3){
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border:1px solid #3b82f6;
+}
+
+/* Status-based color overlays */
+.listing-card[data-status="available"]::before{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--green), #1e5a3a);
+}
+
+.listing-card[data-status="unavailable"]::before{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
 }
 
 .listing-card:hover{
   transform:translateY(-3px);
-  box-shadow:0 6px 16px rgba(0,0,0,0.12);
+  box-shadow:0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* Text styling for colored cards */
+.listing-card > div{
+  position: relative;
+  z-index: 1;
+}
+
+.listing-card > div[style*="font-weight:800"]{
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.listing-card > div[style*="color:var(--green)"]{
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  font-weight: 900 !important;
+}
+
+.listing-card > div[style*="font-size:.8rem"]{
+  color: rgba(255,255,255,0.9) !important;
+  font-weight: 600 !important;
 }
 
 /* =========================
@@ -229,7 +289,7 @@
 {{-- LISTINGS --}}
 @forelse($dormListings as $listing)
 
-<div class="listing-card">
+<div class="listing-card" data-status="{{ $listing->status }}">
 
     <div style="font-weight:800;">
         {{ $listing->street }}
