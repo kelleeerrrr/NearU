@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
             input.value = '';
             
             // Add new message to chat dynamically
-            const chatMsgs = document.getElementById('chatMsgs');
+            const chatMsgs = document.querySelector('.chat');
             const newMessage = document.createElement('div');
             newMessage.className = 'msg right';
             newMessage.innerHTML = `
