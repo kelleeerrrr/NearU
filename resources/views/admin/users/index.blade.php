@@ -53,7 +53,7 @@
               <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-blue">View</a>
               <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-green">Edit</a>
               @if($user->id !== auth()->id())
-                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display: inline;">
+                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display: inline; margin: 0; padding: 0;">
                   @csrf
                   @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-red" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
@@ -83,8 +83,15 @@
 
 @push('styles')
 <style>
-/* Override mobile layout for admin users page */
-.wrap,
+/* Wrap container for admin users page */
+.wrap {
+  width: 100% !important;
+  max-width: 600px !important;
+  margin: 0 auto !important;
+  padding: 5rem 1rem 1rem 1rem !important;
+  box-sizing: border-box !important;
+}
+
 .screen,
 .screen.active,
 .cs {
@@ -92,14 +99,9 @@
   max-width: 100% !important;
 }
 
-.wrap {
-  max-width: 900px !important;
-  width: 100% !important;
-}
-
 .users-list {
   display: grid !important;
-  grid-template-columns: repeat(2, minmax(320px, 1fr)) !important;
+  grid-template-columns: 1fr !important;
   gap: 1rem !important;
   width: 100% !important;
   align-items: stretch;
@@ -363,11 +365,11 @@
 
 .user-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
-  align-items: stretch;
+  align-items: center;
   flex-shrink: 0;
-  width: 100px;
+  width: auto;
 }
 
 .btn-sm {
@@ -385,7 +387,8 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  width: 100%;
+  width: 80px;
+  height: 40px;
   box-sizing: border-box;
   transform: translateZ(0);
 }
@@ -467,7 +470,14 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  justify-content: space-between;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.header-top .btn-back {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .header-top h2 {
@@ -498,6 +508,80 @@
   border-color: #1f5c38;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(45, 125, 79, 0.4);
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .wrap {
+    padding: 4rem 0.75rem 0.75rem 0.75rem !important;
+  }
+  
+  .users-list {
+    grid-template-columns: 1fr !important;
+    margin: 0 !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
+  }
+  
+  .user-card {
+    padding: 1rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+  
+  .user-info {
+    width: 100% !important;
+  }
+  
+  .user-actions {
+    width: auto !important;
+    flex-direction: row !important;
+    gap: 0.4rem !important;
+  }
+  
+  .btn-sm {
+    width: 70px !important;
+    height: 36px !important;
+    padding: 0.6rem 0.8rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .wrap {
+    padding: 3rem 0.5rem 0.5rem 0.5rem !important;
+    max-width: 100% !important;
+  }
+  
+  .users-list {
+    margin: 0 !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+  }
+  
+  .header-top {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  
+  .user-card {
+    padding: 0.75rem !important;
+  }
+  
+  .user-actions {
+    width: auto !important;
+    flex-direction: row !important;
+    gap: 0.3rem !important;
+  }
+  
+  .btn-sm {
+    width: 60px !important;
+    height: 32px !important;
+    padding: 0.5rem 0.6rem !important;
+    font-size: 0.75rem !important;
+  }
 }
 </style>
 @endpush

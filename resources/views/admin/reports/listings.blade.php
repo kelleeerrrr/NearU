@@ -13,46 +13,50 @@
         <h2>🏠 Listing Analytics</h2>
       </div>
 
-      <div class="stats-overview">
-        <div class="stat-card">
-          <div class="stat-number">{{ $totalListings }}</div>
-          <div class="stat-label">Total Listings</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ $activeListings }}</div>
-          <div class="stat-label">Active</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">{{ $inactiveListings }}</div>
-          <div class="stat-label">Inactive</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">₱{{ number_format($avgPrice, 0) }}</div>
-          <div class="stat-label">Avg Price</div>
+      <div class="stats-container">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">{{ $totalListings }}</div>
+            <div class="stat-label">Total Listings</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ $activeListings }}</div>
+            <div class="stat-label">Active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ $inactiveListings }}</div>
+            <div class="stat-label">Inactive</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">₱{{ number_format($avgPrice, 0) }}</div>
+            <div class="stat-label">Avg Price</div>
+          </div>
         </div>
       </div>
 
-      <div class="charts-section">
-        <div class="chart-row">
-          <div class="chart-card">
+        <div class="data-container">
+          <div class="data-section">
             <h3>📊 Listings by Type</h3>
-            <div class="type-stats">
+            <div class="type-grid">
               @foreach($listingsByType as $type)
-                <div class="type-item">
-                  <span class="type-label">{{ $type->type }}</span>
-                  <span class="type-count">{{ $type->count }}</span>
-                </div>
-              @endforeach
-            </div>
-          </div>
-
-          <div class="chart-card">
-            <h3>💰 Price Distribution</h3>
-            <div class="price-stats">
-              @foreach($priceDistribution as $range)
-                <div class="price-item">
-                  <span class="price-label">{{ $range->price_range }}</span>
-                  <span class="price-count">{{ $range->count }}</span>
+                <div class="type-card">
+                  <div class="type-content">
+                    <span class="type-icon">
+  @if($type->type === 'Room')
+    🏠
+  @elseif($type->type === 'Bedspace')
+    🛏️
+  @elseif($type->type === 'Unit')
+    🏬
+  @else
+    📁
+  @endif
+</span>
+                    <div class="type-info">
+                      <div class="type-name">{{ $type->type }}</div>
+                      <div class="type-count">{{ $type->count }}</div>
+                    </div>
+                  </div>
                 </div>
               @endforeach
             </div>
@@ -60,41 +64,41 @@
         </div>
       </div>
 
-      <div class="detailed-stats">
-        
-        <div class="detail-section">
-          <h3>💵 Pricing Analysis</h3>
-          <div class="pricing-stats">
-            <div class="pricing-item">
-              <span class="pricing-label">Minimum Price:</span>
-              <span class="pricing-value">₱{{ number_format($minPrice, 0) }}</span>
-            </div>
-            <div class="pricing-item">
-              <span class="pricing-label">Maximum Price:</span>
-              <span class="pricing-value">₱{{ number_format($maxPrice, 0) }}</span>
-            </div>
-            <div class="pricing-item">
-              <span class="pricing-label">Average Price:</span>
-              <span class="pricing-value">₱{{ number_format($avgPrice, 0) }}</span>
+        <div class="data-container">
+          <div class="data-section">
+            <h3>💵 Pricing Analysis</h3>
+            <div class="data-list">
+              <div class="data-row">
+                <span class="data-label">Minimum Price:</span>
+                <span class="data-value price">₱{{ number_format($minPrice, 0) }}</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">Maximum Price:</span>
+                <span class="data-value price">₱{{ number_format($maxPrice, 0) }}</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">Average Price:</span>
+                <span class="data-value price">₱{{ number_format($avgPrice, 0) }}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="detail-section">
-          <h3>📅 Recent Activity</h3>
-          <div class="activity-stats">
-            <div class="activity-item">
-              <span class="activity-label">New Listings This Month:</span>
-              <span class="activity-value">{{ $newListingsThisMonth }}</span>
-            </div>
-            <div class="activity-item">
-              <span class="activity-label">New Listings This Week:</span>
-              <span class="activity-value">{{ $newListingsThisWeek }}</span>
+        <div class="data-container">
+          <div class="data-section">
+            <h3>📅 Recent Activity</h3>
+            <div class="data-list">
+              <div class="data-row">
+                <span class="data-label">New Listings This Month:</span>
+                <span class="data-value">{{ $newListingsThisMonth }}</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">New Listings This Week:</span>
+                <span class="data-value">{{ $newListingsThisWeek }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
   </div>
 
   @include('partials.footer')
@@ -103,6 +107,7 @@
 
 @push('styles')
 <style>
+
 .page-header {
   margin-bottom: 1.5rem;
 }
@@ -133,25 +138,77 @@
   text-decoration: none;
 }
 
-.stats-overview {
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.data-container {
+  margin: 0 1rem 1rem 1rem;
+}
+
+.data-section {
+  background: white;
+  border: 2px solid #2D7D4F;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.data-section h3 {
+  margin: 0 0 0.75rem 0;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.data-section h3 {
+  margin: 0 0 0.75rem 0;
+  color: #374151;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.stats-container {
+  margin: 0 1rem 1.5rem 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+@media (max-width: 430px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
 }
 
 .stat-card {
   background: white;
   border: 2px solid #2D7D4F;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 1rem;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1);
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  background: #f8fafc;
+  border-color: #2D7D4F;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.1);
 }
 
 .stat-number {
-  font-size: 1.8rem;
-  font-weight: 800;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: #2D7D4F;
   margin-bottom: 0.5rem;
 }
@@ -160,160 +217,148 @@
   color: #6b7280;
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
 }
 
-.charts-section {
+.type-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding: 0.75rem;
 }
 
-.chart-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+@media (max-width: 430px) {
+  .type-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
 }
 
-.chart-card {
+.type-card {
   background: white;
-  border: 2px solid #2D7D4F;
-  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 1rem;
-  box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1);
+  text-align: center;
+  transition: all 0.2s ease;
 }
 
-.chart-card h3 {
-  margin: 0 0 0.75rem 0;
-  color: #374151;
+.type-card:hover {
+  border-color: #2D7D4F;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.1);
 }
 
-.type-stats {
+.type-content {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.type-item {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  gap: 0.5rem;
 }
 
-.type-label {
-  color: #6b7280;
+.type-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.type-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.type-name {
   font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .type-count {
-  color: #2D7D4F;
+  font-size: 1.5rem;
   font-weight: 700;
-  font-size: 1.1rem;
+  color: #2D7D4F;
 }
 
-.price-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.price-item {
+.data-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-.price-label {
-  color: #6b7280;
-  font-weight: 600;
-}
-
-.price-count {
-  color: #2D7D4F;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.detailed-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.detail-section {
+  padding: 0.625rem 0.75rem;
   background: white;
-  border: 2px solid #2D7D4F;
-  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.data-item:hover {
+  background: #f8fafc;
+  border-color: #2D7D4F;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.1);
+}
+
+.data-list {
   padding: 1rem;
-  box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1);
 }
 
-.detail-section h3 {
-  margin: 0 0 0.75rem 0;
-  color: #374151;
-}
-
-.pricing-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.pricing-item {
+.data-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
 }
 
-.pricing-label {
+.data-row:last-child {
+  border-bottom: none;
+}
+
+.data-row:hover {
+  background: #f8fafc;
+  padding-left: 0.75rem;
+}
+
+.data-label {
   color: #6b7280;
   font-weight: 600;
+  font-size: 0.875rem;
 }
 
-.pricing-value {
+.data-value {
   color: #2D7D4F;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
 }
 
-.activity-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.data-value.price {
+  font-size: 1rem;
+  background: linear-gradient(135deg, #2D7D4F, #1f5c38);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.activity-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-.activity-label {
-  color: #6b7280;
-  font-weight: 600;
-}
-
-.activity-value {
-  color: #2D7D4F;
-  font-weight: 700;
-  font-size: 1.1rem;
+@media (max-width: 430px) {
+  .data-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 0.625rem 0;
+  }
+  
+  .data-label {
+    font-size: 0.8rem;
+  }
+  
+  .data-value {
+    font-size: 0.85rem;
+  }
 }
 </style>
 @endpush

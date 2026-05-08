@@ -65,14 +65,7 @@
           </div>
         </div>
 
-        <div class="chart-card">
-          <h3>📊 Hourly Activity</h3>
-          <div class="chart-placeholder">
-            <p>Activity distribution throughout the day</p>
-            <small>Chart integration would go here</small>
-          </div>
-        </div>
-      </div>
+              </div>
     </div>
   </div>
 
