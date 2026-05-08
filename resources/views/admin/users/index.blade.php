@@ -15,10 +15,45 @@
         </div>
       </div>
       
+      <!-- User Statistics -->
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ $stats['total_users'] }}</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🎓</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ $stats['students'] }}</div>
+            <div class="stat-label">Students</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🏠</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ $stats['owners'] }}</div>
+            <div class="stat-label">Owners</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🛡️</div>
+          <div class="stat-content">
+            <div class="stat-number">{{ $stats['admins'] }}</div>
+            <div class="stat-label">Admins</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Category Filter -->
-      <div class="category-filter" style="margin: 1rem 0;">
-        <label style="font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">Filter by Category:</label>
-        <select name="category" id="categoryFilter" onchange="filterByCategory()" style="padding: 0.5rem 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.9rem; color: #374151;">
+      <div class="category-filter">
+        <label>Filter by Category:</label>
+        <select name="category" id="categoryFilter" onchange="filterByCategory()">
           <option value="">All Users</option>
           <option value="student">🎓 Students</option>
           <option value="owner">🏠 Owners</option>
@@ -83,13 +118,163 @@
 
 @push('styles')
 <style>
-/* Wrap container for admin users page */
+/* Wrap container for admin users page - override layout styles */
 .wrap {
   width: 100% !important;
-  max-width: 600px !important;
+  max-width: 100% !important;
   margin: 0 auto !important;
   padding: 5rem 1rem 1rem 1rem !important;
   box-sizing: border-box !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  min-height: 100vh !important;
+}
+
+/* Admin specific container */
+.screen.active .cs {
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  padding: 0 1rem !important;
+  background: white !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1) !important;
+}
+
+/* Extend white background to cover header area */
+.screen.active {
+  background: white !important;
+  padding-top: 0 !important;
+}
+
+/* Statistics Cards Container */
+.stats-container {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1rem !important;
+  margin-bottom: 1.5rem !important;
+  width: 100% !important;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
+  border: 2px solid #2D7D4F !important;
+  border-radius: 20px !important;
+  padding: 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  box-shadow: 0 8px 32px rgba(45, 125, 79, 0.15) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 100px !important;
+}
+
+.stat-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -50% !important;
+  right: -50% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(45deg, rgba(45, 125, 79, 0.03), rgba(45, 125, 79, 0.08)) !important;
+  border-radius: 50% !important;
+  transition: all 0.4s ease !important;
+}
+
+.stat-card::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: 8px !important;
+  height: 8px !important;
+  background: linear-gradient(135deg, #6ee7b7, #34d399) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.stat-card:hover::before {
+  top: -30% !important;
+  right: -30% !important;
+}
+
+.stat-card:hover::after {
+  transform: scale(1.5) !important;
+  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.5) !important;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  box-shadow: 0 16px 40px rgba(45, 125, 79, 0.25) !important;
+  border-color: #1f5c38 !important;
+}
+
+.stat-icon {
+  font-size: 2rem !important;
+  width: 50px !important;
+  height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #2D7D4F, #16a34a) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 16px rgba(45, 125, 79, 0.3) !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.stat-content {
+  flex: 1 !important;
+  z-index: 1 !important;
+}
+
+.stat-number {
+  font-size: 1.8rem !important;
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1 !important;
+}
+
+/* Category Filter Styles */
+.category-filter {
+  margin: 1rem 0 !important;
+}
+
+.page-header {
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+  margin-top: 3rem !important;
+}
+
+.category-filter label {
+  font-weight: 600 !important;
+  margin-bottom: 0.5rem !important;
+  color: #1f2937 !important;
+  display: block !important;
+}
+
+.category-filter select {
+  padding: 0.5rem 0.75rem !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  background: white !important;
+  font-size: 0.9rem !important;
+  color: #374151 !important;
+  width: 100% !important;
+  max-width: 300px !important;
+}
+
+.stat-label {
+  font-size: 0.9rem !important;
+  color: #6b7280 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
 }
 
 .screen,
@@ -510,10 +695,53 @@
   box-shadow: 0 4px 12px rgba(45, 125, 79, 0.4);
 }
 
+/* Tablet Responsive Styles */
+@media (max-width: 1024px) {
+  .wrap {
+    max-width: 100% !important;
+    padding: 5rem 1rem 1rem 1rem !important;
+  }
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .wrap {
     padding: 4rem 0.75rem 0.75rem 0.75rem !important;
+  }
+  
+  .screen.active .cs {
+    max-width: 100% !important;
+    padding: 0 0.5rem !important;
+    margin: 0 !important;
+  }
+  
+  .stats-container {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    gap: 0.75rem !important;
+  }
+  
+  .stat-card {
+    padding: 1rem !important;
+    min-height: 80px !important;
+  }
+  
+  .stat-icon {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.5rem !important;
+  }
+  
+  .category-filter select {
+    max-width: 100% !important;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem !important;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem !important;
   }
   
   .users-list {
@@ -552,6 +780,12 @@
   .wrap {
     padding: 3rem 0.5rem 0.5rem 0.5rem !important;
     max-width: 100% !important;
+  }
+  
+  .screen.active .cs {
+    max-width: 100% !important;
+    padding: 0 0.25rem !important;
+    margin: 0 !important;
   }
   
   .users-list {

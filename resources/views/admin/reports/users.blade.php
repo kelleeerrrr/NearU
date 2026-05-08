@@ -13,37 +13,8 @@
         <h2>👥 User Statistics</h2>
       </div>
 
-      <div class="stats-overview">
-        <div class="stat-row">
-          <div class="stat-card">
-            <div class="stat-number">{{ $totalUsers }}</div>
-            <div class="stat-label">Total Users</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">{{ $students }}</div>
-            <div class="stat-label">Students</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">{{ $userTypeDistribution['admins'] }}</div>
-            <div class="stat-label">Admins</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">{{ $owners }}</div>
-            <div class="stat-label">Owners</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="charts-section">
-        <div class="chart-card">
-          <h3>📈 User Growth (Last 30 Days)</h3>
-          <div class="chart-placeholder">
-            <p>User registration trend over the past month</p>
-            <small>Chart integration would go here</small>
-          </div>
-        </div>
-      </div>
-
+      
+      
       <div class="detailed-stats">
         <div class="detail-section">
           <h3>🔍 Verification Status</h3>
@@ -119,25 +90,101 @@
   margin-bottom: 1.5rem;
 }
 
-.stats-overview:first-child {
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+/* Statistics Cards Container */
+.stats-container {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  margin-bottom: 1.5rem !important;
+  align-items: stretch !important;
 }
 
-.stats-overview:last-child {
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+/* Override parent container constraints */
+.screen.active .cs .stats-container {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.stats-container .stat-card {
+  min-width: 0 !important;
+  width: 100% !important;
 }
 
 .stat-card {
-  background: white;
-  border: 2px solid #2D7D4F;
-  border-radius: 12px;
-  padding: 1rem;
-  text-align: center;
-  box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1);
+  background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
+  border: 2px solid #2D7D4F !important;
+  border-radius: 20px !important;
+  padding: 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  box-shadow: 0 8px 32px rgba(45, 125, 79, 0.15) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 100px !important;
+}
+
+.stat-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -50% !important;
+  right: -50% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(45deg, rgba(45, 125, 79, 0.03), rgba(45, 125, 79, 0.08)) !important;
+  border-radius: 50% !important;
+  transition: all 0.4s ease !important;
+}
+
+.stat-card::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: 8px !important;
+  height: 8px !important;
+  background: linear-gradient(135deg, #6ee7b7, #34d399) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.stat-card:hover::before {
+  top: -30% !important;
+  right: -30% !important;
+}
+
+.stat-card:hover::after {
+  transform: scale(1.5) !important;
+  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.5) !important;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  box-shadow: 0 16px 40px rgba(45, 125, 79, 0.25) !important;
+  border-color: #1f5c38 !important;
+}
+
+.stat-icon {
+  font-size: 2rem !important;
+  width: 50px !important;
+  height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #2D7D4F, #16a34a) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 16px rgba(45, 125, 79, 0.3) !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.stat-content {
+  flex: 1 !important;
+  z-index: 1 !important;
 }
 
 .stat-number {
@@ -181,8 +228,8 @@
 }
 
 .detailed-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
