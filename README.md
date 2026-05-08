@@ -1,269 +1,417 @@
-# NearU - Dorm Listing Platform
+# NearU - Dormitory Listing Platform
 
-A Laravel 12 application for connecting students with dorm listings, featuring a two-layer owner verification system.
+A comprehensive Laravel 12 web application that connects students with nearby dormitory accommodations. NearU provides a seamless platform for dorm owners to list their properties and for students to find, compare, and book their ideal living space.
 
-## 📁 Project Structure
+Built with modern web technologies and following Laravel best practices, NearU features a robust verification system, real-time messaging, and an intuitive admin dashboard.
 
-### Application Structure (`app/`)
+## 📌 Project Overview
 
-```
-app/
-├── Http/
-│   ├── Controllers/           # HTTP Controllers
-│   │   ├── AuthController.php
-│   │   ├── Controller.php
-│   │   ├── DormController.php
-│   │   ├── HomeController.php
-│   │   ├── MessageController.php
-│   │   ├── OwnerVerificationController.php
-│   │   └── UserController.php
-│   ├── Middleware/            # Custom Middleware
-│   │   └── EnsureOwnerIsVerified.php
-│   └── Requests/              # Form Request Classes
-│       └── StoreOwnerVerificationRequest.php
-├── Models/                    # Eloquent Models
-│   ├── User.php
-│   ├── DormListing.php
-│   ├── Message.php
-│   ├── OwnerVerification.php
-│   ├── SavedListing.php
-│   └── VisitSchedule.php
-├── Providers/                 # Service Providers
-│   └── AppServiceProvider.php
-└── Services/                  # Business Logic Services
-    └── FileUploadService.php
-```
+NearU is a full-featured dormitory management platform designed to simplify the process of finding and renting student accommodations. The platform serves three main user groups:
 
-### Routes (`routes/`)
+- **Students**: Search, compare, save, and inquire about dormitories
+- **Owners**: List, manage, and verify their properties with comprehensive tools
+- **Administrators**: Oversee platform operations, manage users, and generate reports
 
-```
-routes/
-├── web.php                    # Web routes
-└── console.php               # Console routes
-```
-
-### Views (`resources/views/`)
-
-```
-resources/views/
-├── layouts/
-│   └── app.blade.php         # Main layout
-├── auth/                     # Authentication views
-│   ├── login.blade.php
-│   └── register.blade.php
-├── dorms/                    # Dorm listing views
-│   ├── index.blade.php
-│   ├── show.blade.php
-│   ├── compare.blade.php
-│   └── map.blade.php
-├── owner/                    # Owner-specific views
-│   └── dashboard.blade.php
-├── owner-verification/       # Verification views
-│   └── form.blade.php
-├── admin/                    # Admin views
-│   └── owner-verifications/
-│       ├── index.blade.php
-│       └── review.blade.php
-├── messages/                 # Messaging views
-│   ├── index.blade.php
-│   └── show.blade.php
-├── home.blade.php           # Home page
-├── profile.blade.php        # User profile
-├── saved.blade.php          # Saved listings
-├── visits.blade.php         # Visit schedules
-└── welcome.blade.php        # Welcome page
-```
-
-### Database (`database/`)
-
-```
-database/
-├── factories/                # Model Factories
-├── migrations/              # Database Migrations
-│   ├── 0001_01_01_000000_create_users_table.php
-│   ├── 0001_01_01_000001_create_cache_table.php
-│   ├── 0001_01_01_000002_create_jobs_table.php
-│   ├── 2026_03_09_114859_create_dorm_listings_table.php
-│   ├── 2026_03_09_114904_create_messages_table.php
-│   ├── 2026_03_09_114904_create_saved_listings_table.php
-│   ├── 2026_03_09_114905_create_visit_schedules_table.php
-│   ├── 2026_04_29_053746_add_profile_photo_path_to_users.php
-│   └── 2026_05_01_000000_create_owner_verifications_table.php
-├── seeders/                 # Database Seeders
-│   └── DatabaseSeeder.php
-└── database.sqlite         # SQLite Database
-```
-
-### Tests (`tests/`)
-
-```
-tests/
-├── Feature/                  # Feature Tests
-│   ├── AuthenticationTest.php
-│   └── ExampleTest.php
-└── Unit/                     # Unit Tests
-    └── ExampleTest.php
-```
+The application includes advanced features such as owner verification, real-time messaging, visit scheduling, reviews, and comprehensive analytics dashboards.
 
 ## 🚀 Key Features
 
-### 🔐 Authentication System
-- **Multi-field Login**: Email or phone number
-- **Role-based Redirects**: Students → `/home`, Owners → `/owner/dashboard`
-- **Registration**: No auto-login, redirects to login with success message
-- **Session Management**: Proper regeneration and invalidation
+### 🔐 Multi-Role Authentication System
+- **Flexible Login**: Email or phone number authentication
+- **Role-Based Access**: Students, Owners, and Administrators with dedicated dashboards
+- **Secure Registration**: Email validation and password confirmation
+- **Session Management**: Proper session regeneration and security
 
 ### 🏠 Owner Verification System
-- **Two-layer System**: User type + verification status
-- **Document Upload**: 6 required documents with validation
-- **Admin Review**: Approve/reject with reasons
-- **Status Tracking**: Pending, approved, rejected states
+- **Two-Layer Verification**: User type + document verification status
+- **Document Upload**: Government ID, proof of ownership, and property photos
+- **Admin Review**: Comprehensive approval/rejection workflow with reasons
+- **Status Tracking**: Not verified, under review, approved, or rejected states
 
-### 📱 Mobile-First UI
-- **Responsive Design**: Optimized for mobile devices
-- **Toast Notifications**: Session-based success/error messages
-- **Dark Mode Support**: Toggle between light/dark themes
-- **Touch-Friendly**: Optimized for touch interactions
+### 📱 Modern User Interface
+- **Mobile-First Design**: Fully responsive across all devices
+- **Dark Mode Support**: Toggle between light and dark themes
+- **Interactive Elements**: Touch-friendly components and smooth animations
+- **Toast Notifications**: Real-time feedback for user actions
 
-## 🛠 Development Setup
+### 🔍 Advanced Search & Discovery
+- **Smart Filtering**: Filter by price, location, amenities, and policies
+- **Interactive Maps**: Geographic visualization of dormitory locations
+- **Comparison Tool**: Side-by-side comparison of multiple properties
+- **Save Listings**: Bookmark favorite dormitories for later review
+
+### 💬 Real-Time Communication
+- **Messaging System**: Direct communication between students and owners
+- **Visit Scheduling**: Book and manage property visits
+- **Notifications**: Real-time alerts for inquiries, bookings, and updates
+- **Conversation History**: Complete message thread management
+
+### ⭐ Reviews & Ratings
+- **Student Reviews**: Rate and review dormitory experiences
+- **Average Ratings**: Automatic calculation of property ratings
+- **Review Moderation**: Admin oversight for content quality
+
+### 📊 Analytics & Reporting
+- **Owner Statistics**: Listing performance, views, and inquiry metrics
+- **Admin Reports**: User activity, listing statistics, and platform analytics
+- **Data Export**: CSV exports for detailed analysis
+- **Visual Charts**: Interactive graphs and data visualization
+
+## 🛠 Technologies Used
+
+### Backend
+- **Laravel 12**: Modern PHP framework with elegant syntax
+- **PHP 8.2+**: Latest PHP version with performance improvements
+- **Postgress**: Database for development and testing
+- **Eloquent ORM**: Powerful database abstraction layer
+
+### Frontend
+- **Blade Templates**: Laravel's templating engine
+- **TailwindCSS 4.0**: Utility-first CSS framework
+- **Vite**: Fast build tool and development server
+- **JavaScript ES6+**: Modern JavaScript features
+
+### Additional Libraries
+- **Intervention Image**: Image manipulation and processing
+- **Axios**: HTTP client for API requests
+- **Concurrently**: Run multiple development servers
+
+## 📁 Project Structure
+
+```
+NearU-Laravel/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/          # HTTP Controllers
+│   │   │   ├── Admin/           # Admin-specific controllers
+│   │   │   ├── AuthController.php
+│   │   │   ├── DormController.php
+│   │   │   ├── MessageController.php
+│   │   │   └── ...
+│   │   └── Middleware/          # Custom middleware
+│   ├── Models/                  # Eloquent Models
+│   │   ├── User.php
+│   │   ├── DormListing.php
+│   │   ├── Message.php
+│   │   ├── Review.php
+│   │   └── ...
+│   └── Providers/               # Service Providers
+├── database/
+│   ├── migrations/              # Database schema migrations
+│   ├── seeders/                 # Database seeders
+│   └── factories/               # Model factories
+├── resources/
+│   ├── views/                   # Blade templates
+│   │   ├── admin/               # Admin interface views
+│   │   ├── auth/                # Authentication views
+│   │   ├── owner/               # Owner dashboard views
+│   │   ├── student/             # Student interface views
+│   │   └── layouts/             # Layout templates
+│   ├── css/                     # Compiled CSS
+│   └── js/                      # JavaScript files
+├── routes/
+│   ├── web.php                  # Web routes
+│   └── console.php              # Console routes
+├── storage/
+│   ├── app/                     # Application files
+│   └── public/                  # Public uploads
+├── tests/                       # Test files
+└── public/                      # Public web root
+```
+
+## 🗄️ Database Schema
+
+### Core Tables
+
+#### Users
+- **Fields**: id, name, email, phone, user_type, password, profile_photo_path
+- **Roles**: student, owner, admin
+- **Verification**: verification_status, status
+- **Timestamps**: created_at, updated_at
+
+#### Dorm Listings
+- **Fields**: owner_id, title, description, price, location details
+- **Features**: amenities, furnishings, appliances, bills_included
+- **Policies**: gender_policy, curfew, pets_allowed
+- **Media**: Multiple images with cover photo support
+- **Status**: Available, Unavailable, Pending
+
+#### Messages & Conversations
+- **Real-time messaging** between users
+- **Conversation threading** for organized communication
+- **Listing association** for context-aware messages
+
+#### Reviews & Ratings
+- **Student reviews** with star ratings
+- **Detailed feedback** on dormitory experience
+- **Moderation tools** for administrators
+
+#### Visit Schedules
+- **Appointment booking** system
+- **Status tracking**: Pending, Confirmed, Cancelled
+- **Calendar integration** for easy management
+
+## 🎯 System Architecture
+
+### Authentication Flow
+1. User registration with email/phone validation
+2. Role assignment (student/owner/admin)
+3. Email verification (optional)
+4. Owner document verification for property listing
+
+### Owner Verification Process
+1. Owner uploads verification documents
+2. Admin reviews submitted documents
+3. Approval/rejection with detailed feedback
+4. Verified owners can create and manage listings
+
+### Messaging System
+- **Real-time notifications** for new messages
+- **Conversation organization** by listing
+- **Read/unread status tracking**
+- **File attachment support**
+
+### Search & Discovery
+- **Advanced filtering** by multiple criteria
+- **Geographic search** with map integration
+- **Sorting options** by price, distance, rating
+- **Saved listings** for user favorites
+
+## 🔒 Security Features
+
+- **CSRF Protection**: All forms protected against cross-site request forgery
+- **Input Validation**: Comprehensive validation rules for all user inputs
+- **File Upload Security**: Type and size restrictions for uploaded files
+- **Role-Based Authorization**: Proper access control for different user types
+- **Session Security**: Proper session regeneration and secure cookies
+- **Password Hashing**: Bcrypt encryption for user passwords
+- **SQL Injection Prevention**: Eloquent ORM parameterized queries
+
+## 🧪 Testing
+
+The application includes comprehensive test coverage:
+
+```bash
+# Run all tests
+php artisan test
+
+# Run specific test suite
+php artisan test --filter AuthenticationTest
+
+# Run with coverage
+php artisan test --coverage
+```
+
+### Test Categories
+- **Feature Tests**: Complete user workflows and API endpoints
+- **Unit Tests**: Individual model and service method testing
+- **Browser Tests**: User interface interactions (if using Laravel Dusk)
+
+## 🚀 Installation & Setup
 
 ### Prerequisites
-- PHP 8.2+
-- Composer
-- Node.js & NPM
-- SQLite (or configure other database)
+- PHP 8.2 or higher
+- Composer 2.0 or higher
+- Node.js 18+ and NPM
+- SQLite or MySQL/PostgreSQL (for production)
 
-### Installation
+### Quick Start
+
+1. **Clone Repository**
 ```bash
-# Install PHP dependencies
+git clone https://github.com/kelleeerrrr/NearU.git
+cd NearU
+```
+
+2. **Install Dependencies**
+```bash
+# PHP dependencies
 composer install
 
-# Install Node dependencies
+# Node.js dependencies
 npm install
+```
 
+3. **Environment Setup**
+```bash
 # Copy environment file
 cp .env.example .env
 
 # Generate application key
 php artisan key:generate
+```
 
+4. **Database Setup**
+```bash
 # Run migrations
 php artisan migrate
 
-# Create storage link
-php artisan storage:link
+# Seed database (optional)
+php artisan db:seed
+```
 
-# Build assets
+5. **Create Storage Link**
+```bash
+php artisan storage:link
+```
+
+6. **Build Assets**
+```bash
 npm run build
 ```
 
-### Development
+7. **Start Development Server**
 ```bash
-# Start development servers
+# Using Laravel's built-in server
+php artisan serve
+
+# Or use the development script
 composer run dev
 ```
 
-### Testing
-```bash
-# Run tests
-php artisan test
+### Environment Configuration
 
-# Run specific test
-php artisan test tests/Feature/AuthenticationTest.php
+Configure your `.env` file with the following settings:
+
+```env
+APP_NAME=NearU
+APP_ENV=local
+APP_KEY=base64:your-generated-key
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+
+# For production use MySQL/PostgreSQL
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=nearu
+# DB_USERNAME=username
+# DB_PASSWORD=password
 ```
 
-## 📊 Database Schema
-
-### Users Table
-- `id`, `name`, `email`, `phone`, `user_type`, `password`
-- `profile_photo_path`, `email_verified_at`
-- `created_at`, `updated_at`
-
-### Owner Verifications Table
-- `user_id` (foreign key)
-- Document paths: `government_id_path`, `selfie_with_id_path`, etc.
-- `status` (pending/approved/rejected)
-- `rejection_reason`, `verified_by`, `verified_at`
-
-### Dorm Listings Table
-- Owner relationship, location data, pricing, amenities
-- Photo arrays, status management
-
-## 🔒 Security Features
-
-- **CSRF Protection**: All forms protected
-- **Input Validation**: Comprehensive validation rules
-- **File Upload Security**: Type and size restrictions
-- **Authorization**: Role-based access control
-- **Session Security**: Proper regeneration
-
-## 🎯 Code Quality
-
-- **PSR-4 Autoloading**: Standard namespace structure
-- **Laravel Conventions**: Follows framework best practices
-- **Service Layer**: Business logic separated from controllers
-- **Form Requests**: Validation logic in dedicated classes
-- **Comprehensive Tests**: Feature and unit test coverage
-
-## 📝 API Endpoints
+## 📊 API Endpoints
 
 ### Authentication
-- `GET /login` - Show login form
-- `POST /login` - Process login
-- `GET /register` - Show registration form
-- `POST /register` - Process registration
-- `POST /logout` - Logout user
+- `POST /login` - User authentication
+- `POST /register` - User registration
+- `POST /logout` - User logout
 
-### Owner Verification
-- `GET /owner/verification` - Show verification form
-- `POST /owner/verification` - Submit documents
-- `GET /api/owner-verification/status/{userId}` - Get status
+### Dorm Listings
+- `GET /dorms` - List all dormitories
+- `GET /dorms/{id}` - Show specific dormitory
+- `POST /dorms` - Create new listing (verified owners only)
+- `PUT /dorms/{id}` - Update listing (owners only)
+- `DELETE /dorms/{id}` - Delete listing (owners only)
 
-### Protected Routes (Verified Owners Only)
-- `GET /dorms/create` - Create listing form
-- `POST /dorms` - Store new listing
-- `GET /owner/dashboard` - Owner dashboard
+### Messages
+- `GET /messages` - List user conversations
+- `GET /messages/{listingId}/{userId}` - Show conversation
+- `POST /messages/send/{listingId}/{userId}` - Send message
+
+### Admin Routes
+- `GET /admin/dashboard` - Admin dashboard
+- `GET /admin/users` - User management
+- `GET /admin/reports` - Platform analytics
+- `POST /admin/settings` - System configuration
+
+## 🎨 UI/UX Features
+
+### Student Interface
+- **Modern Homepage**: Featured listings and quick search
+- **Advanced Search**: Comprehensive filtering options
+- **Detailed Listings**: High-quality images and detailed information
+- **Comparison Tool**: Side-by-side property comparison
+- **Saved Listings**: Bookmark favorite properties
+- **Messaging**: Direct communication with owners
+
+### Owner Dashboard
+- **Property Management**: Create, edit, and manage listings
+- **Inbox**: Respond to student inquiries
+- **Visit Scheduling**: Manage property visit requests
+- **Analytics**: Track listing performance
+- **Verification Status**: Monitor verification progress
+
+### Admin Panel
+- **User Management**: Oversee all platform users
+- **Verification Review**: Process owner verification requests
+- **System Settings**: Configure platform parameters
+- **Reports & Analytics**: Comprehensive platform insights
+- **Content Moderation**: Review and manage user-generated content
+
+## 🌱 Project Significance
+
+NearU addresses the common challenges students face when searching for accommodation:
+
+- **Transparency**: Verified listings with detailed information
+- **Convenience**: One-stop platform for all housing needs
+- **Trust**: Owner verification and student reviews
+- **Efficiency**: Direct communication and streamlined booking
+- **Accessibility**: Mobile-first design for on-the-go access
+
+The platform demonstrates modern web development practices including:
+- **RESTful API design**
+- **Responsive web development**
+- **Database optimization**
+- **Security best practices**
+- **User experience optimization**
+
+## 🚀 Future Enhancements
+
+### Planned Features
+- **Mobile Applications**: Native iOS and Android apps
+- **Payment Integration**: Online rent payment processing
+- **Advanced Analytics**: Machine learning for price recommendations
+- **Multi-language Support**: International expansion
+- **IoT Integration**: Smart dormitory features
+- **Virtual Tours**: 360° property viewing
+
+### Technical Improvements
+- **API-First Architecture**: Separate frontend and backend
+- **Microservices**: Modular service architecture
+- **Real-time Features**: WebSocket implementation
+- **Performance Optimization**: Caching and CDN integration
+- **Enhanced Security**: Two-factor authentication
 
 ## 🤝 Contributing
 
-1. Follow PSR-12 coding standards
-2. Write tests for new features
-3. Update documentation
-4. Use meaningful commit messages
+We welcome contributions to the NearU platform! Please follow these guidelines:
+
+1. **Fork the repository** and create a feature branch
+2. **Follow PSR-12 coding standards**
+3. **Write tests** for new features
+4. **Update documentation** as needed
+5. **Submit pull requests** with clear descriptions
+
+### Development Guidelines
+- Use meaningful commit messages
+- Follow Laravel conventions
+- Write clean, readable code
+- Include appropriate error handling
+- Test thoroughly before submitting
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🙏 Acknowledgments
 
-## Laravel Sponsors
+- **Laravel Team** for the excellent framework
+- **TailwindCSS** for the utility-first CSS framework
+- **OpenAI** for assistance in development and documentation
+- **Contributors** who help improve the platform
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📞 Support
 
-### Premium Partners
+For support, questions, or contributions:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- **GitHub Issues**: Report bugs and request features
+- **Email**: [your-email@example.com]
+- **Documentation**: Check the `/docs` directory for detailed guides
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**NearU** - Making student housing search simple, secure, and efficient. 🏠✨
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
