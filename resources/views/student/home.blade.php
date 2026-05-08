@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'NearU – Find Housing Near Campus')
+@section('title', 'NearU – Find Housing Near University')
 
 @section('content')
 <div class="wrap">
@@ -13,7 +13,7 @@
 
     {{-- Hero --}}
     <div class="hero">
-      <h1>Find a place <span>near campus</span></h1>
+      <h1>Find a place <span>near university</span></h1>
       <p>
         <span class="hero-badge">🛏️ Dorms</span>
         <span class="hero-badge">🛌 Bedspaces</span>
@@ -67,9 +67,10 @@
 
             $inCmp  = in_array($dorm->id, session('compare', []));
             $saved  = auth()->check() && auth()->user()->savedListings()->where('dorm_listing_id', $dorm->id)->exists();
-            $rating = $dorm->rating ? round($dorm->rating) : 0;
             $avgRating = $dorm->rating ?? 0;
-            $empty  = 5 - $rating;
+            $fullStars = floor($avgRating);
+            $hasHalfStar = ($avgRating - $fullStars) >= 0.5;
+            $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
           @endphp
 
           {{-- data-* attrs drive client-side search + filter --}}
@@ -86,50 +87,40 @@
                data-pets="{{ $dorm->pets_allowed ? '1' : '0' }}"
                data-curfew="{{ strtolower($dorm->curfew ?? '') }}">
 
-            {{-- IMAGE CAROUSEL --}}
-            @if(count($photos) > 1)
-              <div class="carousel" id="car-{{ $dorm->id }}">
-                <div class="carousel-inner" id="ci-{{ $dorm->id }}">
-                  @foreach($photos as $photo)
-                    <div class="carousel-slide">
-                      <img src="{{ asset('storage/' . $photo) }}"
-                          alt="{{ $dorm->street }}"
-                          loading="lazy"
-                          style="width:100%;height:185px;object-fit:cover;cursor:pointer;border-radius:12px;"
-                          onclick="UI.openLb(this.src)">
+            {{-- IMAGE - Owner Style with Navigation --}}
+            <div class="listing-images">
+              @if($dorm->images->count())
+                <div class="photo-container" data-photos='@json($photos)'>
+                  <img src="{{ asset('storage/' . $photos[0]) }}"
+                       alt="{{ $dorm->street }}"
+                       class="listing-main-img"
+                       data-index="0"
+                       data-count="{{ count($photos) }}"
+                       loading="lazy"
+                       onclick="UI.openLb(this.src)">
+
+                  @if($dorm->images->count() > 1)
+                    <div class="image-count">
+                      +{{ $dorm->images->count() - 1 }}
                     </div>
-                  @endforeach
+                    
+                    <button class="photo-nav prev" onclick="PhotoNav.prev({{ $dorm->id }})">‹</button>
+                    <button class="photo-nav next" onclick="PhotoNav.next({{ $dorm->id }})">›</button>
+                  @endif
                 </div>
-                <button class="carousel-btn prev" onclick="Carousel.slide({{ $dorm->id }}, -1)">‹</button>
-                <button class="carousel-btn next" onclick="Carousel.slide({{ $dorm->id }},  1)">›</button>
-                <div class="carousel-dots">
-                  @foreach($photos as $i => $photo)
-                    <div class="c-dot{{ $i === 0 ? ' on' : '' }}"
-                         onclick="Carousel.goSlide({{ $dorm->id }}, {{ $i }})"></div>
-                  @endforeach
+              @else
+                <div class="no-image">
+                  <span class="material-symbols-outlined">image</span>
                 </div>
-                <div class="dist-overlay">📍 {{ $dorm->walk_minutes }}-min walk</div>
-                <span class="heart-overlay" id="heart-{{ $dorm->id }}"
-                      style="color:{{ $saved ? 'var(--gold)' : 'white' }}"
-                      onclick="Saved.toggle({{ $dorm->id }}, event)">
-                  {{ $saved ? '♥' : '♡' }}
-                </span>
-              </div>
-            @else
-              <div class="carousel">
-              <img src="{{ $cover }}"
-                  style="width:100%;height:185px;object-fit:cover;cursor:pointer;border-radius:12px;"
-                  alt="{{ $dorm->street }}"
-                  loading="lazy"
-                  onclick="UI.openLb(this.src)">
-                <div class="dist-overlay">📍 {{ $dorm->walk_minutes }}-min walk</div>
-                <span class="heart-overlay" id="heart-{{ $dorm->id }}"
-                      style="color:{{ $saved ? 'var(--gold)' : 'white' }}"
-                      onclick="Saved.toggle({{ $dorm->id }}, event)">
-                  {{ $saved ? '♥' : '♡' }}
-                </span>
-              </div>
-            @endif
+              @endif
+              
+              <div class="dist-overlay">📍 {{ $dorm->walk_minutes }}-min walk</div>
+              <span class="heart-overlay" id="heart-{{ $dorm->id }}"
+                    style="color:{{ $saved ? 'var(--gold)' : 'white' }}"
+                    onclick="Saved.toggle({{ $dorm->id }}, event)">
+                {{ $saved ? '♥' : '♡' }}
+              </span>
+            </div>
 
             {{-- PRICE & RATINGS CONTAINER --}}
             <div class="price-rating-container">
@@ -138,7 +129,7 @@
                 <div class="card-price">₱{{ number_format($dorm->price, 0) }} <small>/ month</small></div>
               </div>
               <div class="rat-row">
-                <span class="stars">{!! str_repeat('★', $rating) !!}{!! str_repeat('☆', $empty) !!}</span>
+                <span class="stars">{!! str_repeat('★', $fullStars) !!}{!! $hasHalfStar ? '✯' : '' !!}{!! str_repeat('☆', $emptyStars) !!}</span>
                 <span class="rv">{{ number_format($dorm->rating ?? 0, 1) }}</span>
                 <span class="rc">({{ $dorm->reviews()->count() }})</span>
               </div>
@@ -279,8 +270,14 @@
 
 {{-- COMPARE BAR --}}
 <div id="cmp-bar" class="hide">
-  <span class="cb-t" id="cmpTxt">0 selected</span>
-  <button class="cb-btn" onclick="Compare.open()">Compare Now →</button>
+  <div class="cb-selected" id="cmpSelected"></div>
+  <div class="cb-actions">
+    <span class="cb-t" id="cmpTxt">0 selected</span>
+    <div style="display:flex;gap:8px;">
+      <button class="cb-btn cb-clear" onclick="Compare.clearAll()" style="background:rgba(255,255,255,0.2);color:#fff;padding:8px 12px;font-size:.7rem;" title="Clear all selections">✕</button>
+      <button class="cb-btn" onclick="Compare.open()">Compare Now →</button>
+    </div>
+  </div>
 </div>
 
 <div id="filterModal" class="modal">
@@ -461,20 +458,85 @@
     background:linear-gradient(90deg, var(--gold), #f59e0b);
   }
 
-  /* CAROUSEL */
-  .carousel { position:relative; border-radius:16px; overflow:hidden; margin-bottom:.9rem; background:linear-gradient(135deg, var(--bg) 0%, #f8fafc 100%); box-shadow:0 4px 12px rgba(45,125,79,0.1); }
-  .carousel-inner { display:flex; transition:transform .35s cubic-bezier(.4,0,.2,1); }
-  .carousel-slide { min-width:100%; height:185px; flex-shrink:0; }
-  .carousel-slide img { width:100%; height:100%; object-fit:cover; cursor:pointer; transition:transform .3s; border-radius:16px; }
-  .carousel-slide img:hover { transform:scale(1.02); }
-  .carousel-dots { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:5px; }
-  .c-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.6); transition:all .2s; cursor:pointer; }
-  .c-dot.on { background:var(--gold); width:18px; border-radius:3px; box-shadow:0 2px 6px rgba(242,183,5,0.3); }
-  .carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.9); border:none; border-radius:50%; width:32px; height:32px; font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,.15); transition:all .2s; z-index:2; }
-  .carousel-btn:hover { background:#fff; transform:translateY(-50%) scale(1.1); box-shadow:0 4px 12px rgba(0,0,0,.2); }
-  .carousel-btn.prev { left:10px; }
-  .carousel-btn.next { right:10px; }
+  /* OWNER STYLE IMAGES - Referencing owners/show and dorms/show */
+  .listing-images {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: .9rem;
+  }
+
+  .listing-main-img {
+    width: 100%;
+    height: 250px;
+    border-radius: 12px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .listing-main-img:hover {
+    transform: scale(1.02);
+  }
+
+  .image-count {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.4) 100%);
+    color: #fff;
+    padding: .3rem .8rem;
+    border-radius: 25px;
+    font-size: .72rem;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+
+  .no-image {
+    height: 250px;
+    border-radius: 12px;
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .dist-overlay { position:absolute; top:10px; right:10px; background:linear-gradient(135deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.4) 100%); color:#fff; padding:.3rem .8rem; border-radius:25px; font-size:.72rem; font-weight:700; backdrop-filter:blur(6px); box-shadow:0 2px 8px rgba(0,0,0,.2); }
+
+  .photo-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    color: #2D7D4F;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,.15);
+    transition: all 0.2s ease;
+    z-index: 2;
+  }
+
+  .photo-nav:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  }
+
+  .photo-nav.prev {
+    left: 12px;
+  }
+
+  .photo-nav.next {
+    right: 12px;
+  }
   .lazy-pending { opacity:0; transition:opacity .35s; }
   .lazy-loaded  { opacity:1; }
 
@@ -544,7 +606,7 @@
     display:inline-flex; 
     align-items:center; 
     gap:.3rem; 
-    background:linear-gradient(135deg, #2D7D4F 0%, #1f5c38 100%); 
+    background:linear-gradient(135deg, #000000 0%, #0b3f04 100%); 
     border:1.5px solid #2D7D4F; 
     border-radius:25px; 
     padding:.24rem .65rem; 
@@ -567,7 +629,7 @@
   .owner-chip:hover { 
     border-color:#1f5c38; 
     color:#fff; 
-    background:linear-gradient(135deg, #1f5c38 0%, #2D7D4F 100%); 
+    background:linear-gradient(135deg, #f8cd0c 0%, #b8a500 100%); 
     transform:translateY(-2px); 
     box-shadow:0 4px 12px rgba(45,125,79,0.4);
   }
@@ -602,8 +664,13 @@
   .empty p  { font-weight:600; font-size:.88rem; }
 
   /* COMPARE BAR */
-  #cmp-bar { position:fixed; bottom:110px; left:50%; transform:translateX(-50%); max-width:480px; width:100%; background:var(--green); color:#fff; padding:11px 1.3rem; display:flex; justify-content:space-between; align-items:center; z-index:1600; box-shadow:0 -2px 12px rgba(45,125,79,.3); }
+  #cmp-bar { position:fixed; bottom:110px; left:50%; transform:translateX(-50%); max-width:480px; width:100%; background:var(--green); color:#fff; padding:11px 1.3rem; z-index:1600; box-shadow:0 -2px 12px rgba(45,125,79,.3); }
   #cmp-bar.hide { display:none; }
+  #cmp-bar .cb-selected { display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+  #cmp-bar .cb-dorm-item { background:rgba(255,255,255,0.2); border-radius:20px; padding:4px 8px; display:flex; align-items:center; gap:6px; font-size:.75rem; font-weight:600; }
+  #cmp-bar .cb-dorm-item .remove { cursor:pointer; background:rgba(255,255,255,0.3); border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:12px; line-height:1; transition:background .2s; }
+  #cmp-bar .cb-dorm-item .remove:hover { background:rgba(255,255,255,0.5); }
+  #cmp-bar .cb-actions { display:flex; justify-content:space-between; align-items:center; }
   #cmp-bar .cb-t { font-size:.84rem; font-weight:700; }
   #cmp-bar .cb-btn { background:var(--gold); color:#1F2933; border:none; border-radius:22px; padding:8px 16px; font-weight:800; font-size:.78rem; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .18s; }
   #cmp-bar .cb-btn:hover { background:var(--gold-dk); }
@@ -844,21 +911,49 @@ const UI = {
   },
 };
 
-const Carousel = {
-  _idx: {},
-  slide(id, dir) {
-    const dorm = DORMS_DATA.find(d => d.id === id);
-    if (!dorm?.imgs?.length) return;
-    this._idx[id] = ((this._idx[id] ?? 0) + dir + dorm.imgs.length) % dorm.imgs.length;
-    this._update(id);
+// Photo Navigation JavaScript
+const PhotoNav = {
+  prev(dormId) {
+    const container = document.querySelector(`#card-${dormId} .photo-container`);
+    if (!container) return;
+    
+    const img = container.querySelector('.listing-main-img');
+    const photos = JSON.parse(container.dataset.photos || '[]');
+    const count = photos.length;
+    const currentIndex = parseInt(img.dataset.index) || 0;
+    
+    if (currentIndex > 0) {
+      const newIndex = currentIndex - 1;
+      img.src = `/storage/${photos[newIndex]}`;
+      img.dataset.index = newIndex;
+      this.updateImageCount(container, newIndex, count);
+    }
   },
-  goSlide(id, idx) { this._idx[id] = idx; this._update(id); },
-  _update(id) {
-    const ci = document.getElementById('ci-' + id);
-    if (ci) ci.style.transform = `translateX(-${this._idx[id] * 100}%)`;
-    document.querySelectorAll(`#car-${id} .c-dot`).forEach((dot, i) =>
-      dot.classList.toggle('on', i === this._idx[id]));
+
+  next(dormId) {
+    const container = document.querySelector(`#card-${dormId} .photo-container`);
+    if (!container) return;
+    
+    const img = container.querySelector('.listing-main-img');
+    const photos = JSON.parse(container.dataset.photos || '[]');
+    const count = photos.length;
+    const currentIndex = parseInt(img.dataset.index) || 0;
+    
+    // Remove next button when viewing last photo
+    if (currentIndex < count - 1) {
+      const newIndex = currentIndex + 1;
+      img.src = `/storage/${photos[newIndex]}`;
+      img.dataset.index = newIndex;
+      this.updateImageCount(container, newIndex, count);
+    }
   },
+
+  updateImageCount(container, currentIndex, total) {
+    const countElement = container.querySelector('.image-count');
+    if (countElement) {
+      countElement.textContent = `+${total - currentIndex - 1}`;
+    }
+  }
 };
 
 const Saved = {
@@ -942,28 +1037,72 @@ const Saved = {
 
 const Compare = {
   _list: [],
+  _dormNames: {},
   toggle(id) {
     const i = this._list.indexOf(id);
     if (i > -1) {
       this._list.splice(i, 1);
+      delete this._dormNames[id];
       document.getElementById('card-' + id)?.classList.remove('cmp-on');
       const btn = document.getElementById('cmp-btn-' + id);
       if (btn) { btn.textContent = '⚖️ Compare'; btn.classList.remove('on'); }
     } else {
       if (this._list.length >= 3) { showToast('⚠️ Max 3 dorms', 'warn'); return; }
       this._list.push(id);
+      // Get dorm name from the card
+      const card = document.getElementById('card-' + id);
+      const dormName = card?.querySelector('.card-street')?.textContent || `Dorm ${id}`;
+      this._dormNames[id] = dormName;
       document.getElementById('card-' + id)?.classList.add('cmp-on');
       const btn = document.getElementById('cmp-btn-' + id);
       if (btn) { btn.textContent = '✓ Added'; btn.classList.add('on'); }
     }
     this._updateBar();
   },
+  remove(id) {
+    const i = this._list.indexOf(id);
+    if (i > -1) {
+      this._list.splice(i, 1);
+      delete this._dormNames[id];
+      document.getElementById('card-' + id)?.classList.remove('cmp-on');
+      const btn = document.getElementById('cmp-btn-' + id);
+      if (btn) { btn.textContent = '⚖️ Compare'; btn.classList.remove('on'); }
+      this._updateBar();
+    }
+  },
   _updateBar() {
     const bar = document.getElementById('cmp-bar');
-    if (!this._list.length) { bar.classList.add('hide'); return; }
+    const selectedContainer = document.getElementById('cmpSelected');
+    if (!this._list.length) { 
+      bar.classList.add('hide'); 
+      selectedContainer.innerHTML = '';
+      return; 
+    }
     bar.classList.remove('hide');
+    
+    // Update selected dorms display
+    selectedContainer.innerHTML = this._list.map(id => `
+      <div class="cb-dorm-item">
+        <span>${this._dormNames[id] || `Dorm ${id}`}</span>
+        <span class="remove" onclick="Compare.remove(${id})">×</span>
+      </div>
+    `).join('');
+    
+    // Update counter text
     document.getElementById('cmpTxt').textContent =
       `${this._list.length} dorm${this._list.length > 1 ? 's' : ''} selected`;
+  },
+  clearAll() {
+    // Clear all selected dorms
+    this._list.forEach(id => {
+      document.getElementById('card-' + id)?.classList.remove('cmp-on');
+      const btn = document.getElementById('cmp-btn-' + id);
+      if (btn) { btn.textContent = '⚖️ Compare'; btn.classList.remove('on'); }
+    });
+    this._list = [];
+    this._dormNames = {};
+    this._updateBar();
+    showToast('✕ All selections cleared', 'ok');
   },
   open() {
     if (this._list.length < 2) { showToast('⚠️ Select at least 2', 'warn'); return; }

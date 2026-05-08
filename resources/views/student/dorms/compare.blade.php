@@ -436,7 +436,16 @@
                   </div>
                 </td>
                 @foreach($dormListings as $dorm)
-                  <td style="font-size:0.8rem;">{{ $dorm->appliances ?? '—' }}</td>
+                  <td style="font-size:0.8rem;">
+                    @php
+                      $appliances = is_array($dorm->appliances) ? $dorm->appliances : (json_decode($dorm->appliances, true) ?: []);
+                    @endphp
+                    @if(!empty($appliances))
+                      {{ implode(', ', array_slice($appliances, 0, 3)) }}{{ count($appliances) > 3 ? '...' : '' }}
+                    @else
+                      —
+                    @endif
+                  </td>
                 @endforeach
               </tr>
 
@@ -449,7 +458,16 @@
                   </div>
                 </td>
                 @foreach($dormListings as $dorm)
-                  <td style="font-size:0.8rem;">{{ $dorm->furnishings ?? '—' }}</td>
+                  <td style="font-size:0.8rem;">
+                    @php
+                      $furnishings = is_array($dorm->furnishings) ? $dorm->furnishings : (json_decode($dorm->furnishings, true) ?: []);
+                    @endphp
+                    @if(!empty($furnishings))
+                      {{ implode(', ', array_slice($furnishings, 0, 3)) }}{{ count($furnishings) > 3 ? '...' : '' }}
+                    @else
+                      —
+                    @endif
+                  </td>
                 @endforeach
               </tr>
 
@@ -462,7 +480,16 @@
                   </div>
                 </td>
                 @foreach($dormListings as $dorm)
-                  <td style="font-size:0.8rem;">{{ $dorm->bills_included ?? '—' }}</td>
+                  <td style="font-size:0.8rem;">
+                    @php
+                      $bills = is_array($dorm->bills_included) ? $dorm->bills_included : (json_decode($dorm->bills_included, true) ?: []);
+                    @endphp
+                    @if(!empty($bills))
+                      {{ implode(', ', array_slice($bills, 0, 3)) }}{{ count($bills) > 3 ? '...' : '' }}
+                    @else
+                      —
+                    @endif
+                  </td>
                 @endforeach
               </tr>
 

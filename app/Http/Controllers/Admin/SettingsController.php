@@ -12,7 +12,7 @@ class SettingsController extends Controller
     {
         $settings = [
             'site_name' => config('app.name'),
-            'site_description' => 'NearU - Find your perfect dorm near campus',
+            'site_description' => 'NearU - Find your perfect dorm near university',
             'contact_email' => config('mail.from.address', 'admin@nearu.com'),
             'max_listings_per_owner' => 10,
             'require_verification' => true,

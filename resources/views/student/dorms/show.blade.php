@@ -4,15 +4,51 @@
 
 @push('styles')
 <style>
-.carousel { position: relative; overflow: hidden; border-radius: 18px; background: linear-gradient(135deg, #f8f9f7, #e8f5e8); box-shadow: 0 8px 32px rgba(45,125,79,0.12); }
-.carousel-inner { display: flex; transition: transform .4s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; }
-.carousel-slide { min-width: 100%; flex-shrink: 0; position: relative; }
-.carousel-slide img { width: 100%; height: 280px; object-fit: cover; display: block; }
-.carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.95); border: none; box-shadow: 0 4px 20px rgba(0,0,0,.2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #2D7D4F; z-index: 2; transition: all 0.3s ease; }
-.carousel-arrow.prev { left: 16px; }
-.carousel-arrow.next { right: 16px; }
-.carousel-arrow:hover { transform: translateY(-50%) scale(1.1); background: #fff; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
-.carousel-indicator { position: absolute; bottom: 16px; right: 16px; background: rgba(45,125,79,0.9); color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; backdrop-filter: blur(10px); }
+/* OWNER STYLE IMAGES */
+.listing-images {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #f8f9f7, #e8f5e8);
+  box-shadow: 0 8px 32px rgba(45,125,79,0.12);
+}
+
+.listing-main-img {
+  width: 100%;
+  height: 280px;
+  border-radius: 18px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.listing-main-img:hover {
+  transform: scale(1.02);
+}
+
+.image-count {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.4) 100%);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+.no-image {
+  height: 280px;
+  border-radius: 18px;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .listing-header { background: linear-gradient(135deg, #ffe62a, #ebb540); color: #000; padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 6px 24px rgba(45,125,79,0.2); }
 .listing-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
@@ -247,7 +283,7 @@
       <!-- Listing Header -->
       <div class="listing-header">
         <h1 class="listing-title">{{ $listing->street }}</h1>
-        <div class="listing-subtitle">{{ $listing->type }} • {{ $listing->gender_policy }} • {{ $listing->walk_minutes }} min walk to campus</div>
+        <div class="listing-subtitle">{{ $listing->type }} • {{ $listing->gender_policy }} • {{ $listing->walk_minutes }} min walk to university</div>
       </div>
 
       @php
@@ -259,26 +295,25 @@
         })->values()->all();
       @endphp
 
-      <!-- Image Carousel -->
-      <div class="carousel" style="margin-bottom: 1rem;">
-        <div class="carousel-inner" id="listing-carousel-inner">
-          @forelse($gallery as $photo)
-            <div class="carousel-slide">
-              <img src="{{ $photo }}" alt="Dorm image">
-            </div>
-          @empty
-            <div class="carousel-slide">
-              <img src="https://via.placeholder.com/400x200?text=Dorm+Image" alt="Dorm image">
-            </div>
-          @endforelse
-        </div>
+      <!-- Image - Owner Style -->
+      <div class="listing-images">
+        @if($listing->images->count())
+          <img src="{{ asset('storage/' . $listing->images->first()->path) }}"
+               alt="{{ $listing->street }}"
+               class="listing-main-img"
+               loading="lazy"
+               onclick="UI.openLb(this.src)">
 
-        @if(count($gallery) > 1)
-          <button type="button" class="carousel-arrow prev" id="carousel-prev">‹</button>
-          <button type="button" class="carousel-arrow next" id="carousel-next">›</button>
+          @if($listing->images->count() > 1)
+            <div class="image-count">
+              +{{ $listing->images->count() - 1 }}
+            </div>
+          @endif
+        @else
+          <div class="no-image">
+            <span class="material-symbols-outlined">image</span>
+          </div>
         @endif
-
-        <div class="carousel-indicator" id="carousel-indicator">1 / {{ count($gallery) ?: 1 }}</div>
       </div>
 
       <!-- Price and Type -->
@@ -437,45 +472,6 @@ function scheduleVisit(dormId) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const inner = document.getElementById('listing-carousel-inner');
-  const prevBtn = document.getElementById('carousel-prev');
-  const nextBtn = document.getElementById('carousel-next');
-  const indicator = document.getElementById('carousel-indicator');
-  if (!inner) return;
-
-  const slides = inner.querySelectorAll('.carousel-slide');
-  const total = slides.length;
-  let index = 0;
-
-  function updateCarousel() {
-    inner.style.transform = `translateX(-${index * 100}%)`;
-    if (indicator) {
-      indicator.textContent = `${index + 1} / ${total}`;
-    }
-    if (prevBtn) {
-      prevBtn.style.display = total > 1 ? 'flex' : 'none';
-    }
-    if (nextBtn) {
-      nextBtn.style.display = total > 1 ? 'flex' : 'none';
-    }
-  }
-
-  if (prevBtn) {
-    prevBtn.addEventListener('click', function() {
-      index = (index - 1 + total) % total;
-      updateCarousel();
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener('click', function() {
-      index = (index + 1) % total;
-      updateCarousel();
-    });
-  }
-
-  updateCarousel();
-});
+// No carousel JavaScript needed - using owner-style photo display
 </script>
 @endpush

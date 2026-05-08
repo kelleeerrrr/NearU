@@ -75,6 +75,7 @@
     right: -250px;
     transform: translateY(-50%);
     top: 0.05%;
+    margin-right: 4.5rem;
 }
 
 .profile-indicator {

@@ -295,23 +295,28 @@ input[readonly]:focus { border-color: var(--border); box-shadow: none; }
   </div>
 
   <div class="steps-track">
-    <div class="step-item done">
-      <div class="step-dot">✓</div>
+    <div class="step-item" id="step-photos">
+      <div class="step-dot">1</div>
       <div class="step-text">Photos</div>
     </div>
-    <div class="step-connector done"></div>
-    <div class="step-item active">
+    <div class="step-connector" id="connector-photos"></div>
+    <div class="step-item active" id="step-basic">
       <div class="step-dot">2</div>
-      <div class="step-text">Details</div>
+      <div class="step-text">Basic Info</div>
     </div>
-    <div class="step-connector"></div>
-    <div class="step-item">
+    <div class="step-connector" id="connector-basic"></div>
+    <div class="step-item" id="step-features">
       <div class="step-dot">3</div>
       <div class="step-text">Features</div>
     </div>
-    <div class="step-connector"></div>
-    <div class="step-item">
+    <div class="step-connector" id="connector-features"></div>
+    <div class="step-item" id="step-rules">
       <div class="step-dot">4</div>
+      <div class="step-text">Rules</div>
+    </div>
+    <div class="step-connector" id="connector-rules"></div>
+    <div class="step-item" id="step-location">
+      <div class="step-dot">5</div>
       <div class="step-text">Location</div>
     </div>
   </div>
@@ -348,15 +353,21 @@ input[readonly]:focus { border-color: var(--border); box-shadow: none; }
 
     <div class="field">
       <label>Street</label>
-      <select name="street">
+      <select name="street" id="streetSelect">
         <option value="">Select street…</option>
-        <option>Mars</option>
-        <option>Jupiter</option>
-        <option>Earth</option>
+        <option>Neptune</option>
         <option>Venus</option>
+        <option>Jupiter</option>
         <option>Saturn</option>
+        <option>Mercury</option>
         <option>Other</option>
       </select>
+    </div>
+
+    <div class="field">
+      <label>Complete Street Address</label>
+      <input type="text" name="complete_address" id="completeAddress" placeholder="Enter complete street address (e.g., 123 Mars Street, Brgy. Poblacion)..." maxlength="255">
+      <small style="color:var(--muted); font-size:0.75rem; margin-top:4px; display:block;">Add the complete address details including house number, building name, or landmarks.</small>
     </div>
 
     <div class="field">
@@ -498,6 +509,100 @@ input[readonly]:focus { border-color: var(--border); box-shadow: none; }
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+
+/* ── STEPS TRACKER ── */
+function updateStepProgress(stepId, connectorId, isCompleted) {
+  const step = document.getElementById(stepId);
+  const connector = document.getElementById(connectorId);
+  const dot = step.querySelector('.step-dot');
+  
+  if (isCompleted) {
+    step.classList.add('done');
+    step.classList.remove('active');
+    dot.textContent = '✓';
+    if (connector) connector.classList.add('done');
+  } else {
+    step.classList.remove('done');
+    dot.textContent = stepId.replace('step-', '').replace('photos', '1').replace('basic', '2').replace('features', '3').replace('rules', '4').replace('location', '5');
+    if (connector) connector.classList.remove('done');
+  }
+}
+
+function setActiveStep(stepId) {
+  // Remove active from all steps
+  document.querySelectorAll('.step-item').forEach(step => step.classList.remove('active'));
+  
+  // Add active to current step
+  const currentStep = document.getElementById(stepId);
+  if (currentStep && !currentStep.classList.contains('done')) {
+    currentStep.classList.add('active');
+  }
+}
+
+function checkPhotosCompletion() {
+  const hasPhotos = files && files.length > 0;
+  updateStepProgress('step-photos', 'connector-photos', hasPhotos);
+  
+  if (hasPhotos) {
+    setActiveStep('step-basic');
+  }
+}
+
+function checkBasicInfoCompletion() {
+  const street = document.getElementById('streetSelect').value;
+  const address = document.getElementById('completeAddress').value;
+  const price = document.querySelector('input[name="price"]').value;
+  const type = document.querySelector('select[name="type"]').value;
+  
+  const isCompleted = street && price && type;
+  updateStepProgress('step-basic', 'connector-basic', isCompleted);
+  
+  if (isCompleted) {
+    setActiveStep('step-features');
+  }
+}
+
+function checkFeaturesCompletion() {
+  const furnishings = document.querySelectorAll('input[name="furnishings[]"]:checked').length;
+  const appliances = document.querySelectorAll('input[name="appliances[]"]:checked').length;
+  const bills = document.querySelectorAll('input[name="bills_included[]"]:checked').length;
+  
+  const isCompleted = furnishings > 0 || appliances > 0 || bills > 0;
+  updateStepProgress('step-features', 'connector-features', isCompleted);
+  
+  if (isCompleted) {
+    setActiveStep('step-rules');
+  }
+}
+
+function checkRulesCompletion() {
+  const curfew = document.querySelector('input[name="curfew"]').value;
+  const landmarks = document.querySelector('input[name="nearby_landmarks"]').value;
+  
+  const isCompleted = curfew || landmarks;
+  updateStepProgress('step-rules', 'connector-rules', isCompleted);
+  
+  if (isCompleted) {
+    setActiveStep('step-location');
+  }
+}
+
+function checkLocationCompletion() {
+  const lat = document.getElementById('lat').value;
+  const lng = document.getElementById('lng').value;
+  
+  const isCompleted = lat && lng;
+  updateStepProgress('step-location', 'connector-rules', isCompleted);
+}
+
+function checkAllSteps() {
+  checkPhotosCompletion();
+  checkBasicInfoCompletion();
+  checkFeaturesCompletion();
+  checkRulesCompletion();
+  checkLocationCompletion();
+}
+
 /* ── PHOTO UPLOAD WITH WORKING PREVIEW ── */
 let files = [];
 let input, grid;
@@ -518,11 +623,44 @@ document.addEventListener('DOMContentLoaded', function() {
   files = combined.slice(0, maxFiles);
   input.value = ''; // reset so same file can be re-added
   renderPhotos();
+  // Check photos completion after upload
+  checkPhotosCompletion();
     });
   }
   
+  // Add event listeners for basic info fields
+  document.getElementById('streetSelect').addEventListener('change', checkBasicInfoCompletion);
+  document.getElementById('completeAddress').addEventListener('input', checkBasicInfoCompletion);
+  document.querySelector('input[name="price"]').addEventListener('input', checkBasicInfoCompletion);
+  document.querySelector('select[name="type"]').addEventListener('change', checkBasicInfoCompletion);
+  document.querySelector('select[name="bathroom"]').addEventListener('change', checkBasicInfoCompletion);
+  document.querySelector('select[name="gender_policy"]').addEventListener('change', checkBasicInfoCompletion);
+  document.querySelector('select[name="walk_minutes"]').addEventListener('change', checkBasicInfoCompletion);
+  
+  // Add event listeners for features
+  document.querySelectorAll('input[name="furnishings[]"]').forEach(checkbox => {
+    checkbox.addEventListener('change', checkFeaturesCompletion);
+  });
+  document.querySelectorAll('input[name="appliances[]"]').forEach(checkbox => {
+    checkbox.addEventListener('change', checkFeaturesCompletion);
+  });
+  document.querySelectorAll('input[name="bills_included[]"]').forEach(checkbox => {
+    checkbox.addEventListener('change', checkFeaturesCompletion);
+  });
+  
+  // Add event listeners for rules
+  document.querySelector('input[name="curfew"]').addEventListener('input', checkRulesCompletion);
+  document.querySelector('input[name="nearby_landmarks"]').addEventListener('input', checkRulesCompletion);
+  
+  // Add event listeners for location (map changes)
+  document.getElementById('lat').addEventListener('input', checkLocationCompletion);
+  document.getElementById('lng').addEventListener('input', checkLocationCompletion);
+  
   // Initialize map after DOM is ready
   initializeMap();
+  
+  // Check initial state
+  checkAllSteps();
 });
 
 function renderPhotos() {
@@ -591,6 +729,8 @@ function renderPhotos() {
 function removePhoto(index) {
   files.splice(index, 1);
   renderPhotos();
+  // Check photos completion after removal
+  checkPhotosCompletion();
 }
 
 /* ── MAP INITIALIZATION ── */
@@ -634,11 +774,14 @@ function initializeMap() {
     var marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
 
     function setCoords(lat, lng) {
-      const latInput = document.getElementById('lat');
-      const lngInput = document.getElementById('lng');
-      if (latInput) latInput.value = lat.toFixed(6);
-      if (lngInput) lngInput.value = lng.toFixed(6);
-    }
+  const latInput = document.getElementById('lat');
+  const lngInput = document.getElementById('lng');
+  if (latInput) latInput.value = lat.toFixed(6);
+  if (lngInput) lngInput.value = lng.toFixed(6);
+  
+  // Check location completion after setting coordinates
+  checkLocationCompletion();
+}
 
     setCoords(defaultLat, defaultLng);
 
