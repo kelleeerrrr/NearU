@@ -150,7 +150,8 @@
 /* Statistics Cards Container */
 .stats-container {
   display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: 1fr 1fr !important;
   gap: 1rem !important;
   margin-bottom: 1.5rem !important;
   width: 100% !important;
@@ -242,31 +243,47 @@
 
 /* Category Filter Styles */
 .category-filter {
-  margin: 1rem 0 !important;
-}
-
-.page-header {
-  text-align: center !important;
-  margin-bottom: 2rem !important;
-  margin-top: 3rem !important;
+  margin: 1.5rem 0 !important;
+  padding: 1.5rem !important;
+  background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
+  border: 2px solid #2D7D4F !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 16px rgba(45, 125, 79, 0.1) !important;
 }
 
 .category-filter label {
-  font-weight: 600 !important;
-  margin-bottom: 0.5rem !important;
-  color: #1f2937 !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.75rem !important;
+  color: #2D7D4F !important;
   display: block !important;
+  font-size: 1rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
 }
 
 .category-filter select {
-  padding: 0.5rem 0.75rem !important;
-  border: 2px solid #e5e7eb !important;
-  border-radius: 8px !important;
+  padding: 0.75rem 1rem !important;
+  border: 2px solid #2D7D4F !important;
+  border-radius: 12px !important;
   background: white !important;
-  font-size: 0.9rem !important;
+  font-size: 0.95rem !important;
   color: #374151 !important;
   width: 100% !important;
-  max-width: 300px !important;
+  max-width: 400px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+}
+
+.category-filter select:hover {
+  border-color: #1f5c38 !important;
+  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.2) !important;
+}
+
+.category-filter select:focus {
+  outline: none !important;
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(45, 125, 79, 0.1) !important;
 }
 
 .stat-label {
@@ -716,8 +733,8 @@
   }
   
   .stats-container {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
     gap: 0.75rem !important;
   }
   
@@ -732,8 +749,20 @@
     font-size: 1.5rem !important;
   }
   
+  .category-filter {
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
+  }
+  
+  .category-filter label {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
   .category-filter select {
     max-width: 100% !important;
+    padding: 0.6rem 0.8rem !important;
+    font-size: 0.9rem !important;
   }
   
   .stat-number {
