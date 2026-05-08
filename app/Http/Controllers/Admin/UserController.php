@@ -28,6 +28,11 @@ class UserController extends Controller
             $query->where('user_type', $request->user_type);
         }
 
+        // Filter by category (maps to user_type)
+        if ($request->filled('category')) {
+            $query->where('user_type', $request->category);
+        }
+
         // Filter by verification status
         if ($request->filled('verification_status')) {
             $query->where('verification_status', $request->verification_status);
