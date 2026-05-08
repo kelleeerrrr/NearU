@@ -200,15 +200,22 @@ class DormController extends Controller
 
         $request->validate([
             'street' => 'required|string|max:255',
+            'complete_address' => 'nullable|string|max:255',
             'price' => 'required|numeric',
             'type' => 'required|string',
             'photos' => 'array|max:6',
             'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
+        // Combine street selection with complete address
+        $streetValue = $request->street;
+        if (!empty($request->complete_address)) {
+            $streetValue .= ' - ' . $request->complete_address;
+        }
+
         $dorm = DormListing::create([
             'owner_id' => Auth::id(),
-            'street' => $request->street,
+            'street' => $streetValue,
             'price' => $request->price,
             'type' => $request->type,
             'gender_policy' => $request->gender_policy,
@@ -266,15 +273,22 @@ class DormController extends Controller
 
         $request->validate([
             'street' => 'required|string|max:255',
+            'complete_address' => 'nullable|string|max:255',
             'price' => 'required|numeric',
             'type' => 'required|string',
             'photos' => 'array|max:6',
             'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
+        // Combine street selection with complete address
+        $streetValue = $request->street;
+        if (!empty($request->complete_address)) {
+            $streetValue .= ' - ' . $request->complete_address;
+        }
+
         // Update basic listing information
         $dorm->update([
-            'street' => $request->street,
+            'street' => $streetValue,
             'price' => $request->price,
             'type' => $request->type,
             'gender_policy' => $request->gender_policy,

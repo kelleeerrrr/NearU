@@ -98,8 +98,12 @@
           @foreach($savedListings as $saved)
             @php
               $dorm = $saved->dormListing;
-              $photos = is_array($dorm->photos) ? $dorm->photos : (json_decode($dorm->photos, true) ?? []);
-              $cover = count($photos) ? asset('storage/' . $photos[0]) : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400';
+              // Get cover image using the images relationship
+              $cover = $dorm->images->where('is_cover', true)->first()
+                  ? asset('storage/' . $dorm->images->where('is_cover', true)->first()->path)
+                  : ($dorm->images->first()
+                      ? asset('storage/' . $dorm->images->first()->path)
+                      : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400');
             @endphp
             <div class="dorm-card">
               <div class="carousel" style="border-radius: 12px; overflow: hidden; margin-bottom: 0.8rem;">

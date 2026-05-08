@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#2D7D4F">
     
-    <title>NearU – Find Housing Near Campus</title>
+    <title>NearU – Find Housing Near University</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -271,7 +271,7 @@
         <div class="logo">Near<em>U</em></div>
         
         <!-- Tagline -->
-        <div class="tagline">Find Housing Near Campus</div>
+        <div class="tagline">Find Housing Near University</div>
         
         <!-- Main buttons -->
         <div class="buttons">

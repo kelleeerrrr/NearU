@@ -29,7 +29,7 @@ class UserController extends Controller
     public function saved()
     {
         $savedListings = SavedListing::where('user_id', Auth::id())
-            ->with('dormListing.owner')
+            ->with('dormListing.owner', 'dormListing.images')
             ->get();
 
         return view('student.saved', compact('savedListings'));

@@ -72,6 +72,12 @@ class DormListing extends Model
         return $this->hasMany(Review::class);
     }
 
+    // Calculate average rating from reviews
+    public function getRatingAttribute()
+    {
+        return $this->reviews()->avg('rating');
+    }
+
     // ✅ FIXED ACCESSOR (THIS IS THE IMPORTANT FIX)
     public function getFirstImageUrlAttribute()
     {

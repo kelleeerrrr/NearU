@@ -200,15 +200,23 @@ body {
 
     <div class="form-group">
       <label class="form-label" for="street">Street Address</label>
-      <select name="street" id="street" class="form-select" required>
+      <select name="street" id="streetSelect" class="form-select" required>
         <option value="">Select street...</option>
-        <option value="Mars" {{ old('street', $listing->street) == 'Mars' ? 'selected' : '' }}>Mars</option>
-        <option value="Jupiter" {{ old('street', $listing->street) == 'Jupiter' ? 'selected' : '' }}>Jupiter</option>
-        <option value="Earth" {{ old('street', $listing->street) == 'Earth' ? 'selected' : '' }}>Earth</option>
-        <option value="Venus" {{ old('street', $listing->street) == 'Venus' ? 'selected' : '' }}>Venus</option>
-        <option value="Saturn" {{ old('street', $listing->street) == 'Saturn' ? 'selected' : '' }}>Saturn</option>
-        <option value="Other" {{ old('street', $listing->street) == 'Other' ? 'selected' : '' }}>Other</option>
+        <option value="Mars" {{ old('street', explode(' - ', $listing->street)[0]) == 'Mars' ? 'selected' : '' }}>Mars</option>
+        <option value="Jupiter" {{ old('street', explode(' - ', $listing->street)[0]) == 'Jupiter' ? 'selected' : '' }}>Jupiter</option>
+        <option value="Earth" {{ old('street', explode(' - ', $listing->street)[0]) == 'Earth' ? 'selected' : '' }}>Earth</option>
+        <option value="Venus" {{ old('street', explode(' - ', $listing->street)[0]) == 'Venus' ? 'selected' : '' }}>Venus</option>
+        <option value="Saturn" {{ old('street', explode(' - ', $listing->street)[0]) == 'Saturn' ? 'selected' : '' }}>Saturn</option>
+        <option value="Other" {{ !in_array(old('street', explode(' - ', $listing->street)[0]), ['Mars', 'Jupiter', 'Earth', 'Venus', 'Saturn']) ? 'selected' : '' }}>Other</option>
       </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="complete_address">Complete Street Address</label>
+      <input type="text" name="complete_address" id="completeAddress" class="form-input" 
+             value="{{ old('complete_address', isset(explode(' - ', $listing->street)[1]) ? explode(' - ', $listing->street)[1] : '') }}" 
+             placeholder="Enter complete street address (e.g., 123 Mars Street, Brgy. Poblacion)..." maxlength="255">
+      <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">Add the complete address details including house number, building name, or landmarks.</small>
     </div>
 
     <div class="form-group">
@@ -248,7 +256,6 @@ body {
 
 @endsection
 
-@if(session('success'))
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -265,4 +272,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+@if(session('success'))
 @endif

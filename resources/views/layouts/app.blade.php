@@ -6,7 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="theme-color" content="#2D7D4F">
 
-  <title>@yield('title', 'NearU – Find Housing Near Campus')</title>
+  <title>@yield('title', 'NearU – Find Housing Near University')</title>
 
   {{-- Fonts --}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
