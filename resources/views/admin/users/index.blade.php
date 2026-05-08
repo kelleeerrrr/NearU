@@ -666,6 +666,7 @@
 
 .page-header {
   margin-bottom: 1rem;
+  margin-top: 5rem !important;
 }
 
 .header-top {
@@ -763,6 +764,10 @@
     max-width: 100% !important;
     padding: 0.6rem 0.8rem !important;
     font-size: 0.9rem !important;
+  }
+  
+  .page-header {
+    margin-top: 4rem !important;
   }
   
   .stat-number {
