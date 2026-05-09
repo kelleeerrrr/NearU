@@ -46,8 +46,10 @@
           @foreach($visits as $visit)
             @php
               $dorm = $visit->dormListing;
-              $photos = is_array($dorm->photos) ? $dorm->photos : (json_decode($dorm->photos, true) ?? []);
-              $cover = count($photos) ? asset('storage/' . $photos[0]) : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400';
+              $photos = $dorm->images->pluck('path')->toArray();
+              $cover = count($photos)
+                ? asset('storage/' . $photos[0])
+                : 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400';
               $visitDate = $visit->visit_date->format('M d, Y');
               $visitTime = $visit->visit_time;
               $isPast = $visit->visit_date->isPast();

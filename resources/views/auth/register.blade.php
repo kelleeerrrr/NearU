@@ -5,9 +5,10 @@
 @section('content')
 <!-- SIGNUP PAGE -->
 <div id="signupPage" class="screen active">
-  <div class="auth-wrap">
-    <div class="auth-box">
+  <div class="auth-wrap"> 
+    <div class="auth-box"> 
       <div class="auth-logo">
+        <img src="{{ asset('storage/nearu-logo.png') }}" alt="NearU Logo" style="max-width: 200px; margin-top: -1.8rem; margin-bottom: -1rem;">
         <h1>Near<em>U</em></h1>
         <p>Create your account</p>
       </div>
@@ -28,12 +29,12 @@
           <label>I am a...</label>
           <div style="display:flex;gap:.8rem;">
             <div class="utype {{ old('user_type') === 'student' ? 'sel' : '' }}" onclick="selectUserType('student')" id="sOpt">
-              <div style="font-size:1.7rem;margin-bottom:.3rem;">🎓</div>
+              <div style="font-size:1.7rem;margin-bottom:.3rem; width: 80px;">🎓</div>
               <div style="font-weight:800;font-size:.87rem;">Student</div>
               <div style="font-size:.74rem;color:#6B7280;">Looking for dorm</div>
             </div>
             <div class="utype {{ old('user_type') === 'owner' ? 'sel' : '' }}" onclick="selectUserType('owner')" id="oOpt">
-              <div style="font-size:1.7rem;margin-bottom:.3rem;">🏠</div>
+              <div style="font-size:1.7rem;margin-bottom:.3rem; width: 80px;">🏠</div>
               <div style="font-weight:800;font-size:.87rem;">Owner</div>
               <div style="font-size:.74rem;color:#6B7280;">Listing property</div>
             </div>

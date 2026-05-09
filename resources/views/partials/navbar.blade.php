@@ -7,7 +7,10 @@
   </button>
 
   <!-- LOGO -->
-  <div class="tb-logo">Near<em>U</em></div>
+  <div class="tb-logo">
+    <img src="{{ asset('storage/nearu-logo.png') }}" alt="NearU Logo" style="height: 40px; margin-left: -1rem; margin-right: -1rem; vertical-align: middle;">
+    Near<em>U</em>
+  </div>
 
   <!-- TITLE (optional page title) -->
   <div class="tb-title" id="tbTitle" style="display:none;"></div>

@@ -8,6 +8,7 @@
 
     {{-- Logo --}}
     <div class="auth-logo">
+      <img src="{{ asset('storage/nearu-logo.png') }}" alt="NearU Logo" style="max-width: 200px; margin-top: -1.8rem; margin-bottom: -1rem;">
       <h1>Near<em>U</em></h1>
       <p>NearU makes your dorm finding easier and greater! 🏠</p>
     </div>

@@ -156,7 +156,10 @@ body.dark .bot-nav{
 
   <!-- TOP BAR -->
   <div class="top" style="justify-content:space-between; gap:1rem;">
-    <div class="logo">Near<em>U</em> OWNER</div>
+    <div class="logo" style = "margin-left: -2rem;">
+    <img src="{{ asset('storage/nearu-logo.png') }}" alt="NearU Logo" style="height: 50px;width: 100px; margin-right: -2rem; vertical-align: middle;">
+    Near<em>U</em>
+  </div>
     <div style="display:flex; align-items:center; gap:0.75rem;">
       <a href="{{ route('notifications.owner') }}" style="color:#fff; text-decoration:none; position:relative;">
         🔔

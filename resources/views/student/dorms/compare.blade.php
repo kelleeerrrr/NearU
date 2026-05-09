@@ -26,7 +26,6 @@
 
         {{-- HINT --}}
         <p style="font-size:.76rem;color:var(--t2);margin-bottom:.7rem;">
-          <span style="color:#065F46;font-weight:800;">Green</span> = best in category
         </p>
 
         @php

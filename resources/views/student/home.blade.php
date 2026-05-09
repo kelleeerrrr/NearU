@@ -385,7 +385,7 @@
   .hero h1 { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; line-height:1.22; margin-bottom:.38rem; }
   .hero h1 span { color:#F2B705; }
   .hero p { opacity:.72; font-size:.84rem; display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; }
-  .hero-badge { display:inline-flex; align-items:center; gap:.22rem; background:rgba(255,255,255,.12); padding:.22rem .65rem; border-radius:20px; font-size:.74rem; font-weight:700; border:1px solid rgba(255,255,255,.2); }
+  .hero-badge { display:inline-flex; align-items:center; gap:.22rem; background:rgba(255,255,255,.12); padding:.22rem .65rem; border-radius:20px; font-size:.60rem; font-weight:700; border:1px solid rgba(255,255,255,.2); }
 
   /* SEARCH */
   .search-wrap { margin:0 1.2rem .75rem; position:relative; z-index:3; }

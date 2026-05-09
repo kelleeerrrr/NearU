@@ -30,11 +30,11 @@
 
   <div class="screen active">
     <div class="cs">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: -.5rem; margin-bottom: .5rem;">
         <button class="icon-btn back-btn" onclick="window.location.href='/profile'">
-          ← Back
+          Back
         </button>
-        <h2 style="font-size: 1.1rem; font-weight: 800; margin: 0; text-align: center; flex: 1;">📋 Move-in Checklist</h2>
+        <h2 style="font-size: 1rem; font-weight: 7000;">📋 Move-in Checklist</h2>
         <div style="width: 60px;"></div>
       </div>
 

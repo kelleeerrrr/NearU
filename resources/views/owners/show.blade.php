@@ -12,7 +12,7 @@
   <div id="ownerProfile" class="screen active">
 
     {{-- BACK BUTTON AND OWNER NAME --}}
-    <div style="margin-top: .5rem; display: flex; align-items: center; gap: 1rem;">
+    <div style="margin-top: 1.4rem; display: flex; align-items: center; gap: 1rem;">
       <button class="icon-btn back-btn" onclick="history.back()" style="background: var(--green); color: white; border: none; padding: 0.6rem 1rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
         ← Back 
       </button>
