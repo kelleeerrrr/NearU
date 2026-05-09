@@ -8,7 +8,7 @@
 
   <!-- LOGO -->
   <div class="tb-logo">
-    <img src="{{ asset('storage/nearu-logo.png') }}" alt="NearU Logo" style="height: 40px; margin-left: -1rem; margin-right: -1rem; vertical-align: middle;">
+    <img src="{{ asset('nearu-logo.png') }}" alt="NearU Logo" style="height: 40px; margin-left: -1rem; margin-right: -1rem; vertical-align: middle;">
     Near<em>U</em>
   </div>
 

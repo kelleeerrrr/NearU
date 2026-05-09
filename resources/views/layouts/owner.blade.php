@@ -157,7 +157,7 @@ body.dark .bot-nav{
   <!-- TOP BAR -->
   <div class="top" style="justify-content:space-between; gap:1rem;">
     <div class="logo" style = "margin-left: -2rem;">
-    <img src="{{ asset('storage/nearu-logo.png') }}" alt="NearU Logo" style="height: 50px;width: 100px; margin-right: -2rem; vertical-align: middle;">
+    <img src="{{ asset('nearu-logo.png') }}" alt="NearU Logo" style="height: 50px;width: 100px; margin-right: -2rem; vertical-align: middle;">
     Near<em>U</em>
   </div>
     <div style="display:flex; align-items:center; gap:0.75rem;">

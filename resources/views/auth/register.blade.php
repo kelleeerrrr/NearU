@@ -8,7 +8,7 @@
   <div class="auth-wrap"> 
     <div class="auth-box"> 
       <div class="auth-logo">
-        <img src="{{ asset('storage/nearu-logo.png') }}" alt="NearU Logo" style="max-width: 200px; margin-top: -1.8rem; margin-bottom: -1rem;">
+        <img src="{{ asset('nearu-logo.png') }}" alt="NearU Logo" style="max-width: 200px; margin-top: -1.8rem; margin-bottom: -1rem;">
         <h1>Near<em>U</em></h1>
         <p>Create your account</p>
       </div>
