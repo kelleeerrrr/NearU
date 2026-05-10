@@ -17,8 +17,12 @@
 
       <div class="user-detail-card">
         <div class="user-header">
-          <div class="user-avatar-large">
-            {{ substr($user->name, 0, 1) }}
+          <div class="user-avatar-large force-circle">
+            @if($user->profile_photo_path ?? $user->avatar)
+              <img src="{{ Storage::url($user->profile_photo_path ?? $user->avatar) }}" alt="{{ $user->name }}" style="width: 85px; height: 85px; object-fit: cover; border-radius: 50%; display: block;">
+            @else
+              {{ substr($user->name, 0, 1) }}
+            @endif
           </div>
           <div class="user-basic-info">
             <h3>{{ $user->name }}</h3>

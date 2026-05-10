@@ -31,9 +31,18 @@ body.dark {
 }
 
 .logout-btn{
-  background:#c0392b;
+  background:linear-gradient(135deg, #dc2626, #b91c1c);
   color:#fff;
-  border:none;
+  border:1.5px solid #dc2626;
+  transition:all 0.3s ease;
+  font-weight:700;
+}
+
+.logout-btn:hover{
+  background:linear-gradient(135deg, #b91c1c, #991b1b);
+  border-color: #b91c1c;
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(220,38,38,0.3);
 }
 
 .green-btn{

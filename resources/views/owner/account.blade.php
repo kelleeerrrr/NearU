@@ -91,12 +91,91 @@ body.dark .back-btn{
 /* WARN */
 .warn-box{
   margin-top:1rem;
-  padding:1rem;
-  border-radius:14px;
-  background:#FFF4CC;
-  border:1px solid var(--gold);
+  padding:1.5rem;
+  border-radius:20px;
+  background:linear-gradient(135deg, #fef3c7 0%, #fefce8 50%, #fff9e6 100%);
+  border:2px solid var(--gold);
   font-weight:700;
   color:#5a4300;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(242,183,5,0.15);
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.warn-box::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(242,183,5,0.1) 0%, transparent 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+.warn-box::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -30%;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(45,125,79,0.05) 0%, transparent 70%);
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+.warn-box:hover {
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 12px 35px rgba(242,183,5,0.25);
+  border-color: #f59e0b;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.warn-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+.warn-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.warn-action {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold), #f59e0b);
+  color: #5a4300;
+  padding: 0.6rem 1.2rem;
+  border-radius: 15px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(242,183,5,0.2);
+  position: relative;
+  z-index: 2;
+}
+
+.warn-action:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(242,183,5,0.3);
+  background: linear-gradient(135deg, #f59e0b, #d4a200);
 }
 
 /* SECTION */
@@ -186,7 +265,7 @@ body.dark .back-btn{
   <div class="profile-card">
     <div class="avatar">
       @if($user->profile_photo_path)
-        <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;">
+        <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
       @else
         {{ strtoupper(substr($user->name, 0, 1)) }}
       @endif

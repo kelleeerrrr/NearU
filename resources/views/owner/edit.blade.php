@@ -184,11 +184,16 @@ body.dark {
   </div>
 
   {{-- PAGE TITLE --}}
-  <div style="text-align: center; margin-bottom: 2rem;">
-    <h2 style="font-family: 'Syne', sans-serif; font-size: 1.5rem; color: var(--green);">
-      Edit Profile
-    </h2>
-    <p style="color: var(--t2); margin-top: 0.5rem;">Update your account information</p>
+  <div style="text-align: left; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem;">
+    <div>
+      <h2 style="font-family: 'Syne', sans-serif; font-size: 1.5rem; color: var(--green); margin: 0;">
+        Edit Profile
+      </h2>
+      <p style="color: var(--t2); margin-top: 0.5rem; margin-bottom: 0;">Update your account information</p>
+    </div>
+    <a href="{{ route('owner.account') }}" class="icon-btn" style="background: var(--green); color: white; border: 1.5px solid var(--green); text-decoration: none; padding: .5rem .8rem; border-radius: 10px; font-weight: 700; font-size: .8rem; cursor: pointer; transition: all 0.2s ease;">
+      ← Back
+    </a>
   </div>
 
   {{-- PROFILE PHOTO SECTION --}}

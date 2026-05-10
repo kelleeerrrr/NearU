@@ -16,6 +16,27 @@
       </div>
 
       <div class="edit-card">
+        <div class="user-header">
+          <div class="user-avatar-large force-circle">
+            @if($user->profile_photo_path ?? $user->avatar)
+              <img src="{{ Storage::url($user->profile_photo_path ?? $user->avatar) }}" alt="{{ $user->name }}" style="width: 85px; height: 85px; object-fit: cover; border-radius: 50%; display: block;">
+            @else
+              {{ substr($user->name, 0, 1) }}
+            @endif
+          </div>
+          <div class="user-basic-info">
+            <h3>{{ $user->name }}</h3>
+            <p class="user-email">{{ $user->email }}</p>
+            <div class="user-badges">
+              <span class="user-type {{ $user->user_type }}">{{ $user->user_type }}</span>
+              @if($user->user_type === 'owner')
+                <span class="verification-status {{ $user->verification_status ?? 'unverified' }}">
+                  {{ $user->verification_status ?? 'unverified' }}
+                </span>
+              @endif
+            </div>
+          </div>
+        </div>
         <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
           @csrf
           @method('PUT')
@@ -85,6 +106,33 @@
 
 @push('styles')
 <style>
+.force-circle {
+    width: 85px !important;
+    height: 85px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    background: linear-gradient(135deg, var(--gold), #d4a200) !important;
+    box-shadow: 0 4px 12px rgba(242,183,5,0.2) !important;
+    transition: all .3s ease !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+}
+
+.force-circle img {
+    width: 85px !important;
+    height: 85px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    display: block !important;
+    border: 2px solid var(--gold) !important;
+    box-shadow: 0 0 0 2px rgba(242,183,5,0.3) !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+}
 .page-header {
   margin-bottom: 1.5rem;
 }

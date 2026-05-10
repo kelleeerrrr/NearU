@@ -66,8 +66,12 @@
         @forelse($users as $user)
           <div class="user-card">
             <div class="user-info">
-              <div class="user-avatar">
-                {{ substr($user->name, 0, 1) }}
+              <div class="user-avatar force-circle">
+                @if($user->profile_photo_path ?? $user->avatar)
+                  <img src="{{ Storage::url($user->profile_photo_path ?? $user->avatar) }}" alt="{{ $user->name }}" style="width: 85px; height: 85px; object-fit: cover; border-radius: 50%; display: block;">
+                @else
+                  {{ substr($user->name, 0, 1) }}
+                @endif
               </div>
               <div class="user-details">
                 <div class="user-name">{{ $user->name }}</div>

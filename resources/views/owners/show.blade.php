@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('head')
+<meta name="format-detection" content="telephone=no">
+@endsection
+
 @section('title', 'Owner Profile – ' . $owner->name)
 
 @section('content')
@@ -12,11 +16,11 @@
   <div id="ownerProfile" class="screen active">
 
     {{-- BACK BUTTON AND OWNER NAME --}}
-    <div style="margin-top: 1.4rem; display: flex; align-items: center; gap: 1rem;">
-      <button class="icon-btn back-btn" onclick="history.back()" style="background: var(--green); color: white; border: none; padding: 0.6rem 1rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
-        ← Back 
-      </button>
-      <h2 style="margin: 0; font-size: 1.6rem; font-weight: 900; color: var(--green); font-family: 'Segoe UI', 'Arial', sans-serif; letter-spacing: 0.5px;">{{ $owner->name }}'s Profile</h2>
+    <div style="margin: 0.8rem 1.5rem 0.8rem 1.5rem; position: relative; min-height: 120px; padding-top: 1rem; padding-bottom: 0.5rem;">
+      <button class="icon-btn back-btn" onclick="history.back()" style="position: absolute; top: 5rem; right: 1.5rem; background: linear-gradient(135deg, var(--green), #1e5a3a); color: white; border: none; padding: 0.6rem 1rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(45,125,79,0.3); transform: translateY(-2px); z-index: 10; pointer-events: auto; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+    ← Back
+  </button>
+      <h2 style="margin: 0; font-size: 1.6rem; font-weight: 900; color: #000; font-family: 'Syne', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.1); letter-spacing: 0.5px; animation: title-glow 3s ease-in-out infinite; position: relative; z-index: 2;">👤 {{ $owner->name }}'s Profile</h2>
     </div>
 
     {{-- ── OWNER INFO ── --}}
@@ -34,18 +38,16 @@
         @endif
       </div>
 
-      {{-- Details --}}
+      {{-- OWNER INFO --}}
       <div class="owner-details">
-        <h1>{{ $owner->name }}</h1>
+        <h1 class="owner-name" style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem;">{{ $owner->name }}</h1>
 
         <div class="owner-meta">
-          <span class="material-symbols-outlined">Email:</span>
-          <span>{{ $owner->email }}</span>
+          <span class="owner-email" style="font-size: 1.2rem; font-weight: 500; color: var(--text);">{{ $owner->email }}</span>
         </div>
 
         <div class="owner-meta">
-          <span class="material-symbols-outlined">Phone:</span>
-          <span>{{ $owner->phone ?? 'No phone number' }}</span>
+          <span class="owner-phone" style="font-size: 1.2rem; font-weight: 500; color: var(--text) !important; text-decoration: none !important; pointer-events: none;">{{ $owner->phone ?? 'No phone number' }}</span>
         </div>
 
         <div class="verification-badge">
@@ -138,7 +140,7 @@
                       @if($i <= $review->rating)
                         ⭐
                       @else
-                        ☆
+                        ⭐
                       @endif
                     @endfor
                   </div>
@@ -222,109 +224,322 @@
 
 /* OWNER CARD */
 .owner-card {
-  margin-top: 10px;
-  border-radius: var(--rad);
-  padding: 1.5rem;
-  box-shadow: var(--sh);
-  border: #000;
+    margin-top: 10px;
+    border-radius: 20px;
+    padding: 0.8rem;
+    box-shadow: 0 12px 32px rgba(45,125,79,0.15);
+    border: 2px solid var(--gold);
+    border-bottom: 4px solid var(--gold) !important;
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #fffef8 0%, rgba(242,183,5,0.05) 100%) !important;
+    transform-style: preserve-3d;
+}
+
+.owner-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -60%;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(242,183,5,0.1) 0%, transparent 70%);
+    animation: float-bubble 7s ease-in-out infinite;
+}
+
+.owner-card::after {
+    content: '';
+    position: absolute;
+    bottom: -40%;
+    left: -40%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(45,125,79,0.08) 0%, transparent 70%);
+    animation: float-bubble 9s ease-in-out infinite reverse;
+}
+
+@keyframes float-bubble {
+    0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+    50% { transform: translateY(-20px) rotate(180deg) scale(1.15); }
+}
+
+.owner-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -60%;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(242,183,5,0.1) 0%, transparent 70%);
+    animation: float-bubble 6s ease-in-out infinite;
+}
+
+.owner-card::after {
+    content: '';
+    position: absolute;
+    bottom: -40%;
+    left: -40%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(45,125,79,0.08) 0%, transparent 70%);
+    animation: float-bubble 8s ease-in-out infinite reverse;
+}
+
+@keyframes float-bubble {
+    0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+    50% { transform: translateY(-20px) rotate(180deg) scale(1.15); }
+}
+
+.owner-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 48px rgba(45,125,79,0.25);
+    border-color: var(--gold);
+}
+
+.owner-card:hover::before {
+    top: -40%;
+    right: -40%;
+    transform: scale(1.3);
+}
+
+.owner-card:hover::after {
+    bottom: -25%;
+    left: -25%;
+    transform: scale(1.4);
 }
 
 /* OWNER PROFILE STYLING */
 .owner-profile {
-  display: flex;
-  gap: 1.2rem;
-  align-items: center;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    position: relative;
 }
 
 .owner-avatar {
-  width: 85px;
-  height: 85px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: white;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--gold), #d4a200);
+    box-shadow: 0 4px 12px rgba(242,183,5,0.2);
+    transition: all .3s ease;
+    flex-shrink: 0;
 }
 
 .owner-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1/1 !important;
+    display: block !important;
 }
 
 .avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f8fdf9, #e8f5e8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--green);
+    font-weight: 700;
 }
 
 /* OWNER DETAILS */
 .owner-details h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 800;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--text);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 2;
+    margin-bottom: 0.4rem;
+    display: inline-block;
+        padding-bottom: 0.3rem;
+}
+
+.owner-details h1::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+    z-index: 3;
+}
+
+.owner-card .owner-details h1::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+    z-index: 3;
 }
 
 .owner-meta {
-  display: flex;
-  gap: .4rem;
-  align-items: center;
-  color: #000;
-  margin-bottom: 0.5rem;
-  font-size: .1rem;
+    display: flex;
+    gap: 0.2rem;
+    align-items: center;
+    color: var(--text);
+    margin-bottom: 0.15rem;
+    font-size: 0.55rem;
+    font-weight: 500;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius: 6px;
+    padding: 0.1rem 0.3rem;
+    transition: all .3s ease;
 }
 
 .owner-meta .material-symbols-outlined {
-  font-size: 1rem;
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
 }
 
+/* VERIFICATION BADGE */
 .verification-badge {
-  background: linear-gradient(135deg, #2D7D4F, #1f5c38);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: inline-block;
-  box-shadow: 0 2px 8px rgba(45, 125, 79, 0.3);
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--green), #1e5a3a);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: inline-block;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(45,125,79,0.3);
+    border: 2px solid rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(45,125,79,0.3); }
+    50% { transform: scale(1.05); box-shadow: 0 8px 24px rgba(45,125,79,0.5); }
+}
+
+.verification-badge::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, rgba(242,183,5,0.4) 0%, transparent 70%);
+    animation: float-bubble 4s ease-in-out infinite;
+}
+
+.verification-badge::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: -8px;
+    width: 16px;
+    height: 16px;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    animation: float-bubble 5s ease-in-out infinite reverse;
 }
 
 /* STATISTICS GRID */
 .stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 5rem;
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #2D7D4F, #1f5c38);
-  color: white;
-  padding: 1rem;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(45, 125, 79, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(135deg, #f8fdf9 0%, rgba(45,125,79,0.05) 100%);
+    color: var(--text);
+    padding: 1rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(45, 125, 79, 0.2);
+    border: 3px solid var(--green);
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    backdrop-filter: blur(10px);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -40%;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(242, 183, 5, 0.15) 0%, transparent 70%);
+    animation: float-bubble 6s ease-in-out infinite;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -30%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(45, 125, 79, 0.1) 0%, transparent 70%);
+    animation: float-bubble 8s ease-in-out infinite reverse;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(45, 125, 79, 0.3);
+    transform: translateY(-6px) scale(1.05) rotateX(2deg) rotateY(2deg);
+    box-shadow: 0 12px 32px rgba(45, 125, 79, 0.3);
+    border-color: var(--gold);
+    filter: brightness(1.05);
+}
+
+.stat-card:hover::before {
+    top: -30%;
+    right: -30%;
+    transform: scale(1.3) rotate(45deg);
+}
+
+.stat-card:hover::after {
+    bottom: -20%;
+    left: -20%;
+    transform: scale(1.4) rotate(-45deg);
 }
 
 .stat-number {
-  font-size: 2rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
+    font-size: 2.2rem;
+    font-weight: 900;
+    font-family: 'Syne', sans-serif;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 2;
+    animation: pulse-number 3s ease-in-out infinite;
+}
+
+@keyframes pulse-number {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 .stat-label {
-  font-size: 0.9rem;
-  opacity: 0.9;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius: 12px;
+    padding: 0.3rem 0.6rem;
+    display: inline-block;
+    margin-top: 0.5rem;
+    position: relative;
+    z-index: 2;
 }
 
 /* REVIEWS LIST */
@@ -335,11 +550,42 @@
 }
 
 .review-card {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: var(--sh);
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--sh);
+    transition: all .3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.review-card::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -30%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(242, 183, 5, 0.08) 0%, transparent 70%);
+    animation: float-bubble 6s ease-in-out infinite;
+}
+
+.review-card::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -20%;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(45, 125, 79, 0.05) 0%, transparent 70%);
+    animation: float-bubble 8s ease-in-out infinite reverse;
+}
+
+.review-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(45, 125, 79, 0.25);
+    border-color: var(--gold);
 }
 
 .review-header {

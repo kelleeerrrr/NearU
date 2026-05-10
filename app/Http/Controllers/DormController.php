@@ -224,7 +224,7 @@ class DormController extends Controller
             'furnishings' => json_encode($request->furnishings ?? []),
             'appliances' => json_encode($request->appliances ?? []),
             'bills_included' => json_encode($request->bills ?? []),
-            'curfew' => is_numeric($request->curfew) ? $request->curfew . 'PM' : $request->curfew,
+            'curfew' => $request->curfew ? (is_numeric($request->curfew) ? $request->curfew . 'PM' : $request->curfew) : 'No curfew',
             'wifi_included' => $request->has('wifi') ? 1 : 0,
             'pets_allowed' => $request->has('pets') ? 1 : 0,
             'nearby_landmarks' => $request->nearby_landmarks,
@@ -246,7 +246,7 @@ class DormController extends Controller
 
                 DormListingImage::create([
                     'dorm_listing_id' => $dorm->id,
-                    'path' => $path,
+                    'path' => 'dorms/' . basename($path),
                     'is_cover' => $index === 0, // FIRST IMAGE = COVER
                 ]);
             }
@@ -297,7 +297,7 @@ class DormController extends Controller
             'furnishings' => json_encode($request->furnishings ?? []),
             'appliances' => json_encode($request->appliances ?? []),
             'bills_included' => json_encode($request->bills ?? []),
-            'curfew' => is_numeric($request->curfew) ? $request->curfew . 'PM' : $request->curfew,
+            'curfew' => $request->curfew ? (is_numeric($request->curfew) ? $request->curfew . 'PM' : $request->curfew) : 'No curfew',
             'wifi_included' => $request->has('wifi') ? 1 : 0,
             'pets_allowed' => $request->has('pets') ? 1 : 0,
             'nearby_landmarks' => $request->nearby_landmarks,
@@ -340,7 +340,7 @@ class DormController extends Controller
 
                 DormListingImage::create([
                     'dorm_listing_id' => $dorm->id,
-                    'path' => $path,
+                    'path' => 'dorms/' . basename($path),
                     'is_cover' => $currentPhotoCount === 0, // First image becomes cover if no existing cover
                 ]);
                 

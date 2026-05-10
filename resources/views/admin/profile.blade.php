@@ -29,7 +29,7 @@
 
       {{-- PROFILE --}}
       <div class="profile-card">
-        <div class="avatar">
+        <div class="avatar force-circle">
           {{ strtoupper(substr($admin->name, 0, 1)) }}
         </div>
 
@@ -232,6 +232,31 @@ body.dark {
 .bottom-spacer {
   height: 100px;
   width: 100%;
+}
+
+.force-circle {
+    width: 85px !important;
+    height: 85px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    background: linear-gradient(135deg, var(--gold), #d4a200) !important;
+    box-shadow: 0 4px 12px rgba(242,183,5,0.2) !important;
+    transition: all .3s ease !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+}
+
+.force-circle::after {
+    content: '';
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, var(--gold), #d4a200) !important;
+    z-index: -1;
 }
 </style>
 @endpush

@@ -130,43 +130,105 @@
 
 /* VERIFICATION BANNER */
 .verification-banner {
-  background: linear-gradient(135deg, #FFF3CD, #FFE089);
-  border: 2px solid #F2B705;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fefce8 50%, #fff9e6 100%);
+  border: 2px solid var(--gold);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin: 0 1.2rem 0.5rem;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(242,183,5,0.2);
+  box-shadow: 0 8px 25px rgba(242,183,5,0.15);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.verification-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(242,183,5,0.1) 0%, transparent 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+.verification-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -30%;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(45,125,79,0.05) 0%, transparent 70%);
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+.verification-banner:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(242,183,5,0.25);
+  border-color: #f59e0b;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.verification-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  animation: bounce 2s infinite;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
 }
 
 .verification-banner h4 {
-  color: #856404;
-  font-size: 16px;
+  color: #5a4300;
+  font-size: 1.2rem;
   font-weight: 800;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
+  font-family: 'Syne', sans-serif;
+  position: relative;
+  z-index: 2;
 }
 
 .verification-banner p {
-  color: #856404;
-  font-size: 14px;
-  margin-bottom: 10px;
+  color: #6b5900;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  position: relative;
+  z-index: 2;
 }
 
 .verification-link {
-  background: linear-gradient(135deg, #2D7D4F, #1e5a3a);
-  color: white;
+  background: linear-gradient(135deg, var(--gold), #f59e0b);
+  color: #5a4300;
   text-decoration: none;
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 13px;
+  padding: 0.75rem 2rem;
+  border-radius: 15px;
+  font-weight: 800;
+  font-size: 0.9rem;
   display: inline-block;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(242,183,5,0.2);
+  position: relative;
+  z-index: 2;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .verification-link:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(45,125,79,0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(242,183,5,0.3);
+  background: linear-gradient(135deg, #f59e0b, #d4a200);
 }
 
 .listing-card.disabled {
@@ -392,10 +454,11 @@
 
             @if($verificationStatus === 'not_verified' || $verificationStatus === 'under_review')
                 <div class="verification-banner">
-                  <h4>🔐 Verification Required</h4>
+                  <span class="verification-icon">🔐</span>
+                  <h4>Verification Required</h4>
                   <p>You need to complete verification to access inquiries and manage your listing messages.</p>
                   <a href="{{ route('owner.verification.form') }}" class="verification-link">
-                    Complete Verification
+                    🎯 Complete Verification Now
                   </a>
                 </div>
             @else

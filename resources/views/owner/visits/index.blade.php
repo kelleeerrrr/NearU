@@ -14,56 +14,131 @@
 /* VISIT CARD */
 .visit-card{
     margin:0 1.2rem 1.2rem;
-    padding:1rem;
-    border-radius:14px;
-    border:1px solid var(--border);
-    transition:all .2s ease;
+    padding:1.5rem;
+    border-radius:24px;
+    border:3px solid var(--border);
+    transition:all .4s cubic-bezier(0.4, 0, 0.2, 1);
     position:relative;
     overflow:hidden;
+    box-shadow:0 12px 32px rgba(45,125,79,0.15);
+    backdrop-filter: blur(10px);
+    transform-style: preserve-3d;
+    background:linear-gradient(to top, rgba(45,125,79,0.08) 0%, rgba(45,125,79,0.04) 30%, var(--card) 60%, rgba(255,255,255,0.95) 100%);
+    background-origin: border-box;
+    background-clip: padding-box;
+}
+
+.visit-card::before {
+    content:'';
+    position:absolute;
+    top:-60%;
+    right:-60%;
+    width:140px;
+    height:140px;
+    background:radial-gradient(circle, rgba(242,183,5,0.12) 0%, transparent 70%);
+    animation:float-bubble 7s ease-in-out infinite;
+}
+
+.visit-card::after {
+    content:'';
+    position:absolute;
+    bottom:-40%;
+    left:-40%;
+    width:90px;
+    height:90px;
+    background:radial-gradient(circle, rgba(45,125,79,0.08) 0%, transparent 70%);
+    animation:float-bubble 9s ease-in-out infinite reverse;
+}
+
+@keyframes float-bubble {
+    0%, 100% { transform:translateY(0px) rotate(0deg) scale(1); }
+    50% { transform:translateY(-20px) rotate(180deg) scale(1.15); }
 }
 
 /* Color variations based on status */
 .visit-card.status-pending{
-    background: linear-gradient(135deg, var(--green) 0%, #1e5a3a 100%);
-    border:1px solid var(--green);
+    border:3px solid var(--green);
+    background:linear-gradient(to top, rgba(45,125,79,0.15) 0%, rgba(45,125,79,0.08) 100%);
 }
 
 .visit-card.status-confirmed{
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    border:1px solid #fbbf24;
+    border:3px solid var(--gold);
+    background:linear-gradient(to top, rgba(242,183,5,0.15) 0%, rgba(242,183,5,0.08) 100%);
 }
 
 .visit-card.status-completed{
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border:1px solid #3b82f6;
+    border:3px solid #3b82f6;
+    background:linear-gradient(to top, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.08) 100%);
 }
 
 .visit-card.status-cancelled{
-    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-    border:1px solid #6b7280;
+    border:3px solid #6b7280;
+    background:linear-gradient(to top, rgba(107,114,128,0.15) 0%, rgba(107,114,128,0.08) 100%);
 }
 
 .visit-card:hover{
-    transform:translateY(-3px);
-    box-shadow:0 8px 24px rgba(0,0,0,0.15);
+    transform:translateY(-8px) scale(1.03) rotateX(2deg) rotateY(2deg);
+    box-shadow:0 20px 48px rgba(45,125,79,0.25);
+    border-color: var(--gold);
+    filter: brightness(1.05);
 }
 
-/* Text styling for colored cards */
+.visit-card:hover::before {
+    top:-40%;
+    right:-40%;
+    transform:scale(1.4) rotate(45deg);
+}
+
+.visit-card:hover::after {
+    bottom:-25%;
+    left:-25%;
+    transform:scale(1.5) rotate(-45deg);
+}
+
+/* Text styling for default cards */
 .visit-card .student-name{
-    color: #fff !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    color: var(--text) !important;
+    font-weight: 700;
+    font-size:1.1rem;
+    background:linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius:12px;
+    padding:0.3rem 0.6rem;
+    display:inline-block;
+    animation:pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { transform:scale(1); }
+    50% { transform:scale(1.05); }
 }
 
 .visit-card .listing-info{
-    color: rgba(255,255,255,0.9) !important;
+    color: var(--t2) !important;
+    font-weight:600;
+    font-size:0.9rem;
+    margin-top:0.3rem;
 }
 
 .visit-card .visit-details{
-    color: rgba(255,255,255,0.95) !important;
+    color: var(--t2) !important;
+    font-weight:600;
+    font-size:0.9rem;
+    background:linear-gradient(135deg, rgba(45,125,79,0.1) 0%, rgba(45,125,79,0.05) 100%);
+    border-radius:10px;
+    padding:0.4rem 0.6rem;
+    display:inline-block;
+    margin-top:0.5rem;
 }
 
 .visit-card .notes{
-    color: rgba(255,255,255,0.9) !important;
+    color: var(--t2) !important;
+    font-weight:500;
+    font-size:0.85rem;
+    background:linear-gradient(135deg, rgba(242,183,5,0.08) 0%, rgba(242,183,5,0.04) 100%);
+    border-radius:8px;
+    padding:0.3rem 0.5rem;
+    display:inline-block;
+    margin-top:0.4rem;
 }
 
 /* BUTTON SYSTEM */
@@ -123,37 +198,56 @@
 .filter-bar{
     display:flex;
     gap:.5rem;
-    padding:0 1.2rem 1rem;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    scrollbar-width:none;
-    -ms-overflow-style:none;
-}
-
-.filter-bar::-webkit-scrollbar{
-    display:none;
+    margin:0 1.2rem 0.2rem;
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
 }
 
 .filter-bar a{
-    padding:.4rem .8rem;
+    padding:.5rem 1rem;
     border-radius:20px;
-    text-decoration:none;
     font-size:.8rem;
-    border:1px solid var(--border);
-    color:#333;
-    transition:all .2s ease;
-    white-space:nowrap;
-    flex-shrink:0;
+    font-weight:600;
+    text-decoration:none;
+    color:var(--text);
+    background:var(--card);
+    border:2px solid var(--border);
+    transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 4px 12px rgba(45,125,79,0.08);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+}
+
+.filter-bar a::before {
+    content:'';
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg, transparent, rgba(242,183,5,0.2), transparent);
+    transition:left 0.5s ease;
+}
+
+.filter-bar a:hover::before {
+    left:100%;
 }
 
 .filter-bar a.active{
-    background:var(--green);
+    background:linear-gradient(135deg, var(--green), #1e5a3a);
     color:#fff;
-    border:none;
+    border:2px solid var(--green);
+    box-shadow:0 6px 20px rgba(45,125,79,0.25);
+    transform:scale(1.05);
 }
 
 .filter-bar a:hover:not(.active){
-    background:#f8f9fa;
+    background:linear-gradient(135deg, var(--card), #f8fdf9);
+    border-color: var(--gold);
+    transform:translateY(-2px) scale(1.02);
+    box-shadow:0 8px 20px rgba(242,183,5,0.15);
 }
 
 /* Responsive design */
@@ -183,7 +277,7 @@
                 ← Back
             </a>
         </div>
-        <h3 style="margin: 0; margin-left: 10px;">📅 Visit Requests</h3>
+        <h3 style="margin: 0; margin-left: 10px; font-family: 'Syne', sans-serif; font-weight: 800;">📅 Visit Requests</h3>
     </div>
 
     {{-- FILTER --}}
@@ -220,8 +314,14 @@
 <div class="visit-card status-{{ strtolower($visit->status) }}">
 
     <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem;">
-        <div style="width:50px; height:50px; border-radius:8px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
-            👤
+        <div style="width:50px; height:50px; border-radius:50%; overflow:hidden; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center;">
+            @if($visit->user && $visit->user->profile_photo_path)
+                <img src="{{ asset('storage/' . $visit->user->profile_photo_path) }}" alt="{{ $visit->user->name }}" style="width:100%; height:100%; object-fit:cover;">
+            @else
+                <div style="width:100%; height:100%; background:linear-gradient(135deg, var(--green), #1e5a3a); display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#fff;">
+                    👤
+                </div>
+            @endif
         </div>
         <div>
             <div class="student-name" style="font-weight:700;font-size:1rem;">
@@ -247,7 +347,7 @@
         @php
             $statusLabel = $visit->status === 'Confirmed' ? 'Approved' : ucfirst($visit->status);
         @endphp
-        <strong style="color: rgba(255,255,255,0.95); background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">
+        <strong style="color: var(--text); background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">
             {{ $statusLabel }}
         </strong>
     </div>

@@ -9,11 +9,11 @@
 .header {
     font-weight: 800;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    background: #fefce8;
     border-radius: 12px;
     padding: 1rem;
-    border: 1px solid #fbbf24;
-    color: white;
+    border: 2px solid #fbbf24;
+    color: var(--text, #1a2e22);
     position: relative;
     overflow: hidden;
 }
@@ -40,18 +40,18 @@
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    color: var(--text, #1a2e22);
+    text-shadow: none;
 }
 
 .header-details p {
     margin: 0.2rem 0;
-    color: rgba(255,255,255,0.9);
+    color: var(--muted, #6C7A73);
     font-size: 0.9rem;
 }
 
 .listing-info {
-    color: rgba(255,255,255,0.95) !important;
+    color: var(--text, #1a2e22) !important;
     font-weight: 500;
 }
 
@@ -187,7 +187,13 @@ button:hover {
 
     <div class="header">
         <div class="header-info">
-            <div class="header-avatar">👤</div>
+            <div class="header-avatar">
+    @if($student->profile_photo_path)
+        <img src="{{ asset('storage/' . $student->profile_photo_path) }}" alt="{{ $student->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+    @else
+        👤
+    @endif
+</div>
             <div class="header-details">
                 <h3>{{ $student->name }}</h3>
                 <p>Student Inquiry</p>
