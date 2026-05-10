@@ -1,5 +1,51 @@
 # CS 322 - Software Engineering FINAL PROJECT
 
+## 🎯 MAIN FUNCTIONALITY OVERVIEW
+
+### Personalized Dashboard and Recommendations
+**As a Customer,** I want a personalized dashboard that shows all the property listings, compare them and see directions to them, see reviews and ratings, see saved properties, and scheduled visits, so that I can easily discover new properties that match my needs, manage my saved properties, and keep track of my scheduled visits.
+
+**Acceptance Criteria:**
+- Dashboard displays all property listings
+- Dashboard shows saved properties
+- Dashboard shows scheduled visits
+
+
+---
+
+
+## 🏢 OWNER MAIN USER STORY
+
+### User Story 6: Comprehensive Property Management System
+**As a Property Owner,** I want a complete management system that allows me to efficiently handle all aspects of my rental business from any device, with real-time updates and seamless communication with potential tenants.
+
+**Acceptance Criteria:**
+- Complete dashboard with property performance analytics and market insights
+- Advanced listing management with bulk operations and mass updates
+- Real-time availability management with instant status synchronization
+- Integrated messaging system for tenant communications and inquiry management
+- Mobile-responsive design with full functionality on any device
+- Integration with calendar system for visit scheduling and availability management
+- Reporting and analytics tools for business decision-making
+
+---
+
+## 🔧 ADMIN MAIN USER STORY
+
+### User Story 7: System Oversight and Safety Management
+**As an Admin,** I want comprehensive oversight tools to ensure platform safety, maintain data integrity, and provide excellent user support across all system functions.
+
+**Acceptance Criteria:**
+- Advanced admin dashboard with real-time system monitoring and health indicators
+- User management system with approval workflows and role-based permissions
+- Content moderation system with automated flagging and review queues
+- System backup and recovery procedures with automated scheduling
+- Advanced reporting and analytics tools for business intelligence
+- Security monitoring with threat detection and automated alerts
+- Global settings management for platform configuration and policy updates
+- Integration with external services for payment processing and communications
+- Audit trail system for all administrative actions with detailed logging.
+
 ## 🎯 USER STORIES
 
 ### User Story 1: Interactive Map-Based Property Discovery
@@ -11,6 +57,218 @@
 - Instead of traditional dropdown filters, a comprehensive checklist is provided for selecting amenities (e.g., Wi-Fi, Pet-friendly, Parking)
 - The map and results list update dynamically in real-time as users check or uncheck items in the checklist
 - Each property listing displays a summary of "Checked" amenities to quickly confirm a match with user preferences
+
+---
+
+### User Story 2: Enhanced Search and Filtering Experience
+**As a Customer,** I want to use an advanced filtering system that allows me to combine multiple criteria (price range, distance from campus, amenities) and save my search preferences for future visits, so that I can quickly find properties that match my specific needs without scrolling through irrelevant listings.
+
+**Acceptance Criteria:**
+- Advanced filtering interface with multiple filter options (price slider, distance radius, amenity checkboxes, gender policy)
+- System saves user's search preferences and applies them automatically on future visits
+- Filter combinations can be saved as presets for quick access
+- Real-time result updates as filters are adjusted
+- Clear filter reset option to start new searches
+- Mobile-responsive filter panel for easy use on any device
+
+---
+
+### User Story 3: One-Click Visit Scheduling
+**As a Customer,** I want to schedule property visits directly from listing details without navigating to multiple pages, so that I can quickly book appointments that fit my schedule and receive instant confirmations.
+
+**Acceptance Criteria:**
+- "Schedule Visit" button prominently displayed on each property listing
+- Calendar integration shows available time slots in a popup interface
+- System suggests optimal visit times based on property owner's availability
+- Instant confirmation messages for successful scheduling
+- Automatic calendar sync with mobile and email platforms
+- Quick reschedule option for confirmed visits
+
+---
+
+### Personalized Dashboard and Recommendations
+**As a Customer,** I want a personalized dashboard that shows all the property listings, saved properties, and recommendations based on my preferences, so that I can easily track my housing search journey and discover new properties that match my needs.
+
+**Acceptance Criteria:**
+- Dashboard displays saved properties
+- AI-powered recommendations based on search history and saved preferences
+- Quick access to recently viewed properties for comparison
+- Personalized notifications for price changes and new matching properties
+- One-click access to saved properties and search history
+- Mobile-optimized dashboard layout
+
+---
+
+### User Story 5: Mobile-First Property Management
+**As a Property Owner,** I want to manage my property listings through a mobile-first interface that allows me to add, edit, and update properties on the go, with instant photo uploads from my device camera.
+
+**Acceptance Criteria:**
+- Progressive Web App design optimized for mobile devices
+- Camera integration for direct photo uploads and cropping
+- Bulk editing capabilities for multiple listings
+- Real-time status updates (available/unavailable) with instant sync
+- Offline mode for basic property management
+- Push notifications for inquiries and booking requests
+- Quick response templates for common customer questions
+
+---
+
+---
+
+## 🎯 **STUDENT CORE FUNCTIONALITY** [PRIORITY 1]
+
+### Use Case 1: User Authentication and Registration
+### Use Case 2: Dorm Search and Filtering  
+### Use Case 3: Schedule Dorm Visit  
+### Use Case 4: Dorm Comparison  
+### Use Case 5: Messaging and Inquiry System  
+### Use Case 6: Review and Rating System  
+### Use Case 7: Saved Listings Management
+
+## 🏢 **OWNER CORE FUNCTIONALITY** [PRIORITY 2]
+
+### Use Case 8: Manage Dorm Listings
+### Use Case 9: Track Visit Status
+
+## 🔧 **ADMIN CORE FUNCTIONALITY** [PRIORITY 3]
+
+### Use Case 10: Admin Dashboard and System Management
+### Use Case 11: Notification System
+
+### User Story 1: Interactive Map-Based Property Discovery
+**As a Customer,** I want to find rental properties using an integrated map with directions and select my requirements via a checklist, so that I can easily visualize the location of my next home and ensure it has all my must-have amenities through a simple interface.
+
+**Acceptance Criteria:**
+- An interactive map interface is available on the search page to help users find places and view exact property locations
+- The system provides built-in directions and estimated travel times from the user's current location to the listed property
+- Instead of traditional dropdown filters, a comprehensive checklist is provided for selecting amenities (e.g., Wi-Fi, Pet-friendly, Parking)
+- The map and results list update dynamically in real-time as users check or uncheck items in the checklist
+- Each property listing displays a summary of "Checked" amenities to quickly confirm a match with user preferences
+
+---
+
+### User Story 2: Enhanced Search and Filtering Experience
+**As a Customer,** I want to use an advanced filtering system that allows me to combine multiple criteria (price range, distance from campus, amenities) and save my search preferences for future visits, so that I can quickly find properties that match my specific needs without scrolling through irrelevant listings.
+
+**Acceptance Criteria:**
+- Advanced filtering interface with multiple filter options (price slider, distance radius, amenity checkboxes, gender policy)
+- System saves user's search preferences and applies them automatically on future visits
+- Filter combinations can be saved as presets for quick access
+- Real-time result updates as filters are adjusted
+- Clear filter reset option to start new searches
+- Mobile-responsive filter panel for easy use on any device
+
+---
+
+### User Story 3: One-Click Visit Scheduling
+**As a Customer,** I want to schedule property visits directly from listing details without navigating to multiple pages, so that I can quickly book appointments that fit my schedule and receive instant confirmations.
+
+**Acceptance Criteria:**
+- "Schedule Visit" button prominently displayed on each property listing
+- Calendar integration shows available time slots in a popup interface
+- System suggests optimal visit times based on property owner's availability
+- Instant confirmation messages for successful scheduling
+- Automatic calendar sync with mobile and email platforms
+- Quick reschedule option for confirmed visits
+
+---
+
+### User Story 4: Personalized Dashboard and Recommendations
+**As a Customer,** I want a personalized dashboard that shows my search history, saved properties, and recommendations based on my preferences, so that I can easily track my housing search journey and discover new properties that match my needs.
+
+**Acceptance Criteria:**
+- Dashboard displays recent search activity and saved properties
+- Recommendations based on search history and saved preferences
+- Quick access to recently viewed properties for comparison
+- Personalized notifications for price changes and new matching properties
+- One-click access to saved properties and search history
+- Mobile-optimized dashboard layout
+
+---
+
+### User Story 5: Mobile-First Property Management
+**As a Property Owner,** I want to manage my property listings through a mobile-first interface that allows me to add, edit, and update properties on the go, with instant photo uploads from my device camera.
+
+**Acceptance Criteria:**
+- Progressive Web App design optimized for mobile devices
+- Camera integration for direct photo uploads and cropping
+- Bulk editing capabilities for multiple listings
+- Real-time status updates (available/unavailable) with instant sync
+- Offline mode for basic property management
+- Push notifications for inquiries and booking requests
+- Quick response templates for common customer questions
+
+---
+
+## 🏢 **OWNER MAIN USER STORY**
+
+### User Story 6: Comprehensive Property Management System
+**As a Property Owner,** I want a complete management system that allows me to efficiently handle all aspects of my rental business from any device, with real-time updates and seamless communication with potential tenants.
+
+**Acceptance Criteria:**
+- Complete dashboard with property performance analytics and market insights
+- Advanced listing management with bulk operations and mass updates
+- Real-time availability management with instant status synchronization
+- Integrated messaging system for tenant communications and inquiry management
+- Automated pricing suggestions based on market trends and competitor analysis
+- Document management system for leases, agreements, and tenant verification
+- Mobile-responsive design with full functionality on any device
+- Integration with calendar system for visit scheduling and availability management
+- Reporting and analytics tools for business decision-making
+
+---
+
+## 🔧 **ADMIN MAIN USER STORY**
+
+### User Story 7: System Oversight and Safety Management
+**As an Admin,** I want comprehensive oversight tools to ensure platform safety, maintain data integrity, and provide excellent user support across all system functions.
+
+**Acceptance Criteria:**
+- Advanced admin dashboard with real-time system monitoring and health indicators
+- User management system with approval workflows and role-based permissions
+- Content moderation system with automated flagging and review queues
+- System backup and recovery procedures with automated scheduling
+- Advanced reporting and analytics tools for business intelligence
+- Security monitoring with threat detection and automated alerts
+- Global settings management for platform configuration and policy updates
+- Integration with external services for payment processing and communications
+- Audit trail system for all administrative actions with detailed logging
+
+---
+
+## 🏢 OWNER MAIN USER STORY
+
+### User Story 6: Comprehensive Property Management System
+**As a Property Owner,** I want a complete management system that allows me to efficiently handle all aspects of my rental business from any device, with real-time updates and seamless communication with potential tenants.
+
+**Acceptance Criteria:**
+- Complete dashboard with property performance analytics and market insights
+- Advanced listing management with bulk operations and mass updates
+- Real-time availability management with instant status synchronization
+- Integrated messaging system for tenant communications and inquiry management
+- Automated pricing suggestions based on market trends and competitor analysis
+- Document management system for leases, agreements, and tenant verification
+- Mobile-responsive design with full functionality on any device
+- Integration with calendar system for visit scheduling and availability management
+- Reporting and analytics tools for business decision-making
+
+---
+
+## 🔧 ADMIN MAIN USER STORY
+
+### User Story 7: System Oversight and Safety Management
+**As an Admin,** I want comprehensive oversight tools to ensure platform safety, maintain data integrity, and provide excellent user support across all system functions.
+
+**Acceptance Criteria:**
+- Advanced admin dashboard with real-time system monitoring and health indicators
+- User management system with approval workflows and role-based permissions
+- Content moderation system with automated flagging and review queues
+- System backup and recovery procedures with automated scheduling
+- Advanced reporting and analytics tools for business intelligence
+- Security monitoring with threat detection and automated alerts
+- Global settings management for platform configuration and policy updates
+- Integration with external services for payment processing and communications
+- Audit trail system for all administrative actions with detailed logging
 
 ---
 
