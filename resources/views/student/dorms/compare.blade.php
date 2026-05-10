@@ -16,7 +16,7 @@
   {{-- SECONDARY BAR WITH BACK AND TITLE --}}
   <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem;background:var(--surface);border-bottom:1px solid var(--border);">
     <button class="bb" onclick="history.back()" style="background:var(--green);">← Back</button>
-    <div class="tb-title">⚖️ Compare Dorms</div>
+    <div class="tb-title" style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem;">⚖️ Compare Dorms</div>
   </div>
 
   <div class="screen active" style="padding-bottom:90px;">
