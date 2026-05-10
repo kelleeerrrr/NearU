@@ -192,15 +192,19 @@
             
             <!-- Avatar: listing image -->
             <div class="conv-av">
-              @if($listing && $listing->photos)
-                @php $photos = is_array($listing->photos) ? $listing->photos : json_decode($listing->photos, true); @endphp
-                @if(count($photos ?? []))
-                  <img src="{{ asset('storage/' . $photos[0]) }}" alt="Listing" style="width:100%; height:100%; object-fit:cover;">
+              @if($listing && $listing->images && $listing->images->count() > 0)
+                @php $coverImage = $listing->images->where('is_cover', true)->first() ?? $listing->images->first(); @endphp
+                @if($coverImage)
+                  <img src="{{ asset('storage/' . $coverImage->path) }}" alt="Listing" style="width:100%; height:100%; object-fit:cover;">
                 @else
-                  📍
+                  <div style="width:100%; height:100%; background: linear-gradient(135deg, var(--green), #1e5a3a); display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem;">
+                    🏠
+                  </div>
                 @endif
               @else
-                📍
+                <div style="width:100%; height:100%; background: linear-gradient(135deg, var(--green), #1e5a3a); display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem;">
+                  🏠
+                </div>
               @endif
             </div>
 

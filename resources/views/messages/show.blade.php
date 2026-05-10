@@ -8,7 +8,7 @@
 
 .header {
     position: fixed;
-    top: 70px;
+    top: 100px;
     left: 50%;
     transform: translateX(-50%);
     width: calc(100% - 32px);
@@ -16,7 +16,7 @@
     font-weight: 800;
     background: var(--card);
     border-radius: 18px;
-    padding: 1rem;
+    padding: 0.75rem;
     border: 1.5px solid var(--border);
     z-index: 100;
     box-shadow: var(--sh);
@@ -30,27 +30,27 @@
 }
 
 .header-avatar {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: var(--green);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: white;
 }
 
 .header-details h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
 }
 
 .header-details p {
-    margin: 0.2rem 0;
+    margin: 0.1rem 0;
     color: #666;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .listing-info {
@@ -67,7 +67,7 @@
 
 .chat-container {
     position: fixed;
-    top: 175px;
+    top: 190px;
     left: 50%;
     transform: translateX(-50%);
     width: calc(100% - 32px);
@@ -195,7 +195,13 @@ button:hover {
         <div class="page">
             <div class="header">
                 <div class="header-info">
-                    <div class="header-avatar">{{ strtoupper(substr($otherUser->name, 0, 1)) }}</div>
+                    <div class="header-avatar">
+    @if($otherUser->profile_photo_path)
+        <img src="{{ asset('storage/' . $otherUser->profile_photo_path) }}" alt="{{ $otherUser->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+    @else
+        {{ strtoupper(substr($otherUser->name, 0, 1)) }}
+    @endif
+</div>
                     <div class="header-details">
                         <h3>{{ $otherUser->name }}</h3>
                         <p>{{ $otherUser->user_type === 'owner' ? 'Property Owner' : 'Student' }}</p>
@@ -288,6 +294,13 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // Add new message to chat dynamically
             const chatMsgs = document.querySelector('.chat');
+            
+            // Remove "No messages yet" text if it exists
+            const noMessagesElement = chatMsgs.querySelector('div[style*="text-align: center"]');
+            if (noMessagesElement && noMessagesElement.textContent.includes('No messages yet')) {
+                noMessagesElement.remove();
+            }
+            
             const newMessage = document.createElement('div');
             newMessage.className = 'msg right';
             newMessage.innerHTML = `
